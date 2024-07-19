@@ -1,64 +1,79 @@
-# ideal_portfolio_web
+![thumbnail](https://user-images.githubusercontent.com/16558205/180779213-ea740975-3df1-460a-a964-0a623ee25872.png)
 
-My Ideal Portfolio Website
+### Live - https://react-portfolio-template.netlify.app/
 
-## Description
+### Demo Video - https://www.youtube.com/watch?v=62_HLbx2zLQ&t=9s
 
-A profesional website to promote my personal brand, describe who am I, what I can do, my latest projects, some of my services, satisfied clients and the best way to contact me.
+### Tutorials
 
-## Getting Started
+Youtube - https://www.youtube.com/watch?v=8cmJ2kR4SpM
 
-### Dependencies
+Blog - https://blog.chetanverma.com/how-to-build-a-portfolio-website-using-nextjs-and-tailwindcss
 
-- Basic knowlage of HTML, CSS, JS
-- A domain & hostname.
-- Great projects - proud to share.
-- Pi-hosted project just be up an running.
+### Features - 
 
-## Project Images
+- Modern Stack (Next.js + TailwindCSS)
+- Minimal Design
+- Easy To Browse
+- Easy To Customize your details With GUI
+- Blog Crud (Create, Read, Update, Delete blog with easy to use UI).
+- Dark Mode
 
-![](./img/1.png)
 
-### About me Section (My Profile)
+### Sections
 
-![](./img/2.png)
+- Header
+- Work
+- Services
+- About
+- Contact
+- Markdown Blog
 
-### Lo que puedo hacer: incluir Skills & tecnologias
 
-![](./img/3.png)
+### How To Use
 
-### My Projects
+- Clone this repo
+- run `yarn`
+- `yarn dev`
 
-![](./img/4.png)
 
-### Services
+### How To Deploy - 
 
-![](./img/5.png)
+- There are many ways to Deploy this repo.
+- here we are gonna use netlify
+- Login into netlify with github
+- after login select the forked repo or the repo you want to deploy
+- after selecting netlify will automatially deploy your website.
 
-### Satisfied Clients
+Quickes way to deploy this repo - 
 
-![](./img/6.png)
+[![Deploy To Netlify](https://www.netlify.com/img/deploy/button.svg)](https://app.netlify.com/start/deploy?repository=https://github.com/chetanverma16/react-portfolio-template)
 
-### Get in Touch (contact me)
 
-![](./img/7.png)
+### How To Contribute - 
 
-## Authors
+I would be very happy to review your PRs and all the awesome things that you can improve on this portfolio.
 
-Contributors names and contact info
 
-ex. [@juanDiaz](https://twitter.com/)
+### Tech Stack Used - 
+- Next.js
+- TailwindCSS
 
-## Version History
 
-- 0.2
-  - Various bug fixes and optimizations
-  - See [commit change]() or See [release history]()
-- 0.1
-  - Initial Release
+### Thanks
 
-## License
+If you liked this portfolio template, don't forget to give it a ⭐.
 
-This project is licensed under the [NAME HERE] License - see the LICENSE.md file for details
+## Awesome Contributors
+[@Aryan3212](https://github.com/Aryan3212) [@achu-krishna](https://github.com/achu-krishna)
 
-## Acknowledgments
+## Supporting
+Many hours of hard work have gone into this project. Your support will be very appreciated!
+
+[!["Buy Me A Coffee"](https://www.buymeacoffee.com/assets/img/custom_images/orange_img.png)](https://www.buymeacoffee.com/chetanverma)
+
+
+
+
+
+
