@@ -18,6 +18,6 @@
     "postcss": "^8.5.4",
     "prettier": "^3.0.0",
     "tailwindcss": "^4.1.8",
-    "vite": "^2.6.4"
+    "vite": "^6.3.5"
   }
 }
