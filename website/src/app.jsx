@@ -11,8 +11,8 @@ export function App(props) {
   useEffect(async () => {
     try {
       const myActivities = await fetch(
-        // "https://juanpablodiaz.github.io/strava/last-run-activities.json"
-        "http://localhost:5173/last-run-activities.json"
+        "https://juanpablodiaz.github.io/strava/last-run-activities.json"
+        // "http://localhost:5173/last-run-activities.json"
       ).then((response) => response.json());
       setActivities(myActivities);
       // const myActivities = await fetch(
