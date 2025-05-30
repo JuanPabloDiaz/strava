@@ -9,14 +9,14 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/JuanPabloDiaz.git"
+    "url": "git+https://github.com/JuanPabloDiaz/strava.git"
   },
   "author": "",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/JuanPabloDiaz/issues"
+    "url": "https://github.com/JuanPabloDiaz/strava/issues"
   },
-  "homepage": "https://github.com/JuanPabloDiaz#readme",
+  "homepage": "https://github.com/JuanPabloDiaz/strava#readme",
   "dependencies": {
     "@11ty/eleventy": "^3.1.0",
     "date-fns": "^2.19.0",

@@ -1,12 +1,12 @@
 const strava = require("strava-v3");
 const jsonfile = require("jsonfile");
-const dataFile = './website/public/last-activities.json'
+const dataFile = "./website/public/last-run-activities.json";
 
 require("dotenv").config({ path: __dirname + "/.env" });
 
-if(!process.env.STRAVA_CLIENT_ID){
-    console.error('no strava env')
-    return
+if (!process.env.STRAVA_CLIENT_ID) {
+  console.error("no strava env");
+  return;
 }
 
 strava.config({
@@ -36,8 +36,13 @@ const getLastActivities = async () => {
   return activities;
 };
 
-(async function() {
+(async function () {
   const activities = await getLastActivities();
+
+  if (!activities || activities.length === 0) {
+    console.warn("No activities returned from Strava.");
+    return;
+  }
 
   const {
     id,
@@ -77,10 +82,7 @@ const getLastActivities = async () => {
       return;
     } else if (!sameType) {
       // its a new type yay not just running
-      jsonfile.writeFileSync(dataFile, [
-        ...existing,
-        activity,
-      ]);
+      jsonfile.writeFileSync(dataFile, [...existing, activity]);
       return;
     } else {
       // nothing new
@@ -88,7 +90,7 @@ const getLastActivities = async () => {
     }
   } catch (error) {
     // no worries no file yet
-    console.error('processing file error', error)
+    console.error("processing file error", error);
     jsonfile.writeFileSync(dataFile, [activity]);
   }
   return;
