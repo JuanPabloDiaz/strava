@@ -4,7 +4,7 @@
   "scripts": {
     "dev": "vite",
     "build": "vite build",
-    "build-github": "vite build --base=/days-since-last/",
+    "build-github": "vite build --base=/strava/",
     "serve": "vite preview",
     "format": "prettier --write ."
   },
