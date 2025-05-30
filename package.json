@@ -18,7 +18,7 @@
   },
   "homepage": "https://github.com/JuanPabloDiaz#readme",
   "dependencies": {
-    "@11ty/eleventy": "^0.12.1",
+    "@11ty/eleventy": "^3.1.0",
     "date-fns": "^2.19.0",
     "dotenv": "^8.2.0",
     "jsonfile": "^6.1.0",
