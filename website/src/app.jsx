@@ -12,7 +12,7 @@ export function App(props) {
     try {
       const myActivities = await fetch(
         // "https://juanpablodiaz.github.io/strava/last-run-activities.json"
-        "http://localhost:3000/last-run-activities.json"
+        "http://localhost:5173/last-run-activities.json"
       ).then((response) => response.json());
       setActivities(myActivities);
       // const myActivities = await fetch(
@@ -80,7 +80,7 @@ export function App(props) {
         </a>
 
         {/* <h3>Other</h3> */}
-        {/* {activities && (
+        {activities && (
           <ul>
             {activities
               .filter((a) => a.type !== defaultActivity)
@@ -99,7 +99,7 @@ export function App(props) {
                 </li>
               ))}
           </ul>
-        )} */}
+        )}
       </main>
 
       <Footer />
