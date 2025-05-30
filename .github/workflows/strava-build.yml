@@ -18,15 +18,17 @@ jobs:
 
       - run: npm ci
 
-      # - run: node .
-      #   env:
-      #     STRAVA_CLIENT_ID: ${{ secrets.STRAVA_CLIENT_ID }}
-      #     STRAVA_CLIENT_SECRET: ${{ secrets.STRAVA_CLIENT_SECRET }}
-      #     STRAVA_REFRESH_TOKEN: ${{ secrets.STRAVA_REFRESH_TOKEN }}
+      - run: node strava-script.js
+        env:
+          STRAVA_CLIENT_ID: ${{ secrets.STRAVA_CLIENT_ID }}
+          STRAVA_CLIENT_SECRET: ${{ secrets.STRAVA_CLIENT_SECRET }}
+          STRAVA_REFRESH_TOKEN: ${{ secrets.STRAVA_REFRESH_TOKEN }}
 
-      # - uses: stefanzweifel/git-auto-commit-action@v4
-      #   with:
-      #     commit_message: Updated activity list
+      - uses: stefanzweifel/git-auto-commit-action@v4
+        with:
+          commit_message: Updated Strava activities data (last-activities.json)
+          # This action commits all changed files by default.
+          # If only last-activities.json is changed, only that will be committed.
 
       - run: npm run website-build
 

@@ -1,5 +1,11 @@
 import { render } from "preact";
 import { App } from "./app";
+import Layout from "./components/Layout";
 import "./style.css";
 
-render(<App />, document.getElementById("app"));
+render(
+  <Layout>
+    <App />
+  </Layout>,
+  document.getElementById("app")
+);
