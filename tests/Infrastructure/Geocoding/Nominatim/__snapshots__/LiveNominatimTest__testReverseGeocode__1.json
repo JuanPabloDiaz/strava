@@ -1,0 +1,10 @@
+{
+    "headers": {
+        "User-Agent": "Statistics for Strava App"
+    },
+    "query": {
+        "lat": 80,
+        "lon": 100,
+        "format": "json"
+    }
+}

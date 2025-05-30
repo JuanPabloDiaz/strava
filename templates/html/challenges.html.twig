@@ -1,0 +1,37 @@
+{% extends "html/base.html.twig" %}
+
+{% block breadcrumbs %}
+    <li>
+        <div class="flex items-center">
+            <svg class="w-6 h-6 text-gray-400" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+                <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd"></path>
+            </svg>
+            <a href="#" data-router-navigate="{{ relativeUrl('challenges') }}" class="ml-1 text-gray-700 hover:text-primary-600 md:ml-2">{{ "Challenges"|trans }}</a>
+        </div>
+    </li>
+{% endblock %}
+{% block content %}
+{% autoescape false %}
+    <!-- CHALLENGES -->
+    {% for month,challenges in challengesGroupedPerMonth %}
+        <div class="mb-4 p-4 bg-white border border-gray-200 rounded-lg shadow-xs">
+            <h3 class="flex items-center gap-x-1 text-lg font-semibold mb-4">
+                <span>{{ month }}</span>
+                <span class="bg-orange-400/40 text-orange-800 text-xs font-medium px-2.5 py-0.5 rounded-full">{{ challenges|length }}</span>
+            </h3>
+            <div class="grid grid-cols-8 gap-4">
+                {% for challenge in challenges %}
+                    {% set tooltipContent = challenge.getName()|replace({'"':'\''}) %}
+                    <a href="{{ challenge.getUrl() }}" data-tooltip-target="tooltip-{{ challenge.getId() }}">
+                        <img src="{{ renderComponent('placeholder-image') }}" data-src="{{ relativeUrl(challenge.getLocalLogoUrl()) }}" alt="{{ tooltipContent }}" class="lazy h-auto max-w-full rounded-lg" />
+                    </a>
+                    <div id="tooltip-{{ challenge.getId() }}" role="tooltip" class="absolute z-10 invisible inline-block px-3 py-2 text-sm font-medium text-white transition-opacity duration-300 bg-gray-900 rounded-lg shadow-xs opacity-0 tooltip">
+                        {{ tooltipContent }}
+                        <div class="tooltip-arrow" data-popper-arrow></div>
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+    {% endfor %}
+{% endautoescape %}
+{% endblock %}

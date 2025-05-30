@@ -1,0 +1,12 @@
+[
+    {
+        "segmentId": "segment-1",
+        "name": "Segment One",
+        "sportType": "Ride",
+        "distance": 1000,
+        "maxGradient": 5.3,
+        "isFavourite": 0,
+        "climbCategory": null,
+        "deviceName": "Zwift"
+    }
+]

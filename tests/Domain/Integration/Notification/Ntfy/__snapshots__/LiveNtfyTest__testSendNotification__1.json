@@ -1,0 +1,10 @@
+{
+    "headers": {
+        "Content-Type": "text/plain",
+        "Title": "The title",
+        "Tags": "+1",
+        "Click": "",
+        "Icon": "https://raw.githubusercontent.com/robiningelbrecht/strava-statistics/master/public/assets/images/logo.png"
+    },
+    "body": "The message"
+}

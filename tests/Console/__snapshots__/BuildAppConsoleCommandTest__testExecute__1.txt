@@ -1,0 +1,18 @@
+Configuring locale...
+Building Manifest...
+Building App...
+  => Building index.html
+  => Building dashboard.html
+  => Building activities.html
+  => Building gpx files
+  => Building monthly-stats.html
+  => Building gear-stats.html
+  => Building gear-maintenance.html
+  => Building eddington.html
+  => Building segments.html
+  => Building heatmap.html
+  => Building rewind.html
+  => Building challenges.html
+  => Building photos.html
+  => Building badge.svg
+Time: 10s, Memory: 45MB
