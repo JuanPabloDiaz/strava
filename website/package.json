@@ -1,0 +1,23 @@
+{
+  "name": "strava-site",
+  "version": "0.0.0",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "build-github": "vite build --base=/days-since-last/",
+    "serve": "vite preview",
+    "format": "prettier --write ."
+  },
+  "dependencies": {
+    "date-fns": "^2.25.0",
+    "preact": "^10.5.13"
+  },
+  "devDependencies": {
+    "@preact/preset-vite": "^2.0.0",
+    "autoprefixer": "^10.4.21",
+    "postcss": "^8.5.4",
+    "prettier": "^3.0.0",
+    "tailwindcss": "^4.1.8",
+    "vite": "^2.6.4"
+  }
+}

@@ -1,0 +1,27 @@
+{
+  "name": "strava",
+  "version": "1.0.0",
+  "description": "",
+  "main": "strava-script.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "website-build": "cd website && npm ci && npm run build-github"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/JuanPabloDiaz.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/JuanPabloDiaz/issues"
+  },
+  "homepage": "https://github.com/JuanPabloDiaz#readme",
+  "dependencies": {
+    "@11ty/eleventy": "^0.12.1",
+    "date-fns": "^2.19.0",
+    "dotenv": "^8.2.0",
+    "jsonfile": "^6.1.0",
+    "strava-v3": "^2.0.9"
+  }
+}

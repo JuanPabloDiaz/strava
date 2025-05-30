@@ -1,0 +1,108 @@
+import Footer from "./footer";
+import { useEffect, useState } from "preact/hooks";
+import differenceInCalendarDays from "date-fns/differenceInCalendarDays";
+import format from "date-fns/format";
+
+const defaultActivity = import.meta.env.VITE_DEFAULT_ACTIVITY ?? "Run";
+
+export function App(props) {
+  const [activities, setActivities] = useState(null);
+
+  useEffect(async () => {
+    try {
+      const myActivities = await fetch(
+        // "https://juanpablodiaz.github.io/strava/last-run-activities.json"
+        "http://localhost:3000/last-run-activities.json"
+      ).then((response) => response.json());
+      setActivities(myActivities);
+      // const myActivities = await fetch(
+      //   "My-Strava-Activities-API-Endpoint"
+      // ).then((response) => response.json());
+      // setActivities([myActivities]);
+    } catch (error) {
+      console.error(error);
+    }
+  }, []);
+
+  const last = activities?.find((a) => a.type === defaultActivity);
+
+  const pad = (days) =>
+    days < 1000 ? days.toString().padStart(3, "0") : "Err";
+
+  const days = (activity) =>
+    activity
+      ? pad(
+          differenceInCalendarDays(
+            new Date(),
+            new Date(activity.start_date_local)
+          )
+        )
+      : "---";
+
+  const color = (activity) =>
+    activity
+      ? differenceInCalendarDays(
+          new Date(),
+          new Date(activity.start_date_local)
+        ) <= 1
+        ? "#03ba0c"
+        : "#ea1d0d"
+      : "#ea1d0d";
+
+  return (
+    <>
+      <main>
+        <h1 class="title">
+          <span class="title1">
+            <span class="day-background">888</span>
+          </span>
+          <span class="title2">
+            <span id="days" style={{ "--number-color": color(last) }}>
+              {days(last)}
+            </span>
+          </span>
+          <span class="title3">DAYS</span>
+          <span class="title4">SINCE LAST {defaultActivity.toUpperCase()}</span>
+        </h1>
+        <p>
+          Kinda like a “DAYS WITHOUT INCIDENt” sign — except it’s about your
+          workouts, and fewer days is a good thing.
+        </p>
+
+        <a
+          id="strava-link"
+          href={`https://www.strava.com/activities/${last?.id}`}
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          Last {defaultActivity} on{" "}
+          {last && format(new Date(last?.start_date_local), "PPPP")}
+        </a>
+
+        {/* <h3>Other</h3> */}
+        {/* {activities && (
+          <ul>
+            {activities
+              .filter((a) => a.type !== defaultActivity)
+              .map((act) => (
+                <li>
+                  {days(act)} days since last {act.type} (
+                  <a
+                    id="strava-link"
+                    href={`https://www.strava.com/activities/${act.id}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    {act && format(new Date(act?.start_date), "PPPP")}
+                  </a>
+                  )
+                </li>
+              ))}
+          </ul>
+        )} */}
+      </main>
+
+      <Footer />
+    </>
+  );
+}

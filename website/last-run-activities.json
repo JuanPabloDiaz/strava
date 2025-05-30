@@ -1,0 +1,11 @@
+[
+  {
+    "id": 7266319999,
+    "type": "Run",
+    "start_date": "2025-04-10T12:30:00Z",
+    "start_date_local": "2025-04-10T14:30:00Z",
+    "distance": 10000,
+    "elapsed_time": 3600,
+    "visibility": "everyone"
+  }
+]
