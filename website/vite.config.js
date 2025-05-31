@@ -5,4 +5,13 @@ import preact from "@preact/preset-vite";
 export default defineConfig({
   plugins: [preact()],
   envDir: "../",
+  resolve: {
+    alias: {
+      "@": "/src",
+      "@src": "/src",
+      "@utils": "/src/utils",
+      "@components": "/src/components",
+      "@pages": "/src/pages",
+    },
+  },
 });

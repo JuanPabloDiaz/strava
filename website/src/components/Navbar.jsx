@@ -1,13 +1,17 @@
-import { useState } from "preact/hooks";
+import { useState } from "react"; // Changed from preact/hooks
+import { NavLink } from 'react-router-dom'; // Use NavLink
 
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
 
-  const navLinks = [
-    { href: "#/", text: "Home" },
-    { href: "#/cycling", text: "Cycling" },
-    { href: "#/swimming", text: "Swimming" },
-    { href: "#/activities", text: "Activities" },
+  const activeStyle = "text-indigo-400 border-b-2 border-indigo-400"; // Adjusted active style for current design
+  const inactiveStyle = "hover:text-indigo-400";
+
+  const navItems = [
+    { to: "/", text: "Running" },
+    { to: "/cycling", text: "Cycling" },
+    { to: "/swimming", text: "Swimming" },
+    { to: "/activities", text: "All Activities" },
   ];
 
   return (
@@ -15,9 +19,10 @@ const Navbar = () => {
       <div className="container mx-auto px-6 py-3 md:flex md:justify-between md:items-center">
         <div className="flex items-center justify-between">
           <div>
-            <a href="#/" className="text-xl font-bold hover:text-gray-300">
+            {/* Brand link can also be a NavLink if it should highlight when on home */}
+            <NavLink to="/" className="text-xl font-bold hover:text-gray-300">
               Strava Stats
-            </a>
+            </NavLink>
           </div>
           {/* Mobile menu button */}
           <div className="flex md:hidden">
@@ -47,17 +52,20 @@ const Navbar = () => {
 
         {/* Mobile Menu open: "block", Menu closed: "hidden" */}
         <div
-          className={`w-full md:flex md:items-center md:justify-end ${isOpen ? "block" : "hidden"}`}
+          className={`w-full md:flex md:items-center md:justify-end ${isOpen ? "block" : "hidden"}`} // Toggle based on isOpen
         >
           <div className="flex flex-col md:flex-row md:ml-6">
-            {navLinks.map((link) => (
-              <a
-                key={link.text}
-                href={link.href}
-                className="my-2 text-sm hover:text-indigo-400 md:my-0 md:mx-4"
+            {navItems.map((item) => (
+              <NavLink
+                key={item.text}
+                to={item.to}
+                className={({ isActive }) => 
+                  `my-2 text-sm md:my-0 md:mx-4 ${isActive ? activeStyle : inactiveStyle}`
+                }
+                onClick={() => setIsOpen(false)} // Close mobile menu on click
               >
-                {link.text}
-              </a>
+                {item.text}
+              </NavLink>
             ))}
           </div>
         </div>
