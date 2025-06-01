@@ -1,0 +1,80 @@
+@keyframes matrixFade {
+  0% {
+    transform: scale(0) rotateX(90deg);
+    opacity: 0;
+    filter: brightness(2) hue-rotate(180deg);
+  }
+  50% {
+    filter: brightness(1.5) hue-rotate(90deg);
+  }
+  100% {
+    transform: scale(1) rotateX(0deg);
+    opacity: 1;
+    filter: brightness(1) hue-rotate(0deg);
+  }
+}
+
+@keyframes digitalGlitch {
+  0% {
+    transform: scale(0) skewX(20deg);
+    opacity: 0;
+    filter: contrast(2) saturate(2);
+  }
+  25% {
+    transform: scale(0.8) skewX(-10deg);
+    filter: contrast(1.5) saturate(1.5);
+  }
+  50% {
+    transform: scale(1.1) skewX(5deg);
+    filter: contrast(1.2) saturate(1.2);
+  }
+  100% {
+    transform: scale(1) skewX(0deg);
+    opacity: 1;
+    filter: contrast(1) saturate(1);
+  }
+}
+
+@keyframes matrixRain {
+  0% {
+    transform: scale(0) translateY(-20px);
+    opacity: 0;
+    filter: blur(2px) brightness(2);
+  }
+  50% {
+    transform: scale(1.05) translateY(0px);
+    filter: blur(0px) brightness(1.3);
+  }
+  100% {
+    transform: scale(1) translateY(0px);
+    opacity: 1;
+    filter: blur(0px) brightness(1);
+  }
+}
+
+@keyframes matrixRainDrop {
+  0% {
+    opacity: 0;
+    transform: translateY(-100vh);
+  }
+  10% {
+    opacity: 1;
+  }
+  90% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(100vh);
+  }
+}
+
+@keyframes borderPulse {
+  0%,
+  100% {
+    opacity: 0.3;
+  }
+  50% {
+    opacity: 0.8;
+  }
+}

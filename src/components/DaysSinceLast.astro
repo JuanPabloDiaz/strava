@@ -1,0 +1,189 @@
+---
+export interface Props {
+  lastRunDate?: string | Date;
+  activityType?: string;
+}
+
+const { 
+  lastRunDate = new Date(), // Default to today if no date provided
+  activityType = "RUN" 
+} = Astro.props;
+
+// Calculate days since last run
+const lastDate = new Date(lastRunDate);
+const today = new Date();
+const timeDiff = today.getTime() - lastDate.getTime();
+const daysSince = Math.floor(timeDiff / (1000 * 3600 * 24));
+
+// Determine status color and message based on days
+const getStatusInfo = (days: number) => {
+  if (days === 0) {
+    return {
+      color: 'text-green-400',
+      bgColor: 'bg-green-500/20',
+      borderColor: 'border-green-500/40',
+      status: 'OPTIMAL',
+      message: 'NEURAL_PATHWAYS: ACTIVE'
+    };
+  } else if (days <= 2) {
+    return {
+      color: 'text-green-300',
+      bgColor: 'bg-green-500/15',
+      borderColor: 'border-green-500/30',
+      status: 'STABLE',
+      message: 'SYSTEM_READY'
+    };
+  } else if (days <= 7) {
+    return {
+      color: 'text-yellow-400',
+      bgColor: 'bg-yellow-500/20',
+      borderColor: 'border-yellow-500/40',
+      status: 'WARNING',
+      message: 'ACTIVITY_DECLINING'
+    };
+  } else {
+    return {
+      color: 'text-red-400',
+      bgColor: 'bg-red-500/20',
+      borderColor: 'border-red-500/40',
+      status: 'CRITICAL',
+      message: 'REBOOT_REQUIRED'
+    };
+  }
+};
+
+const statusInfo = getStatusInfo(daysSince);
+const formattedDate = lastDate.toLocaleDateString('en-US', {
+  year: 'numeric',
+  month: 'short',
+  day: 'numeric'
+});
+---
+
+<div class="relative z-10 mb-8">
+  <div class={`
+    border ${statusInfo.borderColor} ${statusInfo.bgColor} 
+    backdrop-blur-sm rounded-lg p-6 shadow-xl shadow-black/50
+    transition-all duration-500 hover:shadow-xl hover:${statusInfo.borderColor.replace('/40', '/60')}
+  `}>
+    
+    <!-- Terminal header -->
+    <div class="flex items-center justify-between mb-4">
+      <div class="flex items-center space-x-2">
+        <span class="text-green-400 text-sm animate-pulse">system@matrix:~$</span>
+        <span class="text-green-300 text-sm typing-effect">./check_last_activity.exe</span>
+      </div>
+      <div class={`
+        px-3 py-1 rounded-full text-xs font-bold tracking-wider
+        ${statusInfo.bgColor} ${statusInfo.borderColor} border
+        ${statusInfo.color} animate-pulse
+      `}>
+        [{statusInfo.status}]
+      </div>
+    </div>
+
+    <!-- Main display -->
+    <div class="text-center space-y-4">
+      <!-- Days counter -->
+      <div class="relative">
+        <div class={`
+          text-6xl md:text-8xl font-bold ${statusInfo.color} 
+          filter drop-shadow-lg counter-glow
+        `}>
+          {daysSince.toString().padStart(2, '0')}
+        </div>
+        <div class="absolute inset-0 opacity-30">
+          <div class={`
+            text-6xl md:text-8xl font-bold ${statusInfo.color} 
+            animate-pulse blur-sm
+          `}>
+            {daysSince.toString().padStart(2, '0')}
+          </div>
+        </div>
+      </div>
+
+      <!-- Label -->
+      <div class="space-y-2">
+        <div class={`text-xl md:text-2xl font-bold ${statusInfo.color} tracking-wider`}>
+          {daysSince === 1 ? 'DAY' : 'DAYS'} SINCE LAST
+        </div>
+        <div class="text-green-400 text-lg md:text-xl font-mono tracking-widest">
+          [{activityType}]
+        </div>
+      </div>
+
+      <!-- System info -->
+      <div class="mt-6 pt-4 border-t border-green-500/20">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+          <div class="space-y-1">
+            <div class="text-green-400/60 text-xs">LAST_ACTIVITY_DATE:</div>
+            <div class="text-green-300 font-mono">{formattedDate}</div>
+          </div>
+          <div class="space-y-1">
+            <div class="text-green-400/60 text-xs">SYSTEM_MESSAGE:</div>
+            <div class={`${statusInfo.color} font-mono text-xs animate-pulse`}>
+              {statusInfo.message}
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Digital noise overlay -->
+    <div class="absolute inset-0 pointer-events-none opacity-20">
+      <div class="digital-noise-overlay"></div>
+    </div>
+  </div>
+</div>
+
+<style>
+  .typing-effect {
+    overflow: hidden;
+    white-space: nowrap;
+    border-right: 1px solid rgba(0, 255, 0, 0.6);
+    animation: typing 2s steps(25, end), blink-caret 1s step-end infinite;
+  }
+  
+  @keyframes typing {
+    from { width: 0; }
+    to { width: 100%; }
+  }
+  
+  @keyframes blink-caret {
+    from, to { border-color: transparent; }
+    50% { border-color: rgba(0, 255, 0, 0.6); }
+  }
+
+  .counter-glow {
+    text-shadow: 
+      0 0 10px currentColor,
+      0 0 20px currentColor,
+      0 0 40px currentColor;
+  }
+
+  .digital-noise-overlay {
+    background-image: 
+      radial-gradient(circle at 25% 25%, rgba(0, 255, 0, 0.1) 0%, transparent 50%),
+      radial-gradient(circle at 75% 75%, rgba(0, 255, 0, 0.1) 0%, transparent 50%),
+      radial-gradient(circle at 50% 50%, rgba(0, 255, 0, 0.05) 0%, transparent 50%);
+    animation: digitalGlitch 3s ease-in-out infinite alternate;
+  }
+
+  @keyframes digitalGlitch {
+    0%, 100% { 
+      opacity: 0.1; 
+      filter: hue-rotate(0deg) brightness(1); 
+    }
+    50% { 
+      opacity: 0.3; 
+      filter: hue-rotate(120deg) brightness(1.2); 
+    }
+  }
+
+  /* Responsive adjustments */
+  @media (max-width: 768px) {
+    .typing-effect {
+      font-size: 0.75rem;
+    }
+  }
+</style>

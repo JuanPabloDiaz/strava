@@ -1,0 +1,161 @@
+---
+
+import { SITE_AUTHOR, SITE_PORTFOLIO, SITE_GITHUB, SITE_LINKEDIN } from "../consts";
+
+const site = "jpdiaz.dev";
+
+---
+
+<footer class="relative z-10 mt-16 border-t border-green-500/30">
+  <div class="max-w-4xl mx-auto px-4 py-8">
+    <!-- Terminal-style footer header -->
+    <div class="flex items-center space-x-2 mb-4">
+      <span class="text-green-400 text-sm animate-pulse">root@matrix:~$</span>
+      <span class="text-green-300 text-sm typing-effect-footer">./display_credits.sh</span>
+    </div>
+    
+    <!-- Main footer content -->
+    <div class="bg-black/80 backdrop-blur-sm border border-green-500/40 rounded-lg p-6 shadow-xl shadow-green-500/20">
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        
+        <!-- Creator info -->
+        <div class="space-y-2">
+          <div class="text-green-400 text-xs font-bold tracking-wider">
+            [CREATOR_PROFILE]
+          </div>
+          <div class="text-green-300">
+            <div class="text-sm">{SITE_AUTHOR}</div>
+            <div class="flex flex-col">
+                <a 
+                  href={SITE_PORTFOLIO} 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  class="text-green-400 hover:text-green-300 transition-colors duration-300 text-xs underline-offset-2 hover:underline"
+                >
+                  {site}
+                </a>
+                <a 
+                  href={SITE_LINKEDIN} 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  class="text-green-400 hover:text-green-300 transition-colors duration-300 text-xs underline-offset-2 hover:underline"
+                >
+                  LinkedIn
+                </a>
+                <a 
+                  href={SITE_GITHUB} 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  class="text-green-400 hover:text-green-300 transition-colors duration-300 text-xs underline-offset-2 hover:underline"
+                >
+                  GitHub
+                </a>
+            </div>
+            
+          </div>
+        </div>
+        
+        <!-- System status -->
+        <div class="space-y-2">
+          <div class="text-green-400 text-xs font-bold tracking-wider">
+            [SYSTEM_STATUS]
+          </div>
+          <div class="space-y-1">
+            <div class="flex items-center space-x-2">
+              <div class="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
+              <span class="text-green-300 text-xs">NEURAL_LINK: ACTIVE</span>
+            </div>
+            <div class="flex items-center space-x-2">
+              <div class="w-2 h-2 bg-green-500 rounded-full animate-pulse delay-75"></div>
+              <span class="text-green-300 text-xs">DATA_STREAM: ONLINE</span>
+            </div>
+            <div class="flex items-center space-x-2">
+              <div class="w-2 h-2 bg-green-500 rounded-full animate-pulse delay-150"></div>
+              <span class="text-green-300 text-xs">MATRIX_CORE: STABLE</span>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Tech info -->
+        <div class="space-y-2">
+          <div class="text-green-400 text-xs font-bold tracking-wider">
+            [TECH_STACK]
+          </div>
+          <div class="text-green-300 text-xs space-y-1">
+            <div>ASTRO.JS • TYPESCRIPT</div>
+            <div>TAILWIND CSS • STRAVA API</div>
+            <div class="text-green-500 animate-pulse">MATRIX PROTOCOL v2.1</div>
+          </div>
+        </div>
+        
+      </div>
+      
+      <!-- Bottom border with copyright -->
+      <div class="mt-6 pt-4 border-t border-green-500/20">
+        <div class="flex flex-col md:flex-row justify-between items-center space-y-2 md:space-y-0">
+          <div class="text-green-400/60 text-xs">
+            © {new Date().getFullYear()} {SITE_AUTHOR} • All rights reserved
+          </div>
+          <div class="text-green-400/60 text-xs animate-pulse">
+            [MATRIX_TIMESTAMP: {new Date().toISOString()}]
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Glitch effect overlay -->
+    <div class="absolute inset-0 pointer-events-none">
+      <div class="footer-glitch"></div>
+    </div>
+  </div>
+</footer>
+
+<style>
+  .typing-effect-footer {
+    overflow: hidden;
+    white-space: nowrap;
+    border-right: 1px solid rgba(0, 255, 0, 0.6);
+    animation: typing-footer 2s steps(20, end), blink-caret-footer 1s step-end infinite;
+    animation-delay: 1s;
+    width: 0;
+  }
+  
+  @keyframes typing-footer {
+    from { width: 0; }
+    to { width: 100%; }
+  }
+  
+  @keyframes blink-caret-footer {
+    from, to { border-color: transparent; }
+    50% { border-color: rgba(0, 255, 0, 0.6); }
+  }
+  
+  .footer-glitch {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: 
+      linear-gradient(
+        90deg,
+        transparent 0%,
+        rgba(0, 255, 0, 0.03) 50%,
+        transparent 100%
+      );
+    animation: glitchSweep 8s ease-in-out infinite;
+    opacity: 0;
+  }
+  
+  @keyframes glitchSweep {
+    0%, 90%, 100% { opacity: 0; transform: translateX(-100%); }
+    5%, 85% { opacity: 1; transform: translateX(100%); }
+  }
+  
+  /* Responsive adjustments */
+  @media (max-width: 768px) {
+    .typing-effect-footer {
+      font-size: 0.7rem;
+    }
+  }
+</style>

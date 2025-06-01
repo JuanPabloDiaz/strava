@@ -1,0 +1,53 @@
+---
+import { fetchMileage, processMileageData, getLastActivityDate } from '../services/stravaService';
+
+export interface Props {
+  activityType?: string;
+}
+
+const { activityType = 'Run' } = Astro.props;
+
+// Fetch and process data
+const mileageMap = await fetchMileage();
+const mileageData = processMileageData(mileageMap);
+const lastActivityDate = await getLastActivityDate(activityType);
+
+const minMiles = Math.min(...mileageData.map(data => data[1]));
+const maxMiles = Math.max(...mileageData.map(data => data[1]));
+
+// Process data for use in the component
+const processedData = {
+  mileageData,
+  lastActivityDate,
+  minMiles,
+  maxMiles,
+  activityType
+};
+---
+
+<!-- Este componente ahora actúa como un data provider -->
+<!-- Los datos se pueden acceder desde la página padre -->
+<div class="data-provider" style="display: none;">
+  <!-- Este div está oculto, solo sirve para procesar datos -->
+</div>
+
+<script>
+  interface Window {
+    stravaData: {
+      processed: boolean;
+    };
+  }
+
+  declare global {
+    interface Window {
+      stravaData: {
+        processed: boolean;
+      };
+    }
+  }
+
+  // Expose data globally if needed
+  window.stravaData = {
+    processed: true
+  };
+</script>

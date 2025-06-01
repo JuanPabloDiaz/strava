@@ -1,0 +1,300 @@
+---
+import Base from "../layouts/Base.astro";
+import DaysSinceLast from "../components/DaysSinceLast.astro";
+import HeatmapGrid from "../components/HeatmapGrid.astro";
+import { fetchMileage, processMileageData, getLastActivityDate } from '../services/stravaService';
+
+// Fetch and process data
+const mileageMap = await fetchMileage();
+const mileageData = processMileageData(mileageMap);
+const lastRunDate = await getLastActivityDate('Run');
+
+const minMiles = Math.min(...mileageData.map(data => data[1]));
+const maxMiles = Math.max(...mileageData.map(data => data[1]));
+---
+
+<Base 
+  title="Strava Matrix Tracker"
+  windowTitle="STRAVA_NEURAL_INTERFACE"
+  terminalCommand="./run_activity_monitor.exe"
+  systemMessage="[SYSTEM] Loading neural activity patterns... Strava API connected."
+>
+  <!-- Days Since Last Activity Section -->
+  <section class="activity-section mb-8">
+    <div class="section-header">
+      <div class="text-green-400 text-sm mb-4 flex items-center space-x-2">
+        <span class="animate-pulse">[ACTIVITY_STATUS]</span>
+        <div class="flex-1 h-px bg-gradient-to-r from-green-500/50 to-transparent"></div>
+      </div>
+    </div>
+    
+    <DaysSinceLast 
+      lastRunDate={lastRunDate || undefined}
+      activityType="RUN"
+    />
+  </section>
+
+  <!-- Heatmap Analysis Section -->
+  <section class="heatmap-section">
+    <div class="section-header">
+      <div class="text-green-400 text-sm mb-4 flex items-center justify-between">
+        <div class="flex items-center space-x-2">
+          <span class="animate-pulse">[TEMPORAL_ANALYSIS_GRID]</span>
+          <div class="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
+        </div>
+        <span class="text-green-300 text-xs">[365_DAY_NEURAL_MAPPING]</span>
+      </div>
+    </div>
+
+    <div class="heatmap-container">
+      <div class="heatmap-wrapper">
+        <!-- Heatmap Header Info -->
+        <div class="heatmap-info mb-4">
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-4 text-xs">
+            <div class="info-block">
+              <span class="text-green-400/60">DATA_RANGE:</span>
+              <span class="text-green-300 ml-2">365 DAYS</span>
+            </div>
+            <div class="info-block">
+              <span class="text-green-400/60">MIN_ACTIVITY:</span>
+              <span class="text-green-300 ml-2">{minMiles.toFixed(1)} MI</span>
+            </div>
+            <div class="info-block">
+              <span class="text-green-400/60">MAX_ACTIVITY:</span>
+              <span class="text-green-300 ml-2">{maxMiles.toFixed(1)} MI</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Main Heatmap Grid -->
+        <div class="heatmap-display">
+          <HeatmapGrid 
+            mileageData={mileageData}
+            minMiles={minMiles}
+            maxMiles={maxMiles}
+          />
+        </div>
+        
+        <!-- Heatmap Footer Info -->
+        <div class="heatmap-footer mt-4">
+          <div class="flex justify-between items-center text-xs">
+            <div class="flex items-center space-x-4">
+              <span class="text-green-400/60">NEURAL_ACTIVITY_TRACKING</span>
+              <div class="flex items-center space-x-1">
+                <div class="w-1 h-1 bg-green-500 rounded-full animate-pulse"></div>
+                <span class="text-green-500">ONLINE</span>
+              </div>
+            </div>
+            <div class="text-green-300 animate-pulse">
+              [MATRIX_TIMESTAMP: {new Date().toISOString().split('T')[0]}]
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- System Diagnostics Section -->
+  <section class="diagnostics-section mt-8">
+    <div class="section-header">
+      <div class="text-green-400 text-sm mb-4 flex items-center space-x-2">
+        <span class="animate-pulse">[SYSTEM_DIAGNOSTICS]</span>
+        <div class="flex-1 h-px bg-gradient-to-r from-green-500/50 to-transparent"></div>
+      </div>
+    </div>
+    
+    <div class="diagnostics-grid">
+      <div class="diagnostic-item">
+        <div class="diagnostic-label">API_CONNECTION:</div>
+        <div class="diagnostic-value success">ESTABLISHED</div>
+      </div>
+      <div class="diagnostic-item">
+        <div class="diagnostic-label">DATA_INTEGRITY:</div>
+        <div class="diagnostic-value success">VERIFIED</div>
+      </div>
+      <div class="diagnostic-item">
+        <div class="diagnostic-label">NEURAL_SYNC:</div>
+        <div class="diagnostic-value warning">MONITORING</div>
+      </div>
+      <div class="diagnostic-item">
+        <div class="diagnostic-label">MATRIX_STATUS:</div>
+        <div class="diagnostic-value success">OPERATIONAL</div>
+      </div>
+    </div>
+  </section>
+</Base>
+
+<style>
+  /* Section Styling */
+  .activity-section, .heatmap-section, .diagnostics-section {
+    position: relative;
+    margin-bottom: 2rem;
+  }
+
+  .section-header {
+    border-bottom: 1px solid rgba(0, 255, 0, 0.2);
+    padding-bottom: 8px;
+    margin-bottom: 20px;
+  }
+
+  /* Heatmap Container */
+  .heatmap-container {
+    background: linear-gradient(135deg, rgba(0, 0, 0, 0.8) 0%, rgba(0, 20, 0, 0.6) 100%);
+    border: 1px solid rgba(0, 255, 0, 0.3);
+    border-radius: 8px;
+    padding: 20px;
+    box-shadow: 
+      0 0 20px rgba(0, 255, 0, 0.2),
+      inset 0 0 20px rgba(0, 255, 0, 0.05);
+    position: relative;
+    overflow: hidden;
+  }
+
+  .heatmap-container::before {
+    content: '';
+    position: absolute;
+    inset: -1px;
+    border-radius: 9px;
+    padding: 1px;
+    background: linear-gradient(45deg, 
+      rgba(0, 255, 0, 0.4), 
+      transparent, 
+      rgba(0, 255, 0, 0.4)
+    );
+    mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    mask-composite: xor;
+    animation: heatmapBorderGlow 4s ease-in-out infinite;
+  }
+
+  @keyframes heatmapBorderGlow {
+    0%, 100% { opacity: 0.3; }
+    50% { opacity: 0.8; }
+  }
+
+  .heatmap-wrapper {
+    position: relative;
+    z-index: 2;
+  }
+
+  .heatmap-display {
+    max-width: 1200px;
+    margin: 0 auto;
+    aspect-ratio: 53/7;
+  }
+
+  .heatmap-info, .heatmap-footer {
+    font-family: 'Courier New', monospace;
+  }
+
+  .info-block {
+    padding: 4px 0;
+  }
+
+  /* Diagnostics Section */
+  .diagnostics-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 16px;
+    background: rgba(0, 0, 0, 0.4);
+    border: 1px solid rgba(0, 255, 0, 0.2);
+    border-radius: 6px;
+    padding: 16px;
+  }
+
+  .diagnostic-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 8px 12px;
+    background: rgba(0, 255, 0, 0.05);
+    border: 1px solid rgba(0, 255, 0, 0.1);
+    border-radius: 4px;
+    font-size: 0.75rem;
+  }
+
+  .diagnostic-label {
+    color: rgba(0, 255, 0, 0.7);
+    font-weight: bold;
+  }
+
+  .diagnostic-value {
+    font-family: 'Courier New', monospace;
+    font-weight: bold;
+    animation: diagnosticPulse 2s ease-in-out infinite;
+  }
+
+  .diagnostic-value.success {
+    color: #00ff00;
+  }
+
+  .diagnostic-value.warning {
+    color: #ffff00;
+  }
+
+  .diagnostic-value.error {
+    color: #ff4444;
+  }
+
+  @keyframes diagnosticPulse {
+    0%, 100% { opacity: 0.8; }
+    50% { opacity: 1; }
+  }
+
+  /* Responsive Design */
+  @media (max-width: 1200px) {
+    .heatmap-display {
+      max-width: 1000px;
+    }
+  }
+
+  @media (max-width: 1024px) {
+    .heatmap-display {
+      max-width: 900px;
+    }
+  }
+
+  @media (max-width: 768px) {
+    .heatmap-container {
+      padding: 16px;
+    }
+    
+    .heatmap-display {
+      max-width: 100%;
+    }
+
+    .heatmap-info .grid {
+      grid-template-columns: 1fr;
+      gap: 8px;
+    }
+
+    .diagnostics-grid {
+      grid-template-columns: 1fr;
+      gap: 12px;
+    }
+
+    .section-header .text-sm {
+      font-size: 0.75rem;
+    }
+  }
+
+  @media (max-width: 680px) {
+    .heatmap-display {
+      aspect-ratio: 26/7;
+    }
+  }
+
+  @media (max-width: 480px) {
+    .heatmap-container {
+      padding: 12px;
+      margin: 0 -4px;
+    }
+
+    .diagnostics-grid {
+      padding: 12px;
+    }
+
+    .diagnostic-item {
+      padding: 6px 8px;
+    }
+  }
+</style>

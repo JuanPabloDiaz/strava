@@ -1,0 +1,79 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html {
+    @apply bg-gray-50;
+  }
+
+  body {
+    @apply text-black/90 h-full m-0 font-serif w-screen mx-auto p-0 w-[800px] max-w-[calc(100%-2rem)] flex flex-col overscroll-none;
+  }
+
+  a {
+    @apply no-underline text-[rgb(60,60,120)] transition-all duration-100 hover:scale-[1.075] hover:rotate-[2.5deg] hover:underline;
+  }
+
+  hr {
+    @apply my-4 rounded border border-black/10;
+  }
+
+  pre {
+    @apply p-4 rounded-md;
+  }
+
+  :not(pre) > code {
+    @apply py-[0.15em] px-[0.55em] bg-gray-500/[0.075] rounded-lg;
+  }
+
+  img {
+    @apply w-full h-auto max-h-[15em] object-contain;
+  }
+
+  img:not(#polaroid img) {
+    @apply mix-blend-multiply animate-[load_0.3s_ease];
+  }
+
+  :not(.info) > blockquote {
+    @apply ml-[0.1em] pl-4 border-l-2 border-[rgb(179,221,255)] bg-white/5 rounded-r;
+  }
+}
+
+@layer components {
+  .content-wrap {
+    @apply flex-1;
+  }
+
+  footer {
+    @apply flex justify-center p-4;
+  }
+
+  nav {
+    @apply pt-3;
+  }
+
+  .banner {
+    @apply w-screen h-[0.4em] absolute left-0 bg-gradient-to-r from-[rgb(177,201,226)] to-[rgb(86,109,183)] bg-[length:200vw_200vw] animate-[moveGradient_10s_linear_infinite];
+  }
+
+  .katex .katex-html {
+    @apply overflow-x-scroll overflow-y-hidden;
+  }
+}
+
+@keyframes moveGradient {
+  0% {
+    background-position: 0% 50%;
+  }
+  100% {
+    background-position: 200% 50%;
+  }
+}
+
+@keyframes load {
+  from {
+    transform: scale(0.95) rotate(0deg);
+    opacity: 0;
+  }
+}
