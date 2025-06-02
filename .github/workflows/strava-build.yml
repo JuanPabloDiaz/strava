@@ -1,20 +1,16 @@
-name: CI
+name: Update Strava Data
 
 on:
-  push:
-    branches: [main]
+  schedule:
+    - cron: "0 6 * * *" # todos los días a las 6 AM UTC (ajusta según necesidad)
   workflow_dispatch:
-  # schedule:
-  #   - cron:  '0 */4 * * *'
 
 jobs:
-  build:
+  update:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v2
-        with:
-          ref: ${{ github.head_ref }}
+      - uses: actions/checkout@v3
 
       - run: npm ci
 
@@ -26,14 +22,4 @@ jobs:
 
       - uses: stefanzweifel/git-auto-commit-action@v4
         with:
-          commit_message: Updated Strava activities data (last-activities.json)
-          # This action commits all changed files by default.
-          # If only last-activities.json is changed, only that will be committed.
-
-      - run: npm run website-build
-
-      - name: Deploy
-        uses: peaceiris/actions-gh-pages@v3
-        with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: ./website/dist
+          commit_message: "Update Strava data (daily)"
