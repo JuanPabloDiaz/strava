@@ -2,7 +2,7 @@ name: Update Strava Data
 
 on:
   schedule:
-    - cron: "0 6 * * *" # todos los días a las 6 AM UTC (ajusta según necesidad)
+    - cron: "0 6 * * *" # diario a las 6am UTC
   workflow_dispatch:
 
 jobs:
@@ -12,9 +12,13 @@ jobs:
     steps:
       - uses: actions/checkout@v3
 
-      - run: npm ci
+      - uses: oven-sh/setup-bun@v1
+        with:
+          bun-version: latest
 
-      - run: node strava-script.js
+      - run: bun install
+
+      - run: bun run strava-script
         env:
           STRAVA_CLIENT_ID: ${{ secrets.STRAVA_CLIENT_ID }}
           STRAVA_CLIENT_SECRET: ${{ secrets.STRAVA_CLIENT_SECRET }}
