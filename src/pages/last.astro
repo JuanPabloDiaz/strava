@@ -1,16 +1,70 @@
 ---
+import DaysSinceLast from "@components/DaysSinceLast.astro";
 import Base from "@layouts/Base.astro";
+import { fetchMileage, processMileageData, getLastActivityDate } from '@services/stravaService';
+
+// Fetch and process data
+const mileageMap = await fetchMileage();
+const mileageData = processMileageData(mileageMap);
+const lastRunDate = await getLastActivityDate('Run');
+const lastRideDate = await getLastActivityDate('Ride');
+const lastSwimDate = await getLastActivityDate('Swim');
+
+const minMiles = Math.min(...mileageData.map(data => data[1]));
+const maxMiles = Math.max(...mileageData.map(data => data[1]));
 
 ---
 
-<Base 
+<Base
   title="Test"
   windowTitle="TEST"
   terminalCommand="./test.exe"
   systemMessage="[SYSTEM] Loading neural activity patterns..."
 >
 
-this is a test
+  <!-- Days Since Last RUN Section -->
+  <section class="activity-section mb-8">
+    <div class="section-header">
+      <div class="text-green-400 text-sm mb-4 flex items-center space-x-2">
+        <span class="animate-pulse">[ACTIVITY_STATUS]</span>
+        <div class="flex-1 h-px bg-gradient-to-r from-green-500/50 to-transparent"></div>
+      </div>
+    </div>
 
+    <DaysSinceLast
+      lastRunDate={lastRunDate || undefined}
+      activityType="RUN"
+    />
+  </section>
+
+    <!-- Days Since Last RIDE Section -->
+  <section class="activity-section mb-8">
+    <div class="section-header">
+      <div class="text-green-400 text-sm mb-4 flex items-center space-x-2">
+        <span class="animate-pulse">[ACTIVITY_STATUS]</span>
+        <div class="flex-1 h-px bg-gradient-to-r from-green-500/50 to-transparent"></div>
+      </div>
+    </div>
+
+    <DaysSinceLast
+      lastRunDate={lastRideDate || undefined}
+      activityType="RIDE"
+    />
+  </section>
+
+      <!-- Days Since Last SWIM Section -->
+  <section class="activity-section mb-8">
+    <div class="section-header">
+      <div class="text-green-400 text-sm mb-4 flex items-center space-x-2">
+        <span class="animate-pulse">[ACTIVITY_STATUS]</span>
+        <div class="flex-1 h-px bg-gradient-to-r from-green-500/50 to-transparent"></div>
+      </div>
+    </div>
+
+    <DaysSinceLast
+      lastRunDate={lastSwimDate || undefined}
+      activityType="Swim"
+    />
+  </section>
 
 </Base>
