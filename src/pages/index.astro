@@ -1,8 +1,8 @@
 ---
-import Base from "../layouts/Base.astro";
-import DaysSinceLast from "../components/DaysSinceLast.astro";
-import HeatmapGrid from "../components/HeatmapGrid.astro";
-import { fetchMileage, processMileageData, getLastActivityDate } from '../services/stravaService';
+import Base from "@layouts/Base.astro";
+import DaysSinceLast from "@components/DaysSinceLast.astro";
+import HeatmapGrid from "@components/HeatmapGrid.astro";
+import { fetchMileage, processMileageData, getLastActivityDate } from '@services/stravaService';
 
 // Fetch and process data
 const mileageMap = await fetchMileage();

@@ -1,16 +1,16 @@
 ---
-import '../styles/matrixAnimations.css';
+import '@styles/matrixAnimations.css';
 ---
 
 <div class="fixed inset-0 pointer-events-none">
     <div class="matrix-bg"></div>
   </div>
-  
+
   <!-- Scanlines overlay -->
   <div class="fixed inset-0 pointer-events-none opacity-20">
     <div class="scanlines"></div>
   </div>
-  
+
   <style>
     .matrix-bg::before {
       content: '';
@@ -19,7 +19,7 @@ import '../styles/matrixAnimations.css';
       left: 0;
       right: 0;
       bottom: 0;
-      background-image: 
+      background-image:
         repeating-linear-gradient(
           0deg,
           transparent,
@@ -36,12 +36,12 @@ import '../styles/matrixAnimations.css';
         );
       animation: matrixGrid 20s linear infinite;
     }
-    
+
     @keyframes matrixGrid {
       0% { transform: translate(0, 0); }
       100% { transform: translate(4px, 4px); }
     }
-    
+
     .scanlines {
       background: repeating-linear-gradient(
         0deg,
@@ -52,7 +52,7 @@ import '../styles/matrixAnimations.css';
       );
       animation: scanlineMove 8s linear infinite;
     }
-    
+
     @keyframes scanlineMove {
       0% { transform: translateY(0); }
       100% { transform: translateY(4px); }

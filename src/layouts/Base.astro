@@ -1,6 +1,6 @@
 ---
-import '../styles/matrixAnimations.css';
-import Footer from '../components/Footer.astro';
+import '@styles/matrixAnimations.css';
+import Footer from '@components/Footer.astro';
 
 export interface Props {
   title?: string;
@@ -9,7 +9,7 @@ export interface Props {
   systemMessage?: string;
 }
 
-const { 
+const {
   title = "Matrix Terminal",
   windowTitle = "NEURAL_INTERFACE_v2.1",
   terminalCommand = "./boot_system.exe",
@@ -102,7 +102,7 @@ const {
         left: 0;
         width: 100%;
         height: 100%;
-        background-image: 
+        background-image:
           linear-gradient(to bottom, transparent 0%, rgba(0, 255, 0, 0.1) 50%, transparent 100%);
         opacity: 0.3;
         animation: matrixRainFall 20s linear infinite;
@@ -142,7 +142,7 @@ const {
         left: 0;
         width: 100%;
         height: 100%;
-        background-image: 
+        background-image:
           repeating-linear-gradient(
             0deg,
             transparent,
@@ -193,7 +193,7 @@ const {
         background: linear-gradient(135deg, rgba(0, 0, 0, 0.95) 0%, rgba(0, 20, 0, 0.9) 100%);
         border: 2px solid rgba(0, 255, 0, 0.4);
         border-radius: 8px;
-        box-shadow: 
+        box-shadow:
           0 0 20px rgba(0, 255, 0, 0.3),
           inset 0 0 20px rgba(0, 255, 0, 0.1);
         backdrop-filter: blur(10px);
@@ -208,10 +208,10 @@ const {
         inset: -2px;
         border-radius: 10px;
         padding: 2px;
-        background: linear-gradient(45deg, 
-          rgba(0, 255, 0, 0.3), 
-          transparent, 
-          rgba(0, 255, 0, 0.3), 
+        background: linear-gradient(45deg,
+          rgba(0, 255, 0, 0.3),
+          transparent,
+          rgba(0, 255, 0, 0.3),
           transparent
         );
         mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
@@ -286,9 +286,9 @@ const {
 
       .terminal-separator {
         height: 1px;
-        background: linear-gradient(90deg, 
-          transparent, 
-          rgba(0, 255, 0, 0.5), 
+        background: linear-gradient(90deg,
+          transparent,
+          rgba(0, 255, 0, 0.5),
           transparent
         );
         margin-top: 12px;
@@ -353,12 +353,12 @@ const {
         border-right: 2px solid rgba(0, 255, 0, 0.8);
         animation: typing 3s steps(30, end), blink-caret 1s step-end infinite;
       }
-      
+
       @keyframes typing {
         from { width: 0; }
         to { width: 100%; }
       }
-      
+
       @keyframes blink-caret {
         from, to { border-color: transparent; }
         50% { border-color: rgba(0, 255, 0, 0.8); }
