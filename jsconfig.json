@@ -8,7 +8,7 @@
       "@services/*": ["./src/services/*"],
       "@styles/*": ["./src/styles/*"],
       "@utils/*": ["./src/utils/*"],
-      "@scripts/*": ["./src/scripts/*"]
+      "@scripts/*": ["scripts/*"]
     },
     "module": "ESNext",
     "moduleResolution": "node",

@@ -9,6 +9,7 @@
     "preview": "astro preview",
     "astro": "astro",
     "format": "prettier --write .",
+    "strava-script": "bun scripts/strava-script.js",
     "clean": "rm -rf dist .astro node_modules package-lock.json bun.lockb"
   },
   "dependencies": {
