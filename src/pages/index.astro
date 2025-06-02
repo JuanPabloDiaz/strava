@@ -13,7 +13,7 @@ const minMiles = Math.min(...mileageData.map(data => data[1]));
 const maxMiles = Math.max(...mileageData.map(data => data[1]));
 ---
 
-<Base 
+<Base
   title="Strava Matrix Tracker"
   windowTitle="STRAVA_NEURAL_INTERFACE"
   terminalCommand="./run_activity_monitor.exe"
@@ -27,8 +27,8 @@ const maxMiles = Math.max(...mileageData.map(data => data[1]));
         <div class="flex-1 h-px bg-gradient-to-r from-green-500/50 to-transparent"></div>
       </div>
     </div>
-    
-    <DaysSinceLast 
+
+    <DaysSinceLast
       lastRunDate={lastRunDate || undefined}
       activityType="RUN"
     />
@@ -68,14 +68,14 @@ const maxMiles = Math.max(...mileageData.map(data => data[1]));
 
         <!-- Main Heatmap Grid -->
         <div class="heatmap-display">
-          <HeatmapGrid 
+          <HeatmapGrid
             mileageData={mileageData}
             minMiles={minMiles}
             maxMiles={maxMiles}
           />
         </div>
-        
-        <!-- Heatmap Footer Info -->
+
+        <!-- Heatmap Footer Info with Strava Button -->
         <div class="heatmap-footer mt-4">
           <div class="flex justify-between items-center text-xs">
             <div class="flex items-center space-x-4">
@@ -85,9 +85,26 @@ const maxMiles = Math.max(...mileageData.map(data => data[1]));
                 <span class="text-green-500">ONLINE</span>
               </div>
             </div>
-            <div class="text-green-300 animate-pulse">
-              [MATRIX_TIMESTAMP: {new Date().toISOString().split('T')[0]}]
-            </div>
+
+            <!-- Strava Activities Button -->
+            <a
+              href="https://www.strava.com/athletes/47698767"
+              target="_blank"
+              rel="noopener noreferrer"
+              class="strava-link-button group"
+            >
+              <span class="text-green-300 hover:text-green-100 transition-colors duration-300 font-mono text-xs flex items-center space-x-2">
+                <span>[VERIFY_ON_STRAVA]</span>
+                <svg
+                  class="w-3 h-3 transition-transform duration-300 group-hover:translate-x-1"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/>
+                </svg>
+              </span>
+            </a>
           </div>
         </div>
       </div>
@@ -102,7 +119,7 @@ const maxMiles = Math.max(...mileageData.map(data => data[1]));
         <div class="flex-1 h-px bg-gradient-to-r from-green-500/50 to-transparent"></div>
       </div>
     </div>
-    
+
     <div class="diagnostics-grid">
       <div class="diagnostic-item">
         <div class="diagnostic-label">API_CONNECTION:</div>
@@ -143,7 +160,7 @@ const maxMiles = Math.max(...mileageData.map(data => data[1]));
     border: 1px solid rgba(0, 255, 0, 0.3);
     border-radius: 8px;
     padding: 20px;
-    box-shadow: 
+    box-shadow:
       0 0 20px rgba(0, 255, 0, 0.2),
       inset 0 0 20px rgba(0, 255, 0, 0.05);
     position: relative;
@@ -156,9 +173,9 @@ const maxMiles = Math.max(...mileageData.map(data => data[1]));
     inset: -1px;
     border-radius: 9px;
     padding: 1px;
-    background: linear-gradient(45deg, 
-      rgba(0, 255, 0, 0.4), 
-      transparent, 
+    background: linear-gradient(45deg,
+      rgba(0, 255, 0, 0.4),
+      transparent,
       rgba(0, 255, 0, 0.4)
     );
     mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
@@ -188,6 +205,38 @@ const maxMiles = Math.max(...mileageData.map(data => data[1]));
 
   .info-block {
     padding: 4px 0;
+  }
+
+  /* Strava Link Button */
+  .strava-link-button {
+    position: relative;
+    padding: 6px 12px;
+    border: 1px solid rgba(0, 255, 0, 0.3);
+    border-radius: 4px;
+    background: rgba(0, 255, 0, 0.05);
+    transition: all 0.3s ease;
+    text-decoration: none;
+  }
+
+  .strava-link-button:hover {
+    background: rgba(0, 255, 0, 0.1);
+    border-color: rgba(0, 255, 0, 0.6);
+    box-shadow: 0 0 10px rgba(0, 255, 0, 0.3);
+    transform: translateY(-1px);
+  }
+
+  .strava-link-button::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: 4px;
+    background: linear-gradient(45deg, transparent, rgba(0, 255, 0, 0.1), transparent);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+  }
+
+  .strava-link-button:hover::before {
+    opacity: 1;
   }
 
   /* Diagnostics Section */
@@ -257,7 +306,7 @@ const maxMiles = Math.max(...mileageData.map(data => data[1]));
     .heatmap-container {
       padding: 16px;
     }
-    
+
     .heatmap-display {
       max-width: 100%;
     }
@@ -274,6 +323,16 @@ const maxMiles = Math.max(...mileageData.map(data => data[1]));
 
     .section-header .text-sm {
       font-size: 0.75rem;
+    }
+
+    .heatmap-footer {
+      flex-direction: column;
+      gap: 12px;
+      align-items: flex-start;
+    }
+
+    .strava-link-button {
+      align-self: flex-end;
     }
   }
 
@@ -295,6 +354,10 @@ const maxMiles = Math.max(...mileageData.map(data => data[1]));
 
     .diagnostic-item {
       padding: 6px 8px;
+    }
+
+    .strava-link-button span {
+      font-size: 0.7rem;
     }
   }
 </style>
