@@ -8,107 +8,397 @@ export interface Props {
 }
 
 const { mileageData, minMiles, maxMiles } = Astro.props;
+
+// Helper functions to generate dynamic labels
+function getWeekdayLabels() {
+  return ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+}
+
+function getMonthLabels(data: [number, number][]) {
+  const monthLabels: { label: string; column: number }[] = [];
+  let previousMonth = -1;
+  let previousYear = -1;
+
+  data.forEach((entry, index) => {
+    const date = new Date(entry[0]);
+    const currentMonth = date.getMonth();
+    const currentYear = date.getFullYear();
+    const column = Math.floor(index / 7);
+
+    // Si cambió el mes o el año, es el inicio de un nuevo mes
+    if (currentMonth !== previousMonth || currentYear !== previousYear) {
+      const monthLabel = date.toLocaleDateString('en-US', { month: 'short' });
+      monthLabels.push({ label: monthLabel, column });
+
+      previousMonth = currentMonth;
+      previousYear = currentYear;
+    }
+  });
+
+  // Filtrar meses que están muy cerca para evitar solapamiento
+  return monthLabels.filter((month, index) => {
+    if (index === 0) return true;
+    return month.column - monthLabels[index - 1].column >= 2;
+  });
+}
+
+const weekdayLabels = getWeekdayLabels();
+const monthLabels = getMonthLabels(mileageData);
+const totalWeeks = Math.ceil(mileageData.length / 7);
 ---
 
-<div class="heatmap-grid">
-  {mileageData.map((data, index) => {
-    const style = getAnimationStyle(index);
-    const hasActivity = data[1] > 0;
-    const backgroundColor = getColor(data[1], minMiles, maxMiles);
+<div class="heatmap-container">
+  <!-- Month Labels -->
+  <div class="month-labels">
+    {monthLabels.map(({ label, column }) => (
+      <div
+        class="month-label"
+        style={{ gridColumn: `${column + 2}`, gridRow: '1' }}
+      >
+        {label}
+      </div>
+    ))}
+  </div>
 
-    return (
-            <div class="aspect-square border border-green-500/20 relative cursor-pointer
-                   transition-all duration-300 hover:scale-110 hover:z-50
-                   hover:shadow-lg hover:shadow-green-400/50 hover:border-green-400
-                   active:scale-95 group overflow-visible
-                   ${hasActivity ? 'hover:animate-pulse' : ''}"
-      style={{
-        backgroundColor,
-        transform: 'scale(0)',
-        animation: style.animation,
-        animationDelay: style.animationDelay,
-        boxShadow: hasActivity ? `inset 0 0 10px ${backgroundColor}40` : 'none',
-      }}>
-        {/* Matrix-style tooltip with real data */}
-        <div class="absolute -top-20 left-1/2 transform -translate-x-1/2
-                   bg-black/95 border border-green-500/60 text-green-400
-                   text-xs px-3 py-2 rounded whitespace-nowrap
-                   opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-50
-                   pointer-events-none font-mono shadow-lg">
-          <div class="text-green-300 mb-1">
-            {new Date(data[0]).toLocaleDateString("en-US", {
-              year: "numeric",
-              month: "short",
-              day: "numeric"
-            })}
-          </div>
-          <div class="text-green-400">
-            {data[1] > 0 ? `${(data[1] / 1000).toFixed(2)} km ran` : 'No activity'}
+  <!-- Weekday Labels -->
+  <div class="weekday-labels">
+    {weekdayLabels.map((day, index) => (
+      <div class="weekday-label" style={{ gridRow: `${index + 2}` }}>
+        {day}
+      </div>
+    ))}
+  </div>
+
+  <!-- Main Heatmap Grid -->
+  <div class="heatmap-grid" style={{ gridTemplateColumns: `repeat(${totalWeeks}, 1fr)` }}>
+    {mileageData.map((data, index) => {
+      const style = getAnimationStyle(index);
+      const hasActivity = data[1] > 0;
+      const backgroundColor = getColor(data[1], minMiles, maxMiles);
+      const row = (index % 7) + 2; // +2 to account for month labels
+      const column = Math.floor(index / 7) + 2; // +2 to account for weekday labels
+
+      return (
+        <div
+          class={`heatmap-cell ${hasActivity ? 'has-activity' : ''}`}
+          style={{
+            backgroundColor,
+            transform: 'scale(0)',
+            animation: style.animation,
+            animationDelay: style.animationDelay,
+            boxShadow: hasActivity ? `inset 0 0 10px ${backgroundColor}40` : 'none',
+            gridRow: `${row}`,
+            gridColumn: `${column}`,
+          }}
+        >
+          {/* Matrix-style tooltip */}
+          <div class="tooltip">
+            <div class="tooltip-date">
+              {new Date(data[0]).toLocaleDateString("en-US", {
+                year: "numeric",
+                month: "short",
+                day: "numeric"
+              })}
+            </div>
+            <div class="tooltip-activity">
+              {data[1] > 0 ? `${(data[1] / 1000).toFixed(2)} km ran` : 'No activity'}
+            </div>
           </div>
         </div>
-      </div>
-    );
-  })}
+      );
+    })}
+  </div>
 </div>
 
 <style>
-  .heatmap-grid {
+  .heatmap-container {
     display: grid;
-    grid-template-rows: repeat(7, 1fr);
-    grid-template-columns: repeat(53, 1fr);
-    grid-auto-flow: column;
-    gap: 4px;
+    grid-template-areas:
+      "months months"
+      "weekdays heatmap";
+    grid-template-columns: auto 1fr;
+    grid-template-rows: auto 1fr;
+    gap: 8px;
     width: 100%;
-    height: 100%;
-    aspect-ratio: 53/7;
-    padding: 20px;
+    max-width: 100%;
+    padding: 16px;
     background: radial-gradient(ellipse at center, rgba(0, 255, 0, 0.03) 0%, rgba(0, 0, 0, 0.8) 70%);
     border-radius: 8px;
     border: 1px solid rgba(0, 255, 0, 0.2);
     position: relative;
+    overflow: hidden;
   }
 
-  .digital-noise {
+  .month-labels {
+    grid-area: months;
+    display: grid;
+    grid-template-columns: auto 1fr;
+    position: relative;
+    height: 20px;
+    margin-left: 32px; /* Offset for weekday labels */
+  }
+
+  .month-label {
+    color: rgba(0, 255, 0, 0.7);
+    font-size: 11px;
+    font-family: 'Courier New', monospace;
+    font-weight: bold;
+    text-align: left;
+    align-self: center;
+    white-space: nowrap;
+  }
+
+  .weekday-labels {
+    grid-area: weekdays;
+    display: grid;
+    grid-template-rows: repeat(7, 1fr);
+    gap: 2px;
+    width: 28px;
+    padding-right: 4px;
+  }
+
+  .weekday-label {
+    color: rgba(0, 255, 0, 0.7);
+    font-size: 10px;
+    font-family: 'Courier New', monospace;
+    font-weight: bold;
+    text-align: right;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    height: 100%;
+  }
+
+  .heatmap-grid {
+    grid-area: heatmap;
+    display: grid;
+    grid-template-rows: repeat(7, 1fr);
+    grid-auto-flow: column;
+    gap: 2px;
+    width: 100%;
+    height: 100%;
+    min-height: 140px;
+    position: relative;
+  }
+
+  .heatmap-cell {
+    aspect-ratio: 1;
+    border: 1px solid rgba(0, 255, 0, 0.15);
+    border-radius: 2px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    position: relative;
+    min-width: 12px;
+    min-height: 12px;
+  }
+
+  .heatmap-cell:hover {
+    transform: scale(1.2) !important;
+    z-index: 50;
+    border-color: rgba(0, 255, 0, 0.6);
+    box-shadow: 0 0 12px rgba(0, 255, 0, 0.4);
+  }
+
+  .heatmap-cell.has-activity:hover {
+    animation: pulse 0.5s ease-in-out infinite alternate;
+  }
+
+  .heatmap-cell:active {
+    transform: scale(0.9) !important;
+  }
+
+  .tooltip {
+    position: absolute;
+    bottom: calc(100% + 12px);
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(0, 0, 0, 0.95);
+    border: 1px solid rgba(0, 255, 0, 0.6);
+    color: #00ff00;
+    font-size: 11px;
+    padding: 8px 10px;
+    border-radius: 4px;
+    white-space: nowrap;
+    opacity: 0;
+    pointer-events: none;
+    font-family: 'Courier New', monospace;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.8);
+    z-index: 100;
+    transition: opacity 0.3s ease;
+  }
+
+  .heatmap-cell:hover .tooltip {
+    opacity: 1;
+  }
+
+  .tooltip-date {
+    color: rgba(0, 255, 0, 0.8);
+    margin-bottom: 4px;
+    font-size: 10px;
+  }
+
+  .tooltip-activity {
+    color: #00ff00;
+    font-weight: bold;
+  }
+
+  /* Digital noise effect */
+  .heatmap-container::before {
+    content: '';
+    position: absolute;
+    inset: 0;
     background-image:
-      radial-gradient(circle at 20% 50%, rgba(0, 255, 0, 0.2) 0%, transparent 50%),
-      radial-gradient(circle at 80% 50%, rgba(0, 255, 0, 0.2) 0%, transparent 50%),
-      radial-gradient(circle at 40% 80%, rgba(0, 255, 0, 0.15) 0%, transparent 50%);
-    animation: digitalNoise 2s ease-in-out infinite alternate;
+      radial-gradient(circle at 20% 50%, rgba(0, 255, 0, 0.1) 0%, transparent 50%),
+      radial-gradient(circle at 80% 50%, rgba(0, 255, 0, 0.1) 0%, transparent 50%),
+      radial-gradient(circle at 40% 80%, rgba(0, 255, 0, 0.08) 0%, transparent 50%);
+    animation: digitalNoise 3s ease-in-out infinite alternate;
+    pointer-events: none;
+    border-radius: 8px;
   }
 
   @keyframes digitalNoise {
     0% { opacity: 0.1; filter: hue-rotate(0deg); }
-    100% { opacity: 0.3; filter: hue-rotate(90deg); }
+    100% { opacity: 0.2; filter: hue-rotate(45deg); }
   }
 
-  /* Responsive adjustments */
-  @media (max-width: 1024px) {
+  @keyframes pulse {
+    0% { box-shadow: 0 0 8px rgba(0, 255, 0, 0.3); }
+    100% { box-shadow: 0 0 20px rgba(0, 255, 0, 0.6); }
+  }
+
+  /* Responsive breakpoints */
+  @media (max-width: 1200px) {
+    .heatmap-container {
+      padding: 14px;
+    }
     .heatmap-grid {
-      gap: 3px;
-      padding: 16px;
+      gap: 1.5px;
+    }
+    .month-labels {
+      margin-left: 28px;
     }
   }
 
   @media (max-width: 768px) {
+    .heatmap-container {
+      padding: 12px;
+      gap: 6px;
+    }
+
     .heatmap-grid {
-      gap: 2px;
-      padding: 14px;
+      gap: 1px;
+      min-height: 120px;
+    }
+
+    .heatmap-cell {
+      min-width: 10px;
+      min-height: 10px;
+    }
+
+    .weekday-labels {
+      width: 24px;
+    }
+
+    .month-labels {
+      margin-left: 24px;
+      height: 16px;
+    }
+
+    .month-label {
+      font-size: 10px;
+    }
+
+    .weekday-label {
+      font-size: 9px;
+    }
+
+    .tooltip {
+      font-size: 10px;
+      padding: 6px 8px;
+    }
+
+    .tooltip-date, .tooltip-activity {
+      font-size: 9px;
     }
   }
 
-  @media (max-width: 680px) {
+  @media (max-width: 640px) {
+    .heatmap-container {
+      padding: 10px;
+      overflow-x: auto;
+      overflow-y: hidden;
+    }
+
     .heatmap-grid {
-      grid-template-columns: repeat(26, 1fr);
-      aspect-ratio: 26/7;
-      gap: 2px;
-      padding: 12px;
+      min-width: 500px; /* Ensure grid doesn't compress too much */
+      min-height: 100px;
+    }
+
+    .heatmap-cell {
+      min-width: 8px;
+      min-height: 8px;
+    }
+
+    .weekday-labels {
+      width: 20px;
+    }
+
+    .month-labels {
+      margin-left: 20px;
+      height: 14px;
+    }
+
+    .month-label {
+      font-size: 9px;
+    }
+
+    .weekday-label {
+      font-size: 8px;
     }
   }
 
   @media (max-width: 480px) {
+    .heatmap-container {
+      padding: 8px;
+      gap: 4px;
+    }
+
     .heatmap-grid {
-      padding: 10px;
-      gap: 1px;
+      min-width: 400px;
+      min-height: 80px;
+    }
+
+    .heatmap-cell {
+      min-width: 6px;
+      min-height: 6px;
+      border-radius: 1px;
+    }
+
+    .tooltip {
+      font-size: 9px;
+      padding: 4px 6px;
+      bottom: calc(100% + 8px);
+    }
+
+    .tooltip-date, .tooltip-activity {
+      font-size: 8px;
+    }
+  }
+
+  /* Ultra-wide screens */
+  @media (min-width: 1600px) {
+    .heatmap-container {
+      padding: 20px;
+    }
+
+    .heatmap-grid {
+      gap: 3px;
+      min-height: 160px;
+    }
+
+    .heatmap-cell {
+      min-width: 16px;
+      min-height: 16px;
     }
   }
 </style>
