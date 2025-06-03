@@ -1,0 +1,227 @@
+---
+export interface Props {
+  currentPath?: string;
+}
+
+const { currentPath = "/" } = Astro.props;
+
+const navItems = [
+  { path: "/", label: "root.exe", icon: "●" },
+  { path: "/last", label: "activity_monitor.exe", icon: "◐" },
+  { path: "/404", label: "error_handler.exe", icon: "◑" }
+];
+---
+
+<nav class="browser-tabs-nav">
+  <div class="tabs-container">
+    {navItems.map((item) => (
+      <a
+        href={item.path}
+        class={`browser-tab ${currentPath === item.path ? 'active' : ''}`}
+      >
+        <span class="tab-icon">{item.icon}</span>
+        <span class="tab-label">{item.label}</span>
+        <span class="tab-close">×</span>
+      </a>
+    ))}
+
+    <!-- New Tab Button -->
+    <button class="new-tab-btn">
+      <span class="text-green-400">+</span>
+    </button>
+  </div>
+
+  <!-- Browser Controls -->
+  <div class="browser-controls">
+    <button class="control-btn">←</button>
+    <button class="control-btn">→</button>
+    <button class="control-btn">↻</button>
+  </div>
+</nav>
+
+<style>
+  .browser-tabs-nav {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    background: linear-gradient(180deg, rgba(0, 0, 0, 0.9) 0%, rgba(0, 20, 0, 0.8) 100%);
+    border-bottom: 1px solid rgba(0, 255, 0, 0.3);
+    padding: 0 8px 0 0;
+    position: relative;
+    overflow-x: auto;
+  }
+
+  .tabs-container {
+    display: flex;
+    align-items: flex-end;
+    gap: 2px;
+    flex: 1;
+    min-width: 0;
+  }
+
+  .browser-tab {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 12px 8px 10px;
+    background: rgba(0, 0, 0, 0.6);
+    border: 1px solid rgba(0, 255, 0, 0.2);
+    border-bottom: none;
+    border-radius: 6px 6px 0 0;
+    color: rgba(0, 255, 0, 0.7);
+    text-decoration: none;
+    font-size: 0.75rem;
+    font-family: 'Courier New', monospace;
+    transition: all 0.2s ease;
+    position: relative;
+    min-width: 0;
+    white-space: nowrap;
+    overflow: hidden;
+  }
+
+  .browser-tab:hover {
+    background: rgba(0, 255, 0, 0.1);
+    color: rgba(0, 255, 0, 0.9);
+    border-color: rgba(0, 255, 0, 0.4);
+    transform: translateY(-1px);
+  }
+
+  .browser-tab.active {
+    background: rgba(0, 255, 0, 0.15);
+    color: #00ff00;
+    border-color: rgba(0, 255, 0, 0.6);
+    box-shadow: 0 0 10px rgba(0, 255, 0, 0.3);
+  }
+
+  .browser-tab.active::after {
+    content: '';
+    position: absolute;
+    bottom: -1px;
+    left: 0;
+    right: 0;
+    height: 1px;
+    background: rgba(0, 255, 0, 0.15);
+  }
+
+  .tab-icon {
+    font-size: 8px;
+    animation: pulse 2s ease-in-out infinite;
+  }
+
+  .tab-label {
+    flex: 1;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .tab-close {
+    opacity: 0;
+    font-size: 12px;
+    cursor: pointer;
+    padding: 0 2px;
+    transition: opacity 0.2s ease;
+  }
+
+  .browser-tab:hover .tab-close {
+    opacity: 0.7;
+  }
+
+  .tab-close:hover {
+    opacity: 1 !important;
+    color: #ff4444;
+  }
+
+  .new-tab-btn {
+    padding: 8px 10px;
+    background: rgba(0, 0, 0, 0.4);
+    border: 1px solid rgba(0, 255, 0, 0.2);
+    border-bottom: none;
+    border-radius: 6px 6px 0 0;
+    color: rgba(0, 255, 0, 0.5);
+    cursor: pointer;
+    transition: all 0.2s ease;
+    font-size: 14px;
+  }
+
+  .new-tab-btn:hover {
+    background: rgba(0, 255, 0, 0.1);
+    border-color: rgba(0, 255, 0, 0.4);
+    color: rgba(0, 255, 0, 0.8);
+  }
+
+  .browser-controls {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    margin-left: 12px;
+  }
+
+  .control-btn {
+    width: 24px;
+    height: 24px;
+    background: rgba(0, 0, 0, 0.6);
+    border: 1px solid rgba(0, 255, 0, 0.2);
+    border-radius: 3px;
+    color: rgba(0, 255, 0, 0.7);
+    font-size: 12px;
+    font-family: monospace;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .control-btn:hover {
+    background: rgba(0, 255, 0, 0.1);
+    border-color: rgba(0, 255, 0, 0.4);
+    color: rgba(0, 255, 0, 0.9);
+  }
+
+  @keyframes pulse {
+    0%, 100% { opacity: 0.7; }
+    50% { opacity: 1; }
+  }
+
+  /* Responsive */
+  @media (max-width: 768px) {
+    .browser-tabs-nav {
+      padding: 0 4px 0 0;
+    }
+
+    .browser-tab {
+      padding: 6px 8px 6px 6px;
+      font-size: 0.7rem;
+      min-width: 120px;
+    }
+
+    .tab-label {
+      max-width: 80px;
+    }
+
+    .browser-controls {
+      margin-left: 8px;
+    }
+
+    .control-btn {
+      width: 20px;
+      height: 20px;
+      font-size: 10px;
+    }
+  }
+
+  @media (max-width: 480px) {
+    .browser-controls {
+      display: none;
+    }
+
+    .browser-tab {
+      min-width: 100px;
+    }
+
+    .tab-label {
+      max-width: 60px;
+    }
+  }
+</style>
