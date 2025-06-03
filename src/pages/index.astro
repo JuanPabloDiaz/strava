@@ -1,5 +1,6 @@
 ---
 import Base from "@layouts/Base.astro";
+import SectionLayout from "@components/SectionLayout.astro";
 import DaysSinceLast from "@components/DaysSinceLast.astro";
 import HeatmapGrid from "@components/HeatmapGrid.astro";
 import { fetchMileage, processMileageData, getLastActivityDate } from '@services/stravaService';
@@ -20,32 +21,16 @@ const maxMiles = Math.max(...mileageData.map(data => data[1]));
   systemMessage="[SYSTEM] Loading neural activity patterns... Strava API connected."
 >
   <!-- Days Since Last Activity Section -->
-  <section class="activity-section mb-8">
-    <div class="section-header">
-      <div class="text-green-400 text-sm mb-4 flex items-center space-x-2">
-        <span class="animate-pulse">[ACTIVITY_STATUS]</span>
-        <div class="flex-1 h-px bg-gradient-to-r from-green-500/50 to-transparent"></div>
-      </div>
-    </div>
-
+  <SectionLayout title="[ACTIVITY_STATUS]">
     <DaysSinceLast
       lastRunDate={lastRunDate || undefined}
       activityType="RUN"
     />
-  </section>
+  </SectionLayout>
 
   <!-- Heatmap Analysis Section -->
-  <section class="heatmap-section">
-    <div class="section-header">
-      <div class="text-green-400 text-sm mb-4 flex items-center justify-between">
-        <div class="flex items-center space-x-2">
-          <span class="animate-pulse">[TEMPORAL_ANALYSIS_GRID]</span>
-          <div class="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
-        </div>
-        <span class="text-green-300 text-xs">[365_DAY_NEURAL_MAPPING]</span>
-      </div>
-    </div>
-
+  <SectionLayout title="[TEMPORAL_ANALYSIS_GRID]" rightHeaderText="[365_DAY_NEURAL_MAPPING]">
+    <div slot="headerElements" class="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
     <div class="heatmap-container">
       <div class="heatmap-wrapper">
         <!-- Heatmap Header Info -->
@@ -109,17 +94,10 @@ const maxMiles = Math.max(...mileageData.map(data => data[1]));
         </div>
       </div>
     </div>
-  </section>
+  </SectionLayout>
 
   <!-- System Diagnostics Section -->
-  <section class="diagnostics-section mt-8">
-    <div class="section-header">
-      <div class="text-green-400 text-sm mb-4 flex items-center space-x-2">
-        <span class="animate-pulse">[SYSTEM_DIAGNOSTICS]</span>
-        <div class="flex-1 h-px bg-gradient-to-r from-green-500/50 to-transparent"></div>
-      </div>
-    </div>
-
+  <SectionLayout title="[SYSTEM_DIAGNOSTICS]" sectionClass="mt-8 mb-8">
     <div class="diagnostics-grid">
       <div class="diagnostic-item">
         <div class="diagnostic-label">API_CONNECTION:</div>
@@ -142,18 +120,6 @@ const maxMiles = Math.max(...mileageData.map(data => data[1]));
 </Base>
 
 <style>
-  /* Section Styling */
-  .activity-section, .heatmap-section, .diagnostics-section {
-    position: relative;
-    margin-bottom: 2rem;
-  }
-
-  .section-header {
-    border-bottom: 1px solid rgba(0, 255, 0, 0.2);
-    padding-bottom: 8px;
-    margin-bottom: 20px;
-  }
-
   /* Heatmap Container */
   .heatmap-container {
     background: linear-gradient(135deg, rgba(0, 0, 0, 0.8) 0%, rgba(0, 20, 0, 0.6) 100%);

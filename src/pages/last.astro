@@ -1,4 +1,5 @@
 ---
+import SectionLayout from "@components/SectionLayout.astro";
 import DaysSinceLast from "@components/DaysSinceLast.astro";
 import ActivityFilters from '@components/ActivityFilters.astro';
 import Base from "@layouts/Base.astro";
@@ -90,15 +91,14 @@ const isLastPage = recentActivities.length < activitiesPerPage;
   </section>
 
   <!-- Running Activity Section -->
-  <section class="activity-section mb-12">
-    <div class="section-header mb-6">
-      <div class="flex items-center space-x-3 mb-4">
-        <div class="text-green-400 text-lg font-mono animate-pulse">[RUNNING_MODULE]</div>
-        <div class="flex-1 h-px bg-gradient-to-r from-green-500/50 via-green-500/20 to-transparent"></div>
-        <div class="text-green-400/60 text-xs font-mono">CARDIOVASCULAR_TRAINING</div>
-      </div>
-    </div>
-
+  <SectionLayout
+    title="[RUNNING_MODULE]"
+    titleClass="text-lg font-mono"
+    rightHeaderText="CARDIOVASCULAR_TRAINING"
+    sectionClass="activity-section mb-12"
+    headerClass="mb-6 text-green-400 text-sm"
+  >
+    <div slot="headerElements" class="flex-1 h-px bg-gradient-to-r from-green-500/50 via-green-500/20 to-transparent"></div>
     <DaysSinceLast
       lastRunDate={lastRunDate || new Date()}
       activityType="RUN"
@@ -107,18 +107,17 @@ const isLastPage = recentActivities.length < activitiesPerPage;
       lastDuration={runDetails.duration || 0}
       averageWeekly={calculateWeeklyAverage('Run')}
     />
-  </section>
+  </SectionLayout>
 
   <!-- Cycling Activity Section -->
-  <section class="activity-section mb-12">
-    <div class="section-header mb-6">
-      <div class="flex items-center space-x-3 mb-4">
-        <div class="text-green-400 text-lg font-mono animate-pulse">[CYCLING_MODULE]</div>
-        <div class="flex-1 h-px bg-gradient-to-r from-green-500/50 via-green-500/20 to-transparent"></div>
-        <div class="text-green-400/60 text-xs font-mono">ENDURANCE_TRAINING</div>
-      </div>
-    </div>
-
+  <SectionLayout
+    title="[CYCLING_MODULE]"
+    titleClass="text-lg font-mono"
+    rightHeaderText="ENDURANCE_TRAINING"
+    sectionClass="activity-section mb-12"
+    headerClass="mb-6 text-green-400 text-sm"
+  >
+    <div slot="headerElements" class="flex-1 h-px bg-gradient-to-r from-green-500/50 via-green-500/20 to-transparent"></div>
     <DaysSinceLast
       lastRunDate={lastRideDate || new Date()}
       activityType="RIDE"
@@ -127,18 +126,17 @@ const isLastPage = recentActivities.length < activitiesPerPage;
       lastDuration={rideDetails.duration || 0}
       averageWeekly={calculateWeeklyAverage('Ride')}
     />
-  </section>
+  </SectionLayout>
 
   <!-- Swimming Activity Section -->
-  <section class="activity-section mb-12">
-    <div class="section-header mb-6">
-      <div class="flex items-center space-x-3 mb-4">
-        <div class="text-green-400 text-lg font-mono animate-pulse">[SWIMMING_MODULE]</div>
-        <div class="flex-1 h-px bg-gradient-to-r from-green-500/50 via-green-500/20 to-transparent"></div>
-        <div class="text-green-400/60 text-xs font-mono">AQUATIC_TRAINING</div>
-      </div>
-    </div>
-
+  <SectionLayout
+    title="[SWIMMING_MODULE]"
+    titleClass="text-lg font-mono"
+    rightHeaderText="AQUATIC_TRAINING"
+    sectionClass="activity-section mb-12"
+    headerClass="mb-6 text-green-400 text-sm"
+  >
+    <div slot="headerElements" class="flex-1 h-px bg-gradient-to-r from-green-500/50 via-green-500/20 to-transparent"></div>
     <DaysSinceLast
       lastRunDate={lastSwimDate || new Date()}
       activityType="Swim"
@@ -147,7 +145,7 @@ const isLastPage = recentActivities.length < activitiesPerPage;
       lastDuration={swimDetails.duration || 0}
       averageWeekly={calculateWeeklyAverage('Swim')}
     />
-  </section>
+  </SectionLayout>
 
   <!-- Training Summary Section -->
   <section class="mb-8">
@@ -275,11 +273,12 @@ const isLastPage = recentActivities.length < activitiesPerPage;
     margin-top: 2rem;
   }
 
-  .section-header {
-    position: relative;
+  /* Ensure scanline still works with SectionLayout's internal structure */
+  .activity-section .base-section-header {
+    position: relative; /* Needed for the ::before pseudo-element to be positioned correctly */
   }
 
-  .section-header::before {
+  .activity-section .base-section-header::before {
     content: '';
     position: absolute;
     top: 0;
@@ -306,9 +305,8 @@ const isLastPage = recentActivities.length < activitiesPerPage;
 
   /* Responsive improvements */
   @media (max-width: 768px) {
-    .section-header {
-      margin-bottom: 1rem;
-    }
+    /* Original .section-header responsive margin is now handled by headerClass prop on SectionLayout if needed */
+    /* For example, if headerClass="mb-6 md:mb-4" was used */
 
     .activity-section {
       margin-bottom: 2rem;

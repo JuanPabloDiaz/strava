@@ -1,0 +1,62 @@
+---
+export interface Props {
+  title: string;
+  titleClass?: string;
+  headerContainerClass?: string; // For the left part of the header
+  headerClass?: string; // For the overall header (flex justify-between)
+  rightHeaderText?: string;
+  sectionClass?: string;
+  hrClass?: string;
+}
+
+const {
+  title,
+  titleClass = "", // Default: no extra classes for the title span itself
+  // Default for the container of title and hr/slot: groups title and line/elements together
+  headerContainerClass = "flex items-center space-x-2",
+  // Default for the overall header: green text, small, flex, space-between, bottom border, margins
+  headerClass = "text-green-400 text-sm",
+  rightHeaderText,
+  sectionClass = "mb-8", // Default section bottom margin
+  // Default for the horizontal rule if slot is not used
+  hrClass = "flex-1 h-px bg-gradient-to-r from-green-500/50 to-transparent",
+} = Astro.props;
+---
+
+<section class={`base-section ${sectionClass}`}>
+  <div class={`base-section-header ${headerClass}`}>
+    <div class={headerContainerClass}>
+      <span class={`animate-pulse ${titleClass}`}>{title}</span>
+      {Astro.slots.has('headerElements') ? <slot name="headerElements" /> : <div class={hrClass}></div>}
+    </div>
+    {rightHeaderText && <span class="text-green-300 text-xs">{rightHeaderText}</span>}
+  </div>
+  <slot /> <!-- For the main content of the section -->
+</section>
+
+<style>
+  .base-section {
+    position: relative;
+    /* sectionClass prop handles margin-bottom, e.g., mb-8 (2rem) */
+  }
+
+  .base-section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid rgba(0, 255, 0, 0.2);
+    padding-bottom: 0.5rem; /* 8px */
+    margin-bottom: 1.25rem; /* 20px */
+    /* text color and size are handled by headerClass prop default e.g. text-green-400 text-sm */
+  }
+
+  /* Copied from index.astro, can be removed if Tailwind handles it globally */
+  .animate-pulse {
+    animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+  }
+
+  @keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: .5; }
+  }
+</style>

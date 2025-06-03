@@ -1,5 +1,6 @@
 ---
 import Base from "@layouts/Base.astro";
+import SectionLayout from "@components/SectionLayout.astro";
 import ActivityMap from "@components/ActivityMap.astro";
 import { fetchActivities, getActivityStats } from '@services/stravaService';
 
@@ -20,14 +21,7 @@ const activitiesWithGPS = activities.filter(activity =>
   systemMessage="[SYSTEM] Loading geospatial neural network... GPS satellites locked."
 >
   <!-- Stats Overview Section -->
-  <section class="stats-section mb-8">
-    <div class="section-header">
-      <div class="text-green-400 text-sm mb-4 flex items-center space-x-2">
-        <span class="animate-pulse">[ACTIVITY_ANALYTICS]</span>
-        <div class="flex-1 h-px bg-gradient-to-r from-green-500/50 to-transparent"></div>
-      </div>
-    </div>
-
+  <SectionLayout title="[ACTIVITY_ANALYTICS]">
     <div class="stats-grid">
       <div class="stat-block">
         <div class="stat-label">TOTAL_ACTIVITIES</div>
@@ -46,35 +40,19 @@ const activitiesWithGPS = activities.filter(activity =>
         <div class="stat-value">{Math.floor(stats.totalTime / 3600)}H {Math.floor((stats.totalTime % 3600) / 60)}M</div>
       </div>
     </div>
-  </section>
+  </SectionLayout>
 
   <!-- Activity Map Section -->
-  <section class="map-section mb-8">
-    <div class="section-header">
-      <div class="text-green-400 text-sm mb-4 flex items-center justify-between">
-        <div class="flex items-center space-x-2">
-          <span class="animate-pulse">[NEURAL_MAPPING_INTERFACE]</span>
-          <div class="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
-        </div>
-        <span class="text-green-300 text-xs">[REAL_TIME_GPS_TRACKING]</span>
-      </div>
-    </div>
-
+  <SectionLayout title="[NEURAL_MAPPING_INTERFACE]" rightHeaderText="[REAL_TIME_GPS_TRACKING]">
+    <div slot="headerElements" class="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
     <ActivityMap
       activities={activitiesWithGPS}
       height="500px"
     />
-  </section>
+  </SectionLayout>
 
   <!-- Activity Types Breakdown -->
-  <section class="breakdown-section">
-    <div class="section-header">
-      <div class="text-green-400 text-sm mb-4 flex items-center space-x-2">
-        <span class="animate-pulse">[ACTIVITY_CLASSIFICATION]</span>
-        <div class="flex-1 h-px bg-gradient-to-r from-green-500/50 to-transparent"></div>
-      </div>
-    </div>
-
+  <SectionLayout title="[ACTIVITY_CLASSIFICATION]">
     <div class="breakdown-grid">
       {Object.entries(stats.byType).map(([type, typeStats]) => (
         <div class="breakdown-item">
@@ -128,16 +106,14 @@ const activitiesWithGPS = activities.filter(activity =>
 
 <style>
   /* Section Styling */
-  .stats-section, .map-section, .breakdown-section, .navigation-section {
+  /* Styles for stats-section, map-section, breakdown-section are removed as SectionLayout handles them */
+  /* Retain styles for navigation-section as it's not refactored */
+  .navigation-section {
     position: relative;
     margin-bottom: 2rem;
   }
 
-  .section-header {
-    border-bottom: 1px solid rgba(0, 255, 0, 0.2);
-    padding-bottom: 8px;
-    margin-bottom: 20px;
-  }
+  /* section-header styles are removed as SectionLayout handles them */
 
   /* Stats Grid */
   .stats-grid {
