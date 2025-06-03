@@ -3,12 +3,54 @@ import DaysSinceLast from "@components/DaysSinceLast.astro";
 import Base from "@layouts/Base.astro";
 import { fetchMileage, processMileageData, getLastActivityDate } from '@services/stravaService';
 
-// Fetch and process data
+// Fetch and process data for each activity type
 const mileageMap = await fetchMileage();
 const mileageData = processMileageData(mileageMap);
+
+// Get last activity dates and detailed info for each activity type
 const lastRunDate = await getLastActivityDate('Run');
 const lastRideDate = await getLastActivityDate('Ride');
 const lastSwimDate = await getLastActivityDate('Swim');
+
+// Calculate weekly averages (mock data - replace with actual calculations)
+const calculateWeeklyAverage = (activityType) => {
+  // This would typically come from your Strava service
+  // For now, returning mock data based on activity type
+  const mockAverages = {
+    'Run': 25.5,
+    'Ride': 45.2,
+    'Swim': 2.8
+  };
+  return mockAverages[activityType] || 0;
+};
+
+// Mock last activity details (replace with actual Strava data)
+const getLastActivityDetails = (activityType) => {
+  // This would come from your Strava service
+  const mockDetails = {
+    'Run': {
+      distance: 8.5, // km
+      duration: 2580, // seconds (43 minutes)
+      stravaUrl: 'https://www.strava.com/activities/12345678'
+    },
+    'Ride': {
+      distance: 32.1, // km
+      duration: 4320, // seconds (1h 12m)
+      stravaUrl: 'https://www.strava.com/activities/12345679'
+    },
+    'Swim': {
+      distance: 1200, // meters
+      duration: 1800, // seconds (30 minutes)
+      stravaUrl: 'https://www.strava.com/activities/12345680'
+    }
+  };
+  return mockDetails[activityType] || {};
+};
+
+// Get activity details
+const runDetails = getLastActivityDetails('Run');
+const rideDetails = getLastActivityDetails('Ride');
+const swimDetails = getLastActivityDetails('Swim');
 
 const minMiles = Math.min(...mileageData.map(data => data[1]));
 const maxMiles = Math.max(...mileageData.map(data => data[1]));
@@ -16,55 +58,300 @@ const maxMiles = Math.max(...mileageData.map(data => data[1]));
 ---
 
 <Base
-  title="Test"
-  windowTitle="TEST"
-  terminalCommand="./test.exe"
-  systemMessage="[SYSTEM] Loading neural activity patterns..."
+  title="Activity Status Monitor"
+  windowTitle="LAST_ACTIVITY_TRACKER"
+  terminalCommand="./monitor_athlete_performance.exe"
+  systemMessage="[NEURAL_NETWORK] Analyzing training patterns and performance metrics..."
 >
 
-  <!-- Days Since Last RUN Section -->
-  <section class="activity-section mb-8">
-    <div class="section-header">
-      <div class="text-green-400 text-sm mb-4 flex items-center space-x-2">
-        <span class="animate-pulse">[ACTIVITY_STATUS]</span>
-        <div class="flex-1 h-px bg-gradient-to-r from-green-500/50 to-transparent"></div>
+  <!-- Header Section -->
+  <section class="mb-8">
+    <div class="text-center space-y-4">
+      <div class="inline-flex items-center space-x-2 px-4 py-2 bg-green-500/10 border border-green-500/30 rounded-lg">
+        <span class="text-green-400 animate-pulse">●</span>
+        <span class="text-green-300 font-mono text-sm">REAL_TIME_ACTIVITY_MONITORING</span>
+      </div>
+
+      <div class="text-green-400/80 text-sm max-w-2xl mx-auto">
+        Tracking your fitness journey across multiple disciplines.
+        Stay consistent, stay strong, and let the data guide your progress.
+      </div>
+    </div>
+  </section>
+
+  <!-- Running Activity Section -->
+  <section class="activity-section mb-12">
+    <div class="section-header mb-6">
+      <div class="flex items-center space-x-3 mb-4">
+        <div class="text-green-400 text-lg font-mono animate-pulse">[RUNNING_MODULE]</div>
+        <div class="flex-1 h-px bg-gradient-to-r from-green-500/50 via-green-500/20 to-transparent"></div>
+        <div class="text-green-400/60 text-xs font-mono">CARDIOVASCULAR_TRAINING</div>
       </div>
     </div>
 
     <DaysSinceLast
-      lastRunDate={lastRunDate || undefined}
+      lastRunDate={lastRunDate || new Date()}
       activityType="RUN"
+      stravaUrl={runDetails.stravaUrl}
+      lastDistance={runDetails.distance || 0}
+      lastDuration={runDetails.duration || 0}
+      averageWeekly={calculateWeeklyAverage('Run')}
     />
   </section>
 
-    <!-- Days Since Last RIDE Section -->
-  <section class="activity-section mb-8">
-    <div class="section-header">
-      <div class="text-green-400 text-sm mb-4 flex items-center space-x-2">
-        <span class="animate-pulse">[ACTIVITY_STATUS]</span>
-        <div class="flex-1 h-px bg-gradient-to-r from-green-500/50 to-transparent"></div>
+  <!-- Cycling Activity Section -->
+  <section class="activity-section mb-12">
+    <div class="section-header mb-6">
+      <div class="flex items-center space-x-3 mb-4">
+        <div class="text-green-400 text-lg font-mono animate-pulse">[CYCLING_MODULE]</div>
+        <div class="flex-1 h-px bg-gradient-to-r from-green-500/50 via-green-500/20 to-transparent"></div>
+        <div class="text-green-400/60 text-xs font-mono">ENDURANCE_TRAINING</div>
       </div>
     </div>
 
     <DaysSinceLast
-      lastRunDate={lastRideDate || undefined}
+      lastRunDate={lastRideDate || new Date()}
       activityType="RIDE"
+      stravaUrl={rideDetails.stravaUrl}
+      lastDistance={rideDetails.distance || 0}
+      lastDuration={rideDetails.duration || 0}
+      averageWeekly={calculateWeeklyAverage('Ride')}
     />
   </section>
 
-      <!-- Days Since Last SWIM Section -->
-  <section class="activity-section mb-8">
-    <div class="section-header">
-      <div class="text-green-400 text-sm mb-4 flex items-center space-x-2">
-        <span class="animate-pulse">[ACTIVITY_STATUS]</span>
-        <div class="flex-1 h-px bg-gradient-to-r from-green-500/50 to-transparent"></div>
+  <!-- Swimming Activity Section -->
+  <section class="activity-section mb-12">
+    <div class="section-header mb-6">
+      <div class="flex items-center space-x-3 mb-4">
+        <div class="text-green-400 text-lg font-mono animate-pulse">[SWIMMING_MODULE]</div>
+        <div class="flex-1 h-px bg-gradient-to-r from-green-500/50 via-green-500/20 to-transparent"></div>
+        <div class="text-green-400/60 text-xs font-mono">AQUATIC_TRAINING</div>
       </div>
     </div>
 
     <DaysSinceLast
-      lastRunDate={lastSwimDate || undefined}
+      lastRunDate={lastSwimDate || new Date()}
       activityType="Swim"
+      stravaUrl={swimDetails.stravaUrl}
+      lastDistance={swimDetails.distance || 0}
+      lastDuration={swimDetails.duration || 0}
+      averageWeekly={calculateWeeklyAverage('Swim')}
     />
+  </section>
+
+  <!-- Training Summary Section -->
+  <section class="mb-8">
+    <div class="bg-black/60 border border-green-500/30 rounded-lg p-6 backdrop-blur-sm">
+      <div class="text-center space-y-4">
+        <div class="text-green-400 font-mono text-lg mb-4">[TRAINING_SUMMARY]</div>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
+          <div class="space-y-2">
+            <div class="text-green-400/60 text-xs">TOTAL_ACTIVITIES:</div>
+            <div class="text-green-300 font-mono text-xl">3</div>
+            <div class="text-green-400/80 text-xs">DISCIPLINES_TRACKED</div>
+          </div>
+
+          <div class="space-y-2">
+            <div class="text-green-400/60 text-xs">WEEKLY_TARGET:</div>
+            <div class="text-green-300 font-mono text-xl">5-7</div>
+            <div class="text-green-400/80 text-xs">SESSIONS_PER_WEEK</div>
+          </div>
+
+          <div class="space-y-2">
+            <div class="text-green-400/60 text-xs">CONSISTENCY_RATING:</div>
+            <div class="text-yellow-400 font-mono text-xl">85%</div>
+            <div class="text-green-400/80 text-xs">ADHERENCE_TO_PLAN</div>
+          </div>
+        </div>
+
+        <div class="mt-6 pt-4 border-t border-green-500/20">
+          <div class="text-green-400/80 text-xs mb-2">SYSTEM_RECOMMENDATION:</div>
+          <div class="text-green-300 text-sm italic">
+            "Maintain cross-training balance. Consider increasing swimming frequency for optimal recovery."
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Quick Actions Section -->
+  <section class="mb-8">
+    <div class="text-center space-y-4">
+      <div class="text-green-400 font-mono text-sm mb-4">[QUICK_ACTIONS]</div>
+
+      <div class="flex flex-col sm:flex-row gap-3 justify-center max-w-2xl mx-auto">
+        <a
+          href="https://www.strava.com/dashboard"
+          target="_blank"
+          rel="noopener noreferrer"
+          class="flex-1 px-4 py-3 bg-orange-500/20 border border-orange-500/40 text-orange-400 rounded-lg font-mono text-sm hover:bg-orange-500/30 hover:border-orange-500/60 transition-all duration-300 transform hover:scale-105 no-underline hover:no-underline"
+        >
+          <div class="flex items-center justify-center space-x-2">
+            <span>📊</span>
+            <span>STRAVA_DASHBOARD</span>
+          </div>
+        </a>
+
+        <button
+          class="flex-1 px-4 py-3 bg-blue-500/20 border border-blue-500/40 text-blue-400 rounded-lg font-mono text-sm hover:bg-blue-500/30 hover:border-blue-500/60 transition-all duration-300 transform hover:scale-105 training-plan-btn"
+        >
+          <div class="flex items-center justify-center space-x-2">
+            <span>📋</span>
+            <span>TRAINING_PLAN</span>
+          </div>
+        </button>
+
+        <button
+          class="flex-1 px-4 py-3 bg-purple-500/20 border border-purple-500/40 text-purple-400 rounded-lg font-mono text-sm hover:bg-purple-500/30 hover:border-purple-500/60 transition-all duration-300 transform hover:scale-105 analytics-btn"
+        >
+          <div class="flex items-center justify-center space-x-2">
+            <span>📈</span>
+            <span>ANALYTICS</span>
+          </div>
+        </button>
+      </div>
+    </div>
   </section>
 
 </Base>
+
+<style>
+  .section-header {
+    position: relative;
+  }
+
+  .section-header::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(0, 255, 0, 0.3), transparent);
+    animation: scanLine 2s ease-in-out infinite;
+  }
+
+  @keyframes scanLine {
+    0%, 100% { opacity: 0; }
+    50% { opacity: 1; }
+  }
+
+  .activity-section {
+    position: relative;
+    transition: all 0.3s ease;
+  }
+
+  .activity-section:hover {
+    transform: translateY(-2px);
+  }
+
+  /* Responsive improvements */
+  @media (max-width: 768px) {
+    .section-header {
+      margin-bottom: 1rem;
+    }
+
+    .activity-section {
+      margin-bottom: 2rem;
+    }
+  }
+</style>
+
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    // Training Plan button functionality
+    const trainingPlanBtn = document.querySelector('.training-plan-btn');
+    trainingPlanBtn?.addEventListener('click', () => {
+      showModal('Training Plan', `
+        <div class="space-y-4 text-left">
+          <div class="text-green-400 text-sm">WEEKLY_SCHEDULE:</div>
+          <div class="space-y-2 text-sm text-green-300">
+            <div>• MONDAY: Rest or light swim (30-45min)</div>
+            <div>• TUESDAY: Run - Tempo/Intervals (45-60min)</div>
+            <div>• WEDNESDAY: Bike - Endurance ride (60-90min)</div>
+            <div>• THURSDAY: Run - Easy pace (30-45min)</div>
+            <div>• FRIDAY: Swim - Technique focus (45min)</div>
+            <div>• SATURDAY: Bike - Long ride (90-120min)</div>
+            <div>• SUNDAY: Run - Long run (60-90min)</div>
+          </div>
+          <div class="mt-4 pt-4 border-t border-green-500/20 text-xs text-green-400/80">
+            Adjust intensity based on current fitness level and recovery status.
+          </div>
+        </div>
+      `);
+    });
+
+    // Analytics button functionality
+    const analyticsBtn = document.querySelector('.analytics-btn');
+    analyticsBtn?.addEventListener('click', () => {
+      showModal('Performance Analytics', `
+        <div class="space-y-4 text-left">
+          <div class="grid grid-cols-2 gap-4 text-sm">
+            <div class="space-y-2">
+              <div class="text-green-400 text-xs">RUNNING_METRICS:</div>
+              <div class="text-green-300 font-mono text-xs">
+                Avg Pace: 5:12/km<br>
+                Weekly: 25.5km<br>
+                Trend: ↗ +8%
+              </div>
+            </div>
+            <div class="space-y-2">
+              <div class="text-green-400 text-xs">CYCLING_METRICS:</div>
+              <div class="text-green-300 font-mono text-xs">
+                Avg Speed: 28.3km/h<br>
+                Weekly: 45.2km<br>
+                Trend: ↗ +12%
+              </div>
+            </div>
+          </div>
+          <div class="space-y-2">
+            <div class="text-green-400 text-xs">SWIMMING_METRICS:</div>
+            <div class="text-green-300 font-mono text-xs">
+              Avg Pace: 2:15/100m | Weekly: 2.8km | Trend: → Stable
+            </div>
+          </div>
+          <div class="mt-4 pt-4 border-t border-green-500/20">
+            <div class="text-green-400 text-xs mb-2">RECOMMENDATIONS:</div>
+            <div class="text-green-300 text-xs">
+              • Increase swimming volume by 10-15%<br>
+              • Maintain current running consistency<br>
+              • Consider adding bike hill training
+            </div>
+          </div>
+        </div>
+      `);
+    });
+
+    // Modal utility function
+    function showModal(title, content) {
+      const modal = document.createElement('div');
+      modal.className = 'fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4';
+      modal.innerHTML = `
+        <div class="bg-black/90 border border-green-500/40 rounded-lg p-6 max-w-lg w-full max-h-[80vh] overflow-y-auto">
+          <div class="space-y-4">
+            <div class="text-green-400 text-lg font-mono text-center">[${title.toUpperCase().replace(' ', '_')}]</div>
+            <div class="text-green-300">
+              ${content}
+            </div>
+            <div class="text-center mt-6">
+              <button class="px-6 py-2 bg-green-500/20 border border-green-500/40 text-green-400 rounded hover:bg-green-500/30 transition-all duration-300 font-mono text-sm close-modal">
+                [CLOSE]
+              </button>
+            </div>
+          </div>
+        </div>
+      `;
+
+      document.body.appendChild(modal);
+
+      const closeBtn = modal.querySelector('.close-modal');
+      const closeModal = () => document.body.removeChild(modal);
+
+      closeBtn.addEventListener('click', closeModal);
+      modal.addEventListener('click', (e) => {
+        if (e.target === modal) closeModal();
+      });
+    }
+  });
+</script>
