@@ -57,7 +57,18 @@ const swimDetails = getLastActivityDetails('Swim');
 const minMiles = Math.min(...mileageData.map(data => data[1]));
 const maxMiles = Math.max(...mileageData.map(data => data[1]));
 
-const recentActivities = await fetchActivities(5);
+const activitiesPerPage = 10;
+const pageParam = Astro.url.searchParams.get('page');
+let currentPage = 1;
+if (pageParam) {
+  const parsedPage = parseInt(pageParam, 10);
+  if (!isNaN(parsedPage) && parsedPage > 0) {
+    currentPage = parsedPage;
+  }
+}
+
+const recentActivities = await fetchActivities(currentPage, activitiesPerPage);
+const isLastPage = recentActivities.length < activitiesPerPage;
 ---
 
 <Base
@@ -230,6 +241,29 @@ const recentActivities = await fetchActivities(5);
           ) : (
             <p class="text-center text-gray-400">No recent activities found.</p>
           )}
+        </div>
+        <div class="mt-8 text-center">
+          <a
+            href={currentPage > 1 ? `?page=${currentPage - 1}` : undefined}
+            class:list={[
+              "px-4 py-2 bg-green-500/20 border border-green-500/40 text-green-400 rounded hover:bg-green-500/30 mx-2",
+              currentPage === 1 && "opacity-50 cursor-not-allowed"
+            ]}
+            aria-disabled={currentPage === 1}
+          >
+            &lt; Previous
+          </a>
+          <span class="text-green-400 mx-2">Page {currentPage}</span>
+          <a
+            href={!isLastPage ? `?page=${currentPage + 1}` : undefined}
+            class:list={[
+              "px-4 py-2 bg-green-500/20 border border-green-500/40 text-green-400 rounded hover:bg-green-500/30 mx-2",
+              isLastPage && "opacity-50 cursor-not-allowed"
+            ]}
+            aria-disabled={isLastPage}
+          >
+            Next &gt;
+          </a>
         </div>
       </div>
     </div>

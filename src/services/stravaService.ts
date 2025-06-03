@@ -61,11 +61,12 @@ export async function getPage(page: number, bearer: string): Promise<any[]> {
 
 // Nueva función para obtener actividades recientes (sin filtro de tiempo)
 export async function fetchActivities(
+  page: number = 1,
   perPage: number = 10
 ): Promise<StravaActivity[]> {
   try {
     const bearer = await getBearerToken();
-    const url = `https://www.strava.com/api/v3/athlete/activities?per_page=${perPage}&page=1`;
+    const url = `https://www.strava.com/api/v3/athlete/activities?page=${page}&per_page=${perPage}`;
     const headers = { Authorization: bearer };
     const response = await fetch(url, { method: "GET", headers: headers });
 
@@ -150,7 +151,7 @@ export async function getLastActivityDate(
       return testDate;
     }
 
-    const activities = await fetchActivities(20); // Obtener más actividades para encontrar el tipo específico
+    const activities = await fetchActivities(1, 50); // Obtener más actividades para encontrar el tipo específico
 
     if (activities.length === 0) {
       return null;
@@ -223,7 +224,7 @@ export async function getLastActivityInfo(activityType?: string): Promise<{
       };
     }
 
-    const activities = await fetchActivities(20);
+    const activities = await fetchActivities(1, 50);
 
     if (activities.length === 0) {
       return null;
