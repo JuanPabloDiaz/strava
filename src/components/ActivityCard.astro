@@ -1,0 +1,68 @@
+---
+import type { StravaActivity } from '@services/stravaService';
+
+export interface Props {
+  activity: StravaActivity;
+}
+
+const { activity } = Astro.props;
+
+// Basic formatting (can be improved later)
+const durationInMinutes = Math.floor(activity.moving_time / 60);
+const distanceInKm = (activity.distance / 1000).toFixed(2);
+const activityDate = new Date(activity.start_date).toLocaleDateString();
+---
+
+<div class="activity-card">
+  <h2>{activity.name}</h2>
+  <p><strong>Date:</strong> {activityDate} <!-- TODO: Format date and add relative time --></p>
+  <p><strong>Duration:</strong> {durationInMinutes} minutes</p>
+  <p><strong>Distance:</strong> {distanceInKm} km</p>
+  <p><strong>Type:</strong> {activity.type} ({activity.sport_type})</p>
+  <div class="map-placeholder" style="width:100%; height:200px; background-color:#333; color:white; display:flex; align-items:center; justify-content:center;">
+    Map Placeholder
+  </div>
+  <!-- TODO: Display heart rate if available -->
+</div>
+
+<style>
+  .activity-card {
+    border: 1px solid #0f0; /* Matrix green border */
+    padding: 1.5em;
+    margin-bottom: 1.5em;
+    background-color: #0a0a0a; /* Darker background */
+    color: #ccc;
+    font-family: 'Courier New', Courier, monospace; /* Monospaced font */
+    box-shadow: 0 0 10px #0f0; /* Green glow effect */
+  }
+
+  .activity-card h2 {
+    margin-top: 0;
+    margin-bottom: 0.75em;
+    color: #0f0; /* Matrix green */
+    text-shadow: 0 0 5px #0f0;
+  }
+
+  .activity-card p {
+    margin-bottom: 0.5em;
+    line-height: 1.6;
+    color: #ddd; /* Lighter grey for paragraph text */
+  }
+
+  .activity-card p strong {
+    color: #0f0; /* Green for emphasized parts */
+  }
+
+  .map-placeholder {
+    width: 100%;
+    height: 200px;
+    background-color: #111; /* Darker placeholder bg */
+    color: #0f0; /* Green text */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px dashed #0f0; /* Dashed green border */
+    margin-top: 1em;
+    font-weight: bold;
+  }
+</style>

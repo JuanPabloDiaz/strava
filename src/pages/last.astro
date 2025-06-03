@@ -1,7 +1,9 @@
 ---
 import DaysSinceLast from "@components/DaysSinceLast.astro";
 import Base from "@layouts/Base.astro";
-import { fetchMileage, processMileageData, getLastActivityDate } from '@services/stravaService';
+import { fetchMileage, processMileageData, getLastActivityDate, fetchActivities } from '@services/stravaService';
+import type { StravaActivity } from '@services/stravaService';
+import ActivityCard from '@components/ActivityCard.astro';
 
 // Fetch and process data for each activity type
 const mileageMap = await fetchMileage();
@@ -55,6 +57,7 @@ const swimDetails = getLastActivityDetails('Swim');
 const minMiles = Math.min(...mileageData.map(data => data[1]));
 const maxMiles = Math.max(...mileageData.map(data => data[1]));
 
+const recentActivities = await fetchActivities(5);
 ---
 
 <Base
@@ -214,9 +217,32 @@ const maxMiles = Math.max(...mileageData.map(data => data[1]));
     </div>
   </section>
 
+  <!-- Recent Activities Section -->
+  <section class="mb-8">
+    <div class="bg-black/60 border border-green-500/30 rounded-lg p-6 backdrop-blur-sm">
+      <div class="text-center space-y-4">
+        <div class="text-green-400 font-mono text-lg mb-4">[RECENT_ACTIVITIES]</div>
+        <div class="activities-list space-y-6">
+          {recentActivities && recentActivities.length > 0 ? (
+            recentActivities.map(activity => (
+              <ActivityCard activity={activity} />
+            ))
+          ) : (
+            <p class="text-center text-gray-400">No recent activities found.</p>
+          )}
+        </div>
+      </div>
+    </div>
+  </section>
+
 </Base>
 
 <style>
+  /* Optional: Add some styling for the list container if needed */
+  .activities-list {
+    margin-top: 2rem;
+  }
+
   .section-header {
     position: relative;
   }
