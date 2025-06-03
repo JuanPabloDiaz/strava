@@ -44,6 +44,72 @@ const mapId = `leaflet-map-${Math.random().toString(36).substring(2, 9)}`;
   // Explicitly declare the L global variable with its type for TypeScript
   declare var L: typeof import('leaflet');
 
+  // Simple polyline decoder function as fallback
+  function decodePolyline(encoded: string): [number, number][] {
+    if (!encoded || encoded.length === 0) {
+      console.log('Empty or null polyline string');
+      return [];
+    }
+
+    const poly = [];
+    let index = 0;
+    const len = encoded.length;
+    let lat = 0;
+    let lng = 0;
+
+    try {
+      while (index < len) {
+        let b;
+        let shift = 0;
+        let result = 0;
+        do {
+          b = encoded.charCodeAt(index++) - 63;
+          result |= (b & 0x1f) << shift;
+          shift += 5;
+        } while (b >= 0x20);
+        const dlat = ((result & 1) !== 0 ? ~(result >> 1) : (result >> 1));
+        lat += dlat;
+
+        shift = 0;
+        result = 0;
+        do {
+          b = encoded.charCodeAt(index++) - 63;
+          result |= (b & 0x1f) << shift;
+          shift += 5;
+        } while (b >= 0x20);
+        const dlng = ((result & 1) !== 0 ? ~(result >> 1) : (result >> 1));
+        lng += dlng;
+
+        poly.push([lat / 1e5, lng / 1e5]);
+      }
+      console.log(`Decoded polyline: ${poly.length} points from ${encoded.length} characters`);
+      return poly;
+    } catch (error) {
+      console.error('Error decoding polyline:', error);
+      return [];
+    }
+  }
+
+  // Function to format distance
+  function formatDistance(meters: number): string {
+    if (meters >= 1000) {
+      return `${(meters / 1000).toFixed(2)} km`;
+    }
+    return `${Math.round(meters)} m`;
+  }
+
+  // Function to calculate distance between two points (Haversine formula)
+  function calculateDistance(lat1: number, lon1: number, lat2: number, lon2: number): number {
+    const R = 6371000; // Earth's radius in meters
+    const dLat = (lat2 - lat1) * Math.PI / 180;
+    const dLon = (lon2 - lon1) * Math.PI / 180;
+    const a = Math.sin(dLat/2) * Math.sin(dLat/2) +
+              Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
+              Math.sin(dLon/2) * Math.sin(dLon/2);
+    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+    return R * c;
+  }
+
   // Function to initialize the map
   async function initializeMap(mapContainerElement: HTMLElement) {
     const mapIdFromData = mapContainerElement.dataset.mapId;
@@ -77,8 +143,7 @@ const mapId = `leaflet-map-${Math.random().toString(36).substring(2, 9)}`;
       return;
     }
 
-    setMapMessage('Initializing Geospatial Interface...', false);
-
+    setMapMessage('Decoding activity routes...', false);
 
     let activities: any[] = [];
     try {
@@ -89,6 +154,7 @@ const mapId = `leaflet-map-${Math.random().toString(36).substring(2, 9)}`;
       return;
     }
 
+    // Try to load external polyline library, fallback to built-in decoder
     let polylineDecoder: ((encoded: string) => [number, number][]) | undefined;
     let simplify: ((points: { x: number; y: number }[], tolerance?: number, highestQuality?: boolean) => { x: number; y: number }[]) | undefined;
 
@@ -97,21 +163,28 @@ const mapId = `leaflet-map-${Math.random().toString(36).substring(2, 9)}`;
       const decoder = polylineModule.default?.decode || polylineModule.decode;
       if (typeof decoder === 'function') {
         polylineDecoder = decoder;
-      } else {
-        throw new Error("Polyline library loaded, but 'decode' function is not available or not a function.");
+        console.log('Using @mapbox/polyline decoder');
       }
+    } catch (e) {
+      console.warn('Could not load @mapbox/polyline, using fallback decoder:', e);
+    }
 
+    // Use fallback decoder if external library failed
+    if (!polylineDecoder) {
+      polylineDecoder = decodePolyline;
+      console.log('Using built-in polyline decoder');
+    }
+
+    try {
       const simplifyJsModule = await import('simplify-js');
       if (typeof simplifyJsModule.default === 'function') {
         simplify = simplifyJsModule.default;
-      } else if (typeof simplifyJsModule === 'function') { // In case simplify-js is not a default export
+      } else if (typeof simplifyJsModule === 'function') {
         simplify = simplifyJsModule;
       }
-       else {
-        throw new Error("simplify-js library loaded, but the 'simplify' function is not available.");
-      }
+      console.log('Simplify-js loaded successfully');
     } catch (e: any) {
-      setMapMessage(`Error: Could not load polyline or simplification library. Polylines may not be drawn or optimized. Details: ${e.message}`, true);
+      console.warn('Could not load simplify-js library. Routes will not be simplified:', e);
     }
 
     if (loadingMessageElement) loadingMessageElement.style.display = 'none';
@@ -124,65 +197,194 @@ const mapId = `leaflet-map-${Math.random().toString(36).substring(2, 9)}`;
     const featureGroup = L.featureGroup();
 
     const activityTypeColors = {
-      'Run': '#00FF00', 'Ride': '#00FFFF', 'Swim': '#0000FF',
-      'Walk': '#FFFF00', 'Hike': '#FFA500', 'Default': '#FF00FF'
+      'Run': '#00FF00',
+      'Ride': '#00FFFF',
+      'Swim': '#0000FF',
+      'Walk': '#FFFF00',
+      'Hike': '#FFA500',
+      'VirtualRide': '#FF00FF',
+      'Workout': '#FF6600',
+      'Default': '#FF00FF'
     };
 
-    const greenIcon = L.icon({
-        iconUrl: 'data:image/svg+xml;charset=UTF-8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="%2300FF00" width="20" height="20"><path fill-rule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clip-rule="evenodd" /></svg>',
-        iconSize: [24, 24], iconAnchor: [12, 24], popupAnchor: [0, -24]
+    // Custom icons for start and end points
+    const startIcon = L.icon({
+        iconUrl: 'data:image/svg+xml;charset=UTF-8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="%2300FF00" width="20" height="20"><circle cx="10" cy="10" r="8" stroke="%23000" stroke-width="2"/><text x="10" y="14" text-anchor="middle" fill="%23000" font-size="10" font-weight="bold">S</text></svg>',
+        iconSize: [20, 20],
+        iconAnchor: [10, 10],
+        popupAnchor: [0, -10]
     });
 
-    activities.forEach(activity => {
+    const endIcon = L.icon({
+        iconUrl: 'data:image/svg+xml;charset=UTF-8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="%23FF0000" width="20" height="20"><circle cx="10" cy="10" r="8" stroke="%23000" stroke-width="2"/><text x="10" y="14" text-anchor="middle" fill="%23FFF" font-size="10" font-weight="bold">F</text></svg>',
+        iconSize: [20, 20],
+        iconAnchor: [10, 10],
+        popupAnchor: [0, -10]
+    });
+
+    activities.forEach((activity, index) => {
+      console.log(`\n=== Processing Activity ${index + 1}: "${activity.name}" ===`);
+      console.log('Activity Type:', activity.type || activity.sport_type);
+      console.log('Has summary_polyline:', !!activity.summary_polyline);
+      console.log('Polyline length:', activity.summary_polyline ? activity.summary_polyline.length : 0);
+      console.log('Start coordinates:', activity.start_latlng);
+      console.log('End coordinates:', activity.end_latlng);
+      console.log('Distance:', activity.distance);
+
       let itemAdded = false;
-      const popupContent = `<b>${activity.name || 'Unnamed Activity'}</b><br>Type: ${activity.type || activity.sport_type || 'N/A'}`;
+      const activityType = activity.type || activity.sport_type || 'Default';
+      const selectedColor = activityTypeColors[activityType] || activityTypeColors['Default'];
 
-      if (polylineDecoder && activity.summary_polyline) {
-        try {
-          let latlngs = polylineDecoder(activity.summary_polyline);
-          if (latlngs && latlngs.length > 0) {
-            if (simplify) {
-              // Convert [lat, lng] to {x: lng, y: lat} for simplify-js
-              const pointsToSimplify = latlngs.map(p => ({ x: p[1], y: p[0] }));
-              // Tolerance: smaller values mean less simplification. 0.0001 is a common starting point.
-              const simplifiedPoints = simplify(pointsToSimplify, 0.0001, true);
-              // Convert simplified points back to [lat, lng] for Leaflet
-              latlngs = simplifiedPoints.map(p => [p.y, p.x]);
-            }
+      // Base popup content
+      let popupContent = `<b>${activity.name || 'Unnamed Activity'}</b><br>`;
+      popupContent += `Type: ${activityType}<br>`;
 
-            const activityType = activity.type || activity.sport_type || 'Default';
-            const selectedColor = activityTypeColors[activityType] || activityTypeColors['Default'];
-            L.polyline(latlngs, { color: selectedColor, weight: 3, opacity: 0.75 }).addTo(featureGroup)
-              .bindPopup(popupContent);
-            itemAdded = true;
-          }
-        } catch (decodeError) {
-          console.warn(`Could not decode polyline for activity '${activity.name}': ${decodeError}. Falling back to marker if possible.`);
+      // Add distance if available
+      if (activity.distance) {
+        popupContent += `Distance: ${formatDistance(activity.distance)}<br>`;
+      }
+
+      // Add moving time if available
+      if (activity.moving_time) {
+        const hours = Math.floor(activity.moving_time / 3600);
+        const minutes = Math.floor((activity.moving_time % 3600) / 60);
+        if (hours > 0) {
+          popupContent += `Time: ${hours}h ${minutes}m<br>`;
+        } else {
+          popupContent += `Time: ${minutes}m<br>`;
         }
       }
 
-      if (!itemAdded && activity.start_latlng && activity.start_latlng.length === 2) {
-        L.marker([activity.start_latlng[0], activity.start_latlng[1]], { icon: greenIcon }).addTo(featureGroup)
-          .bindPopup(popupContent + (activity.summary_polyline ? "<br><small>(Polyline error)</small>" : ""));
+      // Try to decode and display the polyline (route)
+      if (activity.summary_polyline && activity.summary_polyline.length > 0) {
+        console.log('Attempting to decode polyline...');
+        try {
+          let latlngs = polylineDecoder(activity.summary_polyline);
+          console.log('Decoded coordinates:', latlngs.length > 0 ? `${latlngs.length} points` : 'No points');
+
+          if (latlngs && latlngs.length > 1) {
+            // Simplify the route if simplify library is available and route is long
+            if (simplify && latlngs.length > 50) {
+              console.log(`Simplifying route with ${latlngs.length} points...`);
+              const pointsToSimplify = latlngs.map(p => ({ x: p[1], y: p[0] }));
+              const simplifiedPoints = simplify(pointsToSimplify, 0.0001, true);
+              latlngs = simplifiedPoints.map(p => [p.y, p.x]);
+              console.log(`Simplified to ${latlngs.length} points`);
+            }
+
+            // Add the route polyline
+            console.log('Adding polyline to map...');
+            const polyline = L.polyline(latlngs, {
+              color: selectedColor,
+              weight: 4,
+              opacity: 0.8,
+              smoothFactor: 1.0
+            }).addTo(featureGroup);
+
+            polyline.bindPopup(popupContent + `<small>Route: ${latlngs.length} points</small>`);
+
+            // Add start marker
+            const startPoint = latlngs[0];
+            console.log('Adding start marker at:', startPoint);
+            L.marker(startPoint, { icon: startIcon })
+              .addTo(featureGroup)
+              .bindPopup(`<b>🚀 Start</b><br>${activity.name || 'Activity'}<br>Type: ${activityType}`);
+
+            // Add end marker (only if different from start)
+            const endPoint = latlngs[latlngs.length - 1];
+            const distance = calculateDistance(startPoint[0], startPoint[1], endPoint[0], endPoint[1]);
+            console.log(`Distance between start and end: ${distance}m`);
+
+            if (distance > 50) { // Only add end marker if it's more than 50m from start
+              console.log('Adding end marker at:', endPoint);
+              L.marker(endPoint, { icon: endIcon })
+                .addTo(featureGroup)
+                .bindPopup(`<b>🏁 Finish</b><br>${activity.name || 'Activity'}<br>Type: ${activityType}`);
+            } else {
+              console.log('Start and end too close, skipping end marker');
+            }
+
+            itemAdded = true;
+            console.log(`✅ Successfully added complete route for "${activity.name}"`);
+
+          } else if (latlngs && latlngs.length === 1) {
+            // Single point activity
+            console.log('Single point activity, adding marker');
+            L.marker(latlngs[0], { icon: startIcon })
+              .addTo(featureGroup)
+              .bindPopup(popupContent + '<small>(Single point activity)</small>');
+            itemAdded = true;
+          } else {
+            console.log('❌ Polyline decoded but no valid points found');
+          }
+        } catch (decodeError) {
+          console.error(`❌ Failed to decode polyline for "${activity.name}":`, decodeError);
+        }
+      } else {
+        console.log('No polyline data available');
+      }
+
+      // Fallback to start coordinates if polyline failed or doesn't exist
+      if (!itemAdded && activity.start_latlng && Array.isArray(activity.start_latlng) && activity.start_latlng.length === 2) {
+        console.log('Using fallback start coordinates:', activity.start_latlng);
+        const marker = L.marker([activity.start_latlng[0], activity.start_latlng[1]], { icon: startIcon })
+          .addTo(featureGroup);
+
+        let fallbackPopup = popupContent;
+        if (activity.summary_polyline) {
+          fallbackPopup += '<small>(Route decode failed - showing start only)</small>';
+        } else {
+          fallbackPopup += '<small>(No route data - showing start only)</small>';
+        }
+
+        marker.bindPopup(fallbackPopup);
         itemAdded = true;
+        console.log(`⚠️ Added start marker only for "${activity.name}"`);
+      }
+
+      // Final fallback - try end coordinates
+      if (!itemAdded && activity.end_latlng && Array.isArray(activity.end_latlng) && activity.end_latlng.length === 2) {
+        console.log('Using fallback end coordinates:', activity.end_latlng);
+        L.marker([activity.end_latlng[0], activity.end_latlng[1]], { icon: endIcon })
+          .addTo(featureGroup)
+          .bindPopup(popupContent + '<small>(Showing end point only)</small>');
+        itemAdded = true;
+        console.log(`⚠️ Added end marker only for "${activity.name}"`);
       }
 
       if (!itemAdded) {
-        console.warn(`Activity '${activity.name}' had no summary_polyline or valid start_latlng. It was not added to the map.`);
+        console.warn(`❌ Activity "${activity.name}" could not be displayed - no valid GPS data found`);
+        console.log('Available data:', {
+          summary_polyline: !!activity.summary_polyline,
+          start_latlng: activity.start_latlng,
+          end_latlng: activity.end_latlng
+        });
       }
+
+      console.log(`=== End Processing Activity ${index + 1} ===\n`);
     });
 
+    // Fit map to show all activities
     if (featureGroup.getLayers().length > 0) {
       featureGroup.addTo(map);
       try {
-        map.fitBounds(featureGroup.getBounds(), { padding: [40, 40], maxZoom: 15, animate: true });
+        map.fitBounds(featureGroup.getBounds(), {
+          padding: [20, 20],
+          maxZoom: 15,
+          animate: true
+        });
       } catch (e) {
-        console.warn("fitBounds failed. Setting a default view for activities:", e);
-        const firstGpsActivity = activities.find(act => act.start_latlng && act.start_latlng.length === 2);
+        console.warn("fitBounds failed. Setting default view:", e);
+        const firstGpsActivity = activities.find(act =>
+          (act.start_latlng && act.start_latlng.length === 2) ||
+          (act.end_latlng && act.end_latlng.length === 2)
+        );
         if (firstGpsActivity?.start_latlng) {
-             map.setView([firstGpsActivity.start_latlng[0], firstGpsActivity.start_latlng[1]], 13);
+          map.setView([firstGpsActivity.start_latlng[0], firstGpsActivity.start_latlng[1]], 13);
+        } else if (firstGpsActivity?.end_latlng) {
+          map.setView([firstGpsActivity.end_latlng[0], firstGpsActivity.end_latlng[1]], 13);
         } else {
-            map.setView([initialLat, initialLng], initialZoom);
+          map.setView([initialLat, initialLng], initialZoom);
         }
       }
     } else {
@@ -190,17 +392,25 @@ const mapId = `leaflet-map-${Math.random().toString(36).substring(2, 9)}`;
       setMapMessage('No activities with displayable GPS data found.', false);
     }
 
+    // Add map tiles
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
       attribution: '&copy; <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener noreferrer" style="color:#33FF33;">OpenStreetMap</a> contributors',
       className: 'matrix-tile-layer'
     }).addTo(map);
 
+    // Style zoom controls
     if (map.zoomControl) {
       const zoomContainer = map.zoomControl.getContainer();
       if (zoomContainer) {
         zoomContainer.classList.add('leaflet-control-zoom-matrix');
       }
     }
+
+    console.log(`\n🗺️ Map initialized with ${featureGroup.getLayers().length} elements from ${activities.length} activities`);
+    console.log('Activities data preview:');
+    activities.forEach((act, i) => {
+      console.log(`${i+1}. "${act.name}" - Type: ${act.type || act.sport_type} - Polyline: ${act.summary_polyline ? act.summary_polyline.substring(0, 20) + '...' : 'None'}`);
+    });
   }
 
   document.addEventListener('DOMContentLoaded', () => {
@@ -236,7 +446,7 @@ const mapId = `leaflet-map-${Math.random().toString(36).substring(2, 9)}`;
     mapContainers.forEach(container => {
       const loadingMessageElement = container.querySelector('.map-loading-message') as HTMLElement | null;
       if (loadingMessageElement) {
-          loadingMessageElement.textContent = 'Map is waiting to be visible...';
+        loadingMessageElement.textContent = 'Map is waiting to be visible...';
       }
       observer.observe(container);
     });
