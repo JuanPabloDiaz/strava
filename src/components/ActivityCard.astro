@@ -1,6 +1,7 @@
 ---
 import type { StravaActivity } from '@services/stravaService';
 import ActivityMap from './ActivityMap.astro';
+import { formatRelativeTime, formatDuration, formatDistance } from '../utils/formatUtils';
 
 export interface Props {
   activity: StravaActivity;
@@ -9,16 +10,16 @@ export interface Props {
 const { activity } = Astro.props;
 
 // Basic formatting (can be improved later)
-const durationInMinutes = Math.floor(activity.moving_time / 60);
-const distanceInKm = (activity.distance / 1000).toFixed(2);
-const activityDate = new Date(activity.start_date).toLocaleDateString();
+const activityDate = formatRelativeTime(new Date(activity.start_date));
+const durationFormatted = formatDuration(activity.moving_time);
+const distanceFormatted = formatDistance(activity.distance);
 ---
 
 <div class="activity-card">
   <h2>{activity.name}</h2>
-  <p><strong>Date:</strong> {activityDate} <!-- TODO: Format date and add relative time --></p>
-  <p><strong>Duration:</strong> {durationInMinutes} minutes</p>
-  <p><strong>Distance:</strong> {distanceInKm} km</p>
+  <p><strong>Date:</strong> {activityDate}</p>
+  <p><strong>Duration:</strong> {durationFormatted}</p>
+  <p><strong>Distance:</strong> {distanceFormatted}</p>
   <p><strong>Type:</strong> {activity.type} ({activity.sport_type})</p>
   <ActivityMap activities={[activity]} />
   <!-- TODO: Display heart rate if available -->

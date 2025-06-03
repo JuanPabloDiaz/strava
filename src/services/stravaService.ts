@@ -179,12 +179,18 @@ export async function getLastActivityDate(
       return null;
     }
 
-    // Convertir a EST como en tu código existente
-    const utcDate = new Date(Date.parse(targetActivity.start_date));
-    const estDate = new Date(utcDate.getTime() - 5 * 60 * 60 * 1000);
+    // Convertir a EST/EDT (America/New_York)
+    const activityDate = new Date(targetActivity.start_date);
+    // Create a new Date object that represents the equivalent local time in New York
+    const newYorkDate = new Date(
+      activityDate.toLocaleString("en-US", { timeZone: "America/New_York" })
+    );
 
-    console.log(`Last ${activityType || "activity"} date:`, estDate);
-    return estDate;
+    console.log(
+      `Last ${activityType || "activity"} date (New York):`,
+      newYorkDate
+    );
+    return newYorkDate;
   } catch (error) {
     console.error("Error getting last activity date:", error);
     return null;
@@ -241,11 +247,14 @@ export async function getLastActivityInfo(activityType?: string): Promise<{
       return null;
     }
 
-    const utcDate = new Date(Date.parse(targetActivity.start_date));
-    const estDate = new Date(utcDate.getTime() - 5 * 60 * 60 * 1000);
+    const activityDate = new Date(targetActivity.start_date);
+    // Create a new Date object that represents the equivalent local time in New York
+    const newYorkDate = new Date(
+      activityDate.toLocaleString("en-US", { timeZone: "America/New_York" })
+    );
 
     return {
-      date: estDate,
+      date: newYorkDate,
       activity: targetActivity,
     };
   } catch (error) {
@@ -257,12 +266,18 @@ export async function getLastActivityInfo(activityType?: string): Promise<{
 export async function fetchMileage(): Promise<MileageData> {
   let mileage: MileageData = {};
 
-  // Initialize all days in the last 365 days
+  // Initialize all days in the last 365 days for 'America/New_York'
+  const todayInNewYork = new Date(
+    new Date().toLocaleString("en-US", { timeZone: "America/New_York" })
+  );
   for (let i = 0; i < 365; i++) {
-    const date = new Date(Date.now() - i * 24 * 60 * 60 * 1000);
-    const key = `${date.getFullYear()}-${
-      date.getMonth() + 1
-    }-${date.getDate()}`;
+    const date = new Date(todayInNewYork);
+    date.setDate(todayInNewYork.getDate() - i);
+    // Use YYYY-MM-DD format for consistency and to avoid issues with single digit month/day
+    const key = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(
+      2,
+      "0"
+    )}-${String(date.getDate()).padStart(2, "0")}`;
     mileage[key] = 0;
   }
 
@@ -276,14 +291,25 @@ export async function fetchMileage(): Promise<MileageData> {
 
     while (pagedMileage.length > 0) {
       for (let data of pagedMileage) {
-        const utcDate = new Date(Date.parse(data.start_date));
-        const estDate = new Date(utcDate.getTime() - 5 * 60 * 60 * 1000); // EST (UTC - 5 hours)
-        const key = `${estDate.getFullYear()}-${
-          estDate.getMonth() + 1
-        }-${estDate.getDate()}`;
+        const activityDate = new Date(data.start_date);
+        // Convert activity date to 'America/New_York' to get the correct day
+        const newYorkActivityDateStr = activityDate.toLocaleString("en-US", {
+          timeZone: "America/New_York",
+          year: "numeric",
+          month: "2-digit",
+          day: "2-digit",
+        });
+        // newYorkActivityDateStr will be in "MM/DD/YYYY" format, need to reformat for key
+        const parts = newYorkActivityDateStr.split("/"); // MM/DD/YYYY
+        const key = `${parts[2]}-${parts[0]}-${parts[1]}`; // YYYY-MM-DD
 
         if (key in mileage) {
           mileage[key] += data.distance;
+        } else {
+          // This case might happen if an activity's date falls outside the initialized 365-day window
+          // after timezone conversion. For simplicity, we can log it or initialize it.
+          // console.warn(`Activity date ${key} not found in initialized mileage map. Activity time: ${data.start_date}`);
+          mileage[key] = data.distance; // Initialize if not present
         }
       }
       pagedMileage = await getPage(++i, bearer);
@@ -298,23 +324,59 @@ export async function fetchMileage(): Promise<MileageData> {
 export function processMileageData(
   mileageMap: MileageData
 ): [number, number][] {
-  console.log(
-    "Mileage map keys with nonzero values:",
-    Object.entries(mileageMap).filter(([_, v]) => v > 0)
+  // console.log(
+  //   "Mileage map keys with nonzero values:",
+  //   Object.entries(mileageMap).filter(([_, v]) => v > 0)
+  // );
+
+  // When converting to [timestamp, value] array, ensure the key is parsed correctly as a New York date
+  // to get a timestamp that aligns with the intended day.
+  let mileageArray: [number, number][] = Object.entries(mileageMap).map(
+    ([key, value]) => {
+      // Key is YYYY-MM-DD. Ensure it's treated as a local date in New York then get timestamp.
+      // new Date("YYYY-MM-DD") will parse it as UTC.
+      // new Date("YYYY/MM/DD") or "MM/DD/YYYY" is often parsed as local.
+      // To be safe, construct from parts in a way that new Date() interprets as local to the system,
+      // then we know the date parts are for New York.
+      const [year, month, day] = key.split("-").map(Number);
+      // The timestamp should represent the beginning of that day in New York.
+      // However, the heatmap might expect UTC midnight timestamps if not handled carefully.
+      // For now, let's assume the key "YYYY-MM-DD" is for a NY day, and we want its timestamp.
+      // new Date(year, month -1, day) will create a date local to the system.
+      // If the system is not NY, this is not quite right for "midnight in NY".
+      // A robust way:
+      const newYorkDateString = `${year}-${month
+        .toString()
+        .padStart(2, "0")}-${day.toString().padStart(2, "0")}T00:00:00`;
+      // Create a date object that is definitely midnight in New York for that day.
+      const dateInNewYork = new Date(
+        new Date(newYorkDateString).toLocaleString("en-US", {
+          timeZone: "America/New_York",
+        })
+      );
+      return [dateInNewYork.getTime(), value];
+    }
   );
 
-  let mileage: [number, number][] = Object.entries(mileageMap).map(
-    ([key, value]) => [new Date(key).getTime(), value]
-  );
+  mileageArray.sort((a, b) => a[0] - b[0]); // sort mileage by date
 
-  mileage.sort((a, b) => a[0] - b[0]); // sort mileage by date
+  // prepend days to mileage until first day is Sunday (0 index for getDay()) in New York time
+  if (mileageArray.length > 0) {
+    let firstDate = new Date(mileageArray[0][0]);
+    // Ensure we interpret this timestamp as a New York date to check its day of the week
+    let firstDateInNewYork = new Date(
+      firstDate.toLocaleString("en-US", { timeZone: "America/New_York" })
+    );
 
-  // prepend days to mileage until first day is Sunday
-  while (new Date(mileage[0][0]).getDay() !== 0) {
-    const previousDate: Date = new Date(mileage[0][0]);
-    previousDate.setDate(previousDate.getDate() - 1);
-    mileage.unshift([previousDate.getTime(), -1]);
+    while (firstDateInNewYork.getDay() !== 0) {
+      const previousDate = new Date(firstDateInNewYork);
+      previousDate.setDate(previousDate.getDate() - 1);
+      mileageArray.unshift([previousDate.getTime(), -1]); // Store timestamp as is
+      firstDateInNewYork = new Date(
+        previousDate.toLocaleString("en-US", { timeZone: "America/New_York" })
+      );
+    }
   }
 
-  return mileage;
+  return mileageArray;
 }
