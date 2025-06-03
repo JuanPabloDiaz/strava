@@ -196,7 +196,10 @@ const mapId = `leaflet-map-${Math.random().toString(36).substring(2, 9)}`;
     }).addTo(map);
 
     if (map.zoomControl) {
-      map.zoomControl.getContainer().classList.add('leaflet-control-zoom-matrix');
+      const zoomContainer = map.zoomControl.getContainer();
+      if (zoomContainer) {
+        zoomContainer.classList.add('leaflet-control-zoom-matrix');
+      }
     }
   }
 

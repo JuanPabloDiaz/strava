@@ -417,9 +417,11 @@ const formatDistance = (distance: number, unit: string) => {
 
     detailButtons.forEach(button => {
       button.addEventListener('click', (e) => {
-        const activityType = e.currentTarget.getAttribute('data-activity-type');
+        const currentTarget = e.currentTarget;
+        if (currentTarget && currentTarget instanceof Element) { // Check currentTarget
+          const activityType = currentTarget.getAttribute('data-activity-type');
 
-        // Create a modal or expand the component with more details
+          // Create a modal or expand the component with more details
         // For now, we'll show an alert, but this could be enhanced to show a modal
         // with detailed analytics, trends, personal records, etc.
 
@@ -449,12 +451,19 @@ const formatDistance = (distance: number, unit: string) => {
 
         // Close modal functionality
         const closeBtn = detailsModal.querySelector('.close-modal');
-        const closeModal = () => document.body.removeChild(detailsModal);
+        const closeModal = () => {
+          if (detailsModal.parentNode) {
+            detailsModal.parentNode.removeChild(detailsModal);
+          }
+        };
 
-        closeBtn.addEventListener('click', closeModal);
-        detailsModal.addEventListener('click', (e) => {
-          if (e.target === detailsModal) closeModal();
+        if (closeBtn) {
+          closeBtn.addEventListener('click', closeModal);
+        }
+        detailsModal.addEventListener('click', (modalEvent) => { // Renamed 'e' to 'modalEvent'
+          if (modalEvent.target === detailsModal) closeModal();
         });
+        }
       });
     });
   });

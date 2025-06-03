@@ -406,9 +406,15 @@ const isLastPage = recentActivities.length < activitiesPerPage;
       document.body.appendChild(modal);
 
       const closeBtn = modal.querySelector('.close-modal');
-      const closeModal = () => document.body.removeChild(modal);
+      const closeModal = () => {
+        if (modal.parentNode) {
+          modal.parentNode.removeChild(modal);
+        }
+      };
 
-      closeBtn.addEventListener('click', closeModal);
+      if (closeBtn) {
+        closeBtn.addEventListener('click', closeModal);
+      }
       modal.addEventListener('click', (e) => {
         if (e.target === modal) closeModal();
       });
