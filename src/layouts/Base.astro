@@ -54,7 +54,7 @@ const currentPath = Astro.url.pathname;
               [{windowTitle}]
             </span>
           </div>
-          <div class="system-info">
+          <div class="system-info hidden sm:block">
             <span class="text-green-500 text-xs animate-pulse">
               MATRIX_OS v2.1
             </span>
@@ -67,7 +67,7 @@ const currentPath = Astro.url.pathname;
         <div class="terminal-header">
           <div class="flex items-center space-x-2 mb-2">
             <div class="text-green-400 text-sm animate-pulse">root@matrix:~$</div>
-            <div class="text-green-300 text-sm ">{terminalCommand}</div>
+            <div class="text-green-300 text-sm">{terminalCommand}</div>
           </div>
           <div class="text-green-500 text-xs animate-pulse opacity-80">
             {systemMessage}
@@ -80,25 +80,11 @@ const currentPath = Astro.url.pathname;
           <main class="content-area">
             <slot />
           </main>
-        </div>
 
-        <!-- Terminal Status Bar -->
-        <div class="terminal-status">
-          <div class="status-left">
-            <span class="status-indicator"></span>
-            <span class="text-xs">NEURAL_LINK: ACTIVE</span>
-          </div>
-          <div class="status-center">
-            <span class="text-xs animate-pulse">[{new Date().toLocaleTimeString()}]</span>
-          </div>
-          <div class="status-right">
-            <span class="text-xs">CPU: 98.7% | MEM: 64.2% | NET: ↑↓</span>
-          </div>
+          <Footer />
         </div>
       </div>
     </div>
-
-    <Footer />
 
     <style>
       /* Matrix Rain Animation */
@@ -317,41 +303,6 @@ const currentPath = Astro.url.pathname;
         z-index: 5;
       }
 
-      /* Terminal Status Bar */
-      .terminal-status {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        padding: 8px 20px;
-        background: linear-gradient(90deg, rgba(0, 255, 0, 0.05), rgba(0, 0, 0, 0.8));
-        border-top: 1px solid rgba(0, 255, 0, 0.2);
-        font-size: 0.75rem;
-      }
-
-      .status-indicator {
-        display: inline-block;
-        width: 8px;
-        height: 8px;
-        background: #00ff00;
-        border-radius: 50%;
-        margin-right: 6px;
-        animation: statusBlink 1s ease-in-out infinite;
-      }
-
-      @keyframes statusBlink {
-        0%, 100% { opacity: 1; }
-        50% { opacity: 0.3; }
-      }
-
-      .status-left, .status-right {
-        display: flex;
-        align-items: center;
-      }
-
-      .status-center {
-        color: rgba(0, 255, 0, 0.8);
-      }
-
       /* Responsive Design */
       @media (max-width: 768px) {
         .window-titlebar {
@@ -365,17 +316,6 @@ const currentPath = Astro.url.pathname;
 
         .terminal-content {
           padding: 16px;
-        }
-
-        .terminal-status {
-          padding: 6px 16px;
-          flex-direction: column;
-          gap: 4px;
-          font-size: 0.65rem;
-        }
-
-        .system-info {
-          display: none;
         }
       }
 
