@@ -152,20 +152,24 @@ const mapId = `leaflet-map-${Math.random().toString(36).substring(2, 9)}`;
     let polylineDecoder: ((encoded: string) => [number, number][]) | undefined;
     let simplify: ((points: { x: number; y: number }[], tolerance?: number, highestQuality?: boolean) => { x: number; y: number }[]) | undefined;
 
+    console.log('Attempting to import @mapbox/polyline...');
     try {
       const polylineModule = await import('@mapbox/polyline');
+      console.log('@mapbox/polyline module loaded:', polylineModule);
       const decoder = polylineModule.default?.decode || polylineModule.decode;
       if (typeof decoder === 'function') {
         polylineDecoder = decoder;
-        console.log('Using @mapbox/polyline decoder');
+        console.log('Using @mapbox/polyline decoder:', polylineDecoder);
+      } else {
+        console.warn('@mapbox/polyline loaded, but decode function not found. Using fallback.');
       }
     } catch (e) {
-      console.warn('Could not load @mapbox/polyline, using fallback decoder:', e);
+      console.warn('Could not load @mapbox/polyline, using fallback decoder. Error:', e);
     }
 
     if (!polylineDecoder) {
-      polylineDecoder = decodePolyline;
-      console.log('Using built-in polyline decoder');
+      polylineDecoder = decodePolyline; // Fallback to built-in
+      console.log('Using built-in polyline decoder (fallback).');
     }
 
     try {
@@ -243,10 +247,23 @@ const mapId = `leaflet-map-${Math.random().toString(36).substring(2, 9)}`;
 
       // 1. Intentar usar polyline si está disponible
       if (activity.summary_polyline && activity.summary_polyline.length > 0) {
-        console.log('Attempting to decode polyline...');
+        console.log(`Activity "${activity.name}": Attempting to decode polyline string: "${activity.summary_polyline}"`);
         try {
-          let latlngs = polylineDecoder(activity.summary_polyline);
-          console.log('Decoded coordinates:', latlngs.length > 0 ? `${latlngs.length} points` : 'No points');
+          let latlngs;
+          if (polylineDecoder === decodePolyline) { // Check if it's the fallback
+            console.log('Using built-in polyline decoder for this activity.');
+            latlngs = polylineDecoder(activity.summary_polyline);
+          } else {
+            console.log('Using @mapbox/polyline decoder for this activity.');
+            try {
+              latlngs = polylineDecoder(activity.summary_polyline);
+            } catch (mapboxDecodeError) {
+              console.error(`@mapbox/polyline failed to decode "${activity.summary_polyline}" for activity "${activity.name}":`, mapboxDecodeError);
+              console.log('Falling back to built-in decoder due to @mapbox/polyline error.');
+              latlngs = decodePolyline(activity.summary_polyline); // Attempt fallback
+            }
+          }
+          console.log('Decoded coordinates:', latlngs && latlngs.length > 0 ? `${latlngs.length} points` : 'No points or empty array');
 
           if (latlngs && latlngs.length > 1) {
             // Simplificar la ruta si es necesario
@@ -286,8 +303,8 @@ const mapId = `leaflet-map-${Math.random().toString(36).substring(2, 9)}`;
             itemAdded = true;
             console.log(`✅ Successfully added complete route for "${activity.name}"`);
           }
-        } catch (decodeError) {
-          console.error(`❌ Failed to decode polyline for "${activity.name}":`, decodeError);
+        } catch (decodeError) { // This outer catch is for the built-in decoder or other unexpected errors
+          console.error(`❌ Failed to decode polyline for "${activity.name}" using built-in decoder or other error:`, decodeError);
         }
       }
 

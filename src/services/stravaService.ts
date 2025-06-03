@@ -11,6 +11,7 @@ export interface StravaActivity {
   moving_time: number;
   sport_type: string;
   start_latlng?: [number, number];
+  end_latlng?: [number, number];
   map_id?: string;
   summary_polyline?: string;
 }
@@ -74,8 +75,38 @@ export async function fetchActivities(
       throw new Error(`Strava API error: ${response.status}`);
     }
 
-    const activities: StravaActivity[] = await response.json();
-    console.log("Recent activities fetched:", activities.length);
+    const rawActivities: any[] = await response.json();
+    console.log(
+      "Raw Strava activities sample (first 2):",
+      JSON.stringify(rawActivities.slice(0, 2), null, 2)
+    );
+
+    const activities: StravaActivity[] = rawActivities.map((activity) => {
+      const mappedActivity: StravaActivity = {
+        id: activity.id,
+        name: activity.name,
+        type: activity.type,
+        start_date: activity.start_date,
+        distance: activity.distance,
+        moving_time: activity.moving_time,
+        sport_type: activity.sport_type,
+        summary_polyline: activity.map?.summary_polyline,
+        start_latlng: activity.start_latlng,
+        end_latlng:
+          activity.end_latlng ||
+          (activity.end_latitude && activity.end_longitude
+            ? [activity.end_latitude, activity.end_longitude]
+            : undefined),
+      };
+      if (!mappedActivity.summary_polyline && activity.summary_polyline) {
+        mappedActivity.summary_polyline = activity.summary_polyline;
+      }
+      return mappedActivity;
+    });
+    console.log(
+      "Processed activities with end_latlng (first 2):",
+      JSON.stringify(activities.slice(0, 2), null, 2)
+    );
     return activities;
   } catch (error) {
     console.error("Error fetching recent activities:", error);
