@@ -44,18 +44,8 @@ const mapId = `leaflet-map-${Math.random().toString(36).substring(2, 9)}`;
   // Explicitly declare the L global variable with its type for TypeScript
   declare var L: typeof import('leaflet');
 
-  // Event listener ensures the script runs after the DOM is fully loaded.
-  document.addEventListener('DOMContentLoaded', async () => {
-    // mapId and activities are now read from data attributes
-    const mapContainerElement = document.querySelector(`.map-container-matrix[data-map-id]`) as HTMLElement | null;
-
-    if (!mapContainerElement) {
-      console.error('Map container element with data-map-id not found.');
-      const loadingMessage = document.querySelector('.map-loading-message') as HTMLElement | null;
-      if (loadingMessage) loadingMessage.textContent = 'Critical Error: Map container data attributes not found.';
-      return;
-    }
-
+  // Function to initialize the map
+  async function initializeMap(mapContainerElement: HTMLElement) {
     const mapIdFromData = mapContainerElement.dataset.mapId;
     const activitiesString = mapContainerElement.dataset.activities;
 
@@ -66,15 +56,6 @@ const mapId = `leaflet-map-${Math.random().toString(36).substring(2, 9)}`;
 
     const mapElement = document.getElementById(mapIdFromData); // Get the actual map div by its ID
     const loadingMessageElement = mapElement?.querySelector('.map-loading-message') as HTMLElement | null;
-
-    let activities: any[] = [];
-    try {
-      activities = JSON.parse(activitiesString || '[]');
-    } catch (e) {
-      console.error('Error parsing activities data from data-activities attribute:', e);
-      if (loadingMessageElement) loadingMessageElement.textContent = 'Error: Could not parse activity data.';
-      return;
-    }
 
     // Helper to update loading/error message
     const setMapMessage = (message: string, isError: boolean = false) => {
@@ -87,18 +68,31 @@ const mapId = `leaflet-map-${Math.random().toString(36).substring(2, 9)}`;
     };
 
     if (!mapElement) {
-      // mapIdFromData is used here for the error message
       setMapMessage(`Critical Error: Map element with ID '${mapIdFromData}' not found.`, true);
       return;
     }
+
     if (typeof L === 'undefined') {
       setMapMessage('Critical Error: Leaflet library (L) not found. Ensure it is loaded.', true);
       return;
     }
 
-    let polylineDecoder: ((encoded: string) => [number, number][]) | undefined; // To store the polyline decoding function
+    setMapMessage('Initializing Geospatial Interface...', false);
+
+
+    let activities: any[] = [];
     try {
-      // Dynamically import the @mapbox/polyline library.
+      activities = JSON.parse(activitiesString || '[]');
+    } catch (e) {
+      setMapMessage('Error: Could not parse activity data.', true);
+      console.error('Error parsing activities data from data-activities attribute:', e);
+      return;
+    }
+
+    let polylineDecoder: ((encoded: string) => [number, number][]) | undefined;
+    let simplify: ((points: { x: number; y: number }[], tolerance?: number, highestQuality?: boolean) => { x: number; y: number }[]) | undefined;
+
+    try {
       const polylineModule = await import('@mapbox/polyline');
       const decoder = polylineModule.default?.decode || polylineModule.decode;
       if (typeof decoder === 'function') {
@@ -106,40 +100,59 @@ const mapId = `leaflet-map-${Math.random().toString(36).substring(2, 9)}`;
       } else {
         throw new Error("Polyline library loaded, but 'decode' function is not available or not a function.");
       }
+
+      const simplifyJsModule = await import('simplify-js');
+      if (typeof simplifyJsModule.default === 'function') {
+        simplify = simplifyJsModule.default;
+      } else if (typeof simplifyJsModule === 'function') { // In case simplify-js is not a default export
+        simplify = simplifyJsModule;
+      }
+       else {
+        throw new Error("simplify-js library loaded, but the 'simplify' function is not available.");
+      }
     } catch (e: any) {
-      setMapMessage(`Error: Could not load polyline decoding library. Polylines will not be drawn. Details: ${e.message}`, true);
-      // We can continue without polylines, relying on markers.
+      setMapMessage(`Error: Could not load polyline or simplification library. Polylines may not be drawn or optimized. Details: ${e.message}`, true);
     }
 
-    if (loadingMessageElement) loadingMessageElement.style.display = 'none'; // Hide initial loading message
+    if (loadingMessageElement) loadingMessageElement.style.display = 'none';
 
-    // Default map view settings (world view)
     let initialLat = 20;
     let initialLng = 0;
     let initialZoom = 2;
 
-    const map = L.map(mapIdFromData); // Initialize the map on the div using ID from data attribute
-    const featureGroup = L.featureGroup(); // Group for markers and polylines to easily fit bounds
+    const map = L.map(mapIdFromData);
+    const featureGroup = L.featureGroup();
 
-    // Custom green marker icon, styled for the matrix theme.
+    const activityTypeColors = {
+      'Run': '#00FF00', 'Ride': '#00FFFF', 'Swim': '#0000FF',
+      'Walk': '#FFFF00', 'Hike': '#FFA500', 'Default': '#FF00FF'
+    };
+
     const greenIcon = L.icon({
         iconUrl: 'data:image/svg+xml;charset=UTF-8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="%2300FF00" width="20" height="20"><path fill-rule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clip-rule="evenodd" /></svg>',
-        iconSize: [24, 24], // Slightly larger for better visibility
-        iconAnchor: [12, 24],
-        popupAnchor: [0, -24]
+        iconSize: [24, 24], iconAnchor: [12, 24], popupAnchor: [0, -24]
     });
 
-    // Process each activity to add it to the map
     activities.forEach(activity => {
       let itemAdded = false;
       const popupContent = `<b>${activity.name || 'Unnamed Activity'}</b><br>Type: ${activity.type || activity.sport_type || 'N/A'}`;
 
-      // Attempt to draw polyline if available and decoder loaded
       if (polylineDecoder && activity.summary_polyline) {
         try {
-          const latlngs = polylineDecoder(activity.summary_polyline);
+          let latlngs = polylineDecoder(activity.summary_polyline);
           if (latlngs && latlngs.length > 0) {
-            L.polyline(latlngs, { color: '#00FF00', weight: 3, opacity: 0.75 }).addTo(featureGroup)
+            if (simplify) {
+              // Convert [lat, lng] to {x: lng, y: lat} for simplify-js
+              const pointsToSimplify = latlngs.map(p => ({ x: p[1], y: p[0] }));
+              // Tolerance: smaller values mean less simplification. 0.0001 is a common starting point.
+              const simplifiedPoints = simplify(pointsToSimplify, 0.0001, true);
+              // Convert simplified points back to [lat, lng] for Leaflet
+              latlngs = simplifiedPoints.map(p => [p.y, p.x]);
+            }
+
+            const activityType = activity.type || activity.sport_type || 'Default';
+            const selectedColor = activityTypeColors[activityType] || activityTypeColors['Default'];
+            L.polyline(latlngs, { color: selectedColor, weight: 3, opacity: 0.75 }).addTo(featureGroup)
               .bindPopup(popupContent);
             itemAdded = true;
           }
@@ -148,7 +161,6 @@ const mapId = `leaflet-map-${Math.random().toString(36).substring(2, 9)}`;
         }
       }
 
-      // If no polyline was added (or couldn't be), try adding a marker if start_latlng exists
       if (!itemAdded && activity.start_latlng && activity.start_latlng.length === 2) {
         L.marker([activity.start_latlng[0], activity.start_latlng[1]], { icon: greenIcon }).addTo(featureGroup)
           .bindPopup(popupContent + (activity.summary_polyline ? "<br><small>(Polyline error)</small>" : ""));
@@ -160,15 +172,12 @@ const mapId = `leaflet-map-${Math.random().toString(36).substring(2, 9)}`;
       }
     });
 
-    // Add the feature group to the map
     if (featureGroup.getLayers().length > 0) {
       featureGroup.addTo(map);
       try {
-        // Adjust map view to fit all items in the feature group
         map.fitBounds(featureGroup.getBounds(), { padding: [40, 40], maxZoom: 15, animate: true });
       } catch (e) {
         console.warn("fitBounds failed. Setting a default view for activities:", e);
-        // Fallback if fitBounds fails: use the first activity's coordinates or a wider default.
         const firstGpsActivity = activities.find(act => act.start_latlng && act.start_latlng.length === 2);
         if (firstGpsActivity?.start_latlng) {
              map.setView([firstGpsActivity.start_latlng[0], firstGpsActivity.start_latlng[1]], 13);
@@ -177,21 +186,57 @@ const mapId = `leaflet-map-${Math.random().toString(36).substring(2, 9)}`;
         }
       }
     } else {
-      // No activities with GPS data were found or could be processed.
       map.setView([initialLat, initialLng], initialZoom);
       setMapMessage('No activities with displayable GPS data found.', false);
     }
 
-    // Add OpenStreetMap tile layer (Matrix-themed attribution)
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
       attribution: '&copy; <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener noreferrer" style="color:#33FF33;">OpenStreetMap</a> contributors',
-      className: 'matrix-tile-layer' // Custom class for potential advanced styling
+      className: 'matrix-tile-layer'
     }).addTo(map);
 
-    // Style Leaflet's zoom controls if they are part of the map
     if (map.zoomControl) {
       map.zoomControl.getContainer().classList.add('leaflet-control-zoom-matrix');
     }
+  }
+
+  document.addEventListener('DOMContentLoaded', () => {
+    const mapContainers = document.querySelectorAll('.map-container-matrix[data-map-id]') as NodeListOf<HTMLElement>;
+
+    if (mapContainers.length === 0) {
+      console.warn('No map containers found on this page.');
+      return;
+    }
+
+    const observerCallback = (entries: IntersectionObserverEntry[], observer: IntersectionObserver) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          const mapContainerElement = entry.target as HTMLElement;
+          const loadingMessageElement = mapContainerElement.querySelector('.map-loading-message') as HTMLElement | null;
+          if (loadingMessageElement) {
+            loadingMessageElement.textContent = 'Loading map data...';
+          }
+
+          initializeMap(mapContainerElement);
+          observer.unobserve(mapContainerElement); // Unobserve after initializing
+        }
+      });
+    };
+
+    const observerOptions = {
+      root: null, // relative to document viewport
+      rootMargin: '0px',
+      threshold: 0.1 // visible amount of item before callback is run
+    };
+
+    const observer = new IntersectionObserver(observerCallback, observerOptions);
+    mapContainers.forEach(container => {
+      const loadingMessageElement = container.querySelector('.map-loading-message') as HTMLElement | null;
+      if (loadingMessageElement) {
+          loadingMessageElement.textContent = 'Map is waiting to be visible...';
+      }
+      observer.observe(container);
+    });
   });
 </script>
 
@@ -263,6 +308,6 @@ const mapId = `leaflet-map-${Math.random().toString(36).substring(2, 9)}`;
   /* Optional: Styling for map tiles for a more "matrix" feel.
      This can impact performance and readability. Use with caution. */
   .matrix-tile-layer .leaflet-tile {
-    /* filter: brightness(0.8) hue-rotate(90deg) sepia(20%) contrast(1.2); */
+    filter: invert(1) hue-rotate(180deg) brightness(0.8) contrast(1.2);
   }
 </style>
