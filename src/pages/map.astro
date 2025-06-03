@@ -1,0 +1,317 @@
+---
+// src/pages/map.astro
+import Base from "@layouts/Base.astro";
+import ActivityMap from "@components/ActivityMap.astro";
+import { fetchActivities, getActivityStats } from '@services/stravaService';
+
+// Fetch activities data
+const activities = await fetchActivities();
+const stats = await getActivityStats(activities);
+
+// Filter activities with GPS data for map display
+const activitiesWithGPS = activities.filter(activity =>
+  activity.start_latlng && activity.start_latlng.length === 2
+);
+---
+
+<Base
+  title="Activity Map - Matrix Interface"
+  windowTitle="GEOSPATIAL_TRACKING_MODULE"
+  terminalCommand="./initialize_gps_matrix.exe"
+  systemMessage="[SYSTEM] Loading geospatial neural network... GPS satellites locked."
+>
+  <!-- Stats Overview Section -->
+  <section class="stats-section mb-8">
+    <div class="section-header">
+      <div class="text-green-400 text-sm mb-4 flex items-center space-x-2">
+        <span class="animate-pulse">[ACTIVITY_ANALYTICS]</span>
+        <div class="flex-1 h-px bg-gradient-to-r from-green-500/50 to-transparent"></div>
+      </div>
+    </div>
+
+    <div class="stats-grid">
+      <div class="stat-block">
+        <div class="stat-label">TOTAL_ACTIVITIES</div>
+        <div class="stat-value">{activities.length}</div>
+      </div>
+      <div class="stat-block">
+        <div class="stat-label">GPS_TRACKED</div>
+        <div class="stat-value">{activitiesWithGPS.length}</div>
+      </div>
+      <div class="stat-block">
+        <div class="stat-label">TOTAL_DISTANCE</div>
+        <div class="stat-value">{(stats.totalDistance / 1000).toFixed(1)} KM</div>
+      </div>
+      <div class="stat-block">
+        <div class="stat-label">TOTAL_TIME</div>
+        <div class="stat-value">{Math.floor(stats.totalTime / 3600)}H {Math.floor((stats.totalTime % 3600) / 60)}M</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Activity Map Section -->
+  <section class="map-section mb-8">
+    <div class="section-header">
+      <div class="text-green-400 text-sm mb-4 flex items-center justify-between">
+        <div class="flex items-center space-x-2">
+          <span class="animate-pulse">[NEURAL_MAPPING_INTERFACE]</span>
+          <div class="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
+        </div>
+        <span class="text-green-300 text-xs">[REAL_TIME_GPS_TRACKING]</span>
+      </div>
+    </div>
+
+    <ActivityMap
+      activities={activitiesWithGPS}
+      height="500px"
+    />
+  </section>
+
+  <!-- Activity Types Breakdown -->
+  <section class="breakdown-section">
+    <div class="section-header">
+      <div class="text-green-400 text-sm mb-4 flex items-center space-x-2">
+        <span class="animate-pulse">[ACTIVITY_CLASSIFICATION]</span>
+        <div class="flex-1 h-px bg-gradient-to-r from-green-500/50 to-transparent"></div>
+      </div>
+    </div>
+
+    <div class="breakdown-grid">
+      {Object.entries(stats.byType).map(([type, typeStats]) => (
+        <div class="breakdown-item">
+          <div class="breakdown-header">
+            <div class="breakdown-type">[{type.toUpperCase()}]</div>
+            <div class="breakdown-count">{typeStats.count}</div>
+          </div>
+          <div class="breakdown-details">
+            <div class="detail-row">
+              <span class="detail-label">DISTANCE:</span>
+              <span class="detail-value">{(typeStats.distance / 1000).toFixed(1)} KM</span>
+            </div>
+            <div class="detail-row">
+              <span class="detail-label">TIME:</span>
+              <span class="detail-value">{Math.floor(typeStats.time / 3600)}H {Math.floor((typeStats.time % 3600) / 60)}M</span>
+            </div>
+            <div class="detail-row">
+              <span class="detail-label">AVG_PACE:</span>
+              <span class="detail-value">{typeStats.avgPace}</span>
+            </div>
+          </div>
+        </div>
+      ))}
+    </div>
+  </section>
+
+  <!-- Navigation Links -->
+  <section class="navigation-section mt-8">
+    <div class="nav-links">
+      <a href="/" class="nav-link">
+        <span>[RETURN_TO_MAIN_TERMINAL]</span>
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
+        </svg>
+      </a>
+
+      <a
+        href="https://www.strava.com/athletes/47698767"
+        target="_blank"
+        rel="noopener noreferrer"
+        class="nav-link external"
+      >
+        <span>[ACCESS_STRAVA_DATABASE]</span>
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/>
+        </svg>
+      </a>
+    </div>
+  </section>
+</Base>
+
+<style>
+  /* Section Styling */
+  .stats-section, .map-section, .breakdown-section, .navigation-section {
+    position: relative;
+    margin-bottom: 2rem;
+  }
+
+  .section-header {
+    border-bottom: 1px solid rgba(0, 255, 0, 0.2);
+    padding-bottom: 8px;
+    margin-bottom: 20px;
+  }
+
+  /* Stats Grid */
+  .stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 16px;
+    background: rgba(0, 0, 0, 0.4);
+    border: 1px solid rgba(0, 255, 0, 0.2);
+    border-radius: 6px;
+    padding: 16px;
+  }
+
+  .stat-block {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 16px 12px;
+    background: rgba(0, 255, 0, 0.05);
+    border: 1px solid rgba(0, 255, 0, 0.1);
+    border-radius: 4px;
+    font-family: 'Courier New', monospace;
+  }
+
+  .stat-label {
+    color: rgba(0, 255, 0, 0.7);
+    font-size: 0.7rem;
+    font-weight: bold;
+    text-align: center;
+    margin-bottom: 8px;
+  }
+
+  .stat-value {
+    color: #00ff00;
+    font-size: 1.5rem;
+    font-weight: bold;
+    animation: statPulse 2s ease-in-out infinite;
+  }
+
+  @keyframes statPulse {
+    0%, 100% { opacity: 0.8; }
+    50% { opacity: 1; }
+  }
+
+  /* Breakdown Grid */
+  .breakdown-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 16px;
+  }
+
+  .breakdown-item {
+    background: linear-gradient(135deg, rgba(0, 0, 0, 0.8) 0%, rgba(0, 20, 0, 0.6) 100%);
+    border: 1px solid rgba(0, 255, 0, 0.3);
+    border-radius: 6px;
+    padding: 16px;
+    font-family: 'Courier New', monospace;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .breakdown-item::before {
+    content: '';
+    position: absolute;
+    inset: -1px;
+    border-radius: 7px;
+    padding: 1px;
+    background: linear-gradient(45deg,
+      rgba(0, 255, 0, 0.3),
+      transparent,
+      rgba(0, 255, 0, 0.3)
+    );
+    mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    mask-composite: xor;
+    animation: breakdownGlow 3s ease-in-out infinite;
+  }
+
+  @keyframes breakdownGlow {
+    0%, 100% { opacity: 0.3; }
+    50% { opacity: 0.7; }
+  }
+
+  .breakdown-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 12px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid rgba(0, 255, 0, 0.2);
+  }
+
+  .breakdown-type {
+    color: #00ff00;
+    font-weight: bold;
+    font-size: 0.9rem;
+  }
+
+  .breakdown-count {
+    color: rgba(0, 255, 0, 0.8);
+    font-size: 1.2rem;
+    font-weight: bold;
+  }
+
+  .breakdown-details {
+    space-y: 6px;
+  }
+
+  .detail-row {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.75rem;
+    margin-bottom: 4px;
+  }
+
+  .detail-label {
+    color: rgba(0, 255, 0, 0.6);
+  }
+
+  .detail-value {
+    color: #00ff00;
+    font-weight: bold;
+  }
+
+  /* Navigation Links */
+  .nav-links {
+    display: flex;
+    gap: 16px;
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+
+  .nav-link {
+    display: inline-flex;
+    align-items: center;
+    space-x: 8px;
+    padding: 12px 20px;
+    background: rgba(0, 255, 0, 0.05);
+    border: 1px solid rgba(0, 255, 0, 0.3);
+    border-radius: 6px;
+    color: #00ff00;
+		font-family: 'Courier New', monospace;
+		text-decoration: none;
+		transition: background 0.3s, transform 0.2s;
+	}
+
+	.nav-link:hover {
+		background: rgba(0, 255, 0, 0.1);
+		transform: translateY(-2px);
+	}
+
+	.nav-link.external {
+		background: rgba(0, 255, 0, 0.05);
+		color: #00ff00;
+	}
+
+	.nav-link svg {
+		margin-left: 4px;
+		width: 16px;
+		height: 16px;
+		stroke-width: 2;
+	}
+	.nav-link svg:hover {
+		stroke: #00ff00;
+	}
+
+	/* Responsive Adjustments */
+	@media (max-width: 768px) {
+		.stats-grid, .breakdown-grid {
+			grid-template-columns: 1fr;
+		}
+
+		.nav-links {
+			flex-direction: column;
+			align-items: center;
+		}
+	}
+</style>
