@@ -1,12 +1,11 @@
 ---
-// src/pages/map.astro
 import Base from "@layouts/Base.astro";
 import ActivityMap from "@components/ActivityMap.astro";
 import { fetchActivities, getActivityStats } from '@services/stravaService';
 
 // Fetch activities data
 const activities = await fetchActivities();
-const stats = await getActivityStats(activities);
+const stats = getActivityStats(activities);
 
 // Filter activities with GPS data for map display
 const activitiesWithGPS = activities.filter(activity =>

@@ -10,6 +10,9 @@ export interface StravaActivity {
   distance: number;
   moving_time: number;
   sport_type: string;
+  start_latlng?: [number, number];
+  map_id?: string;
+  summary_polyline?: string;
 }
 
 export function formatMileage(meters: number): number {
@@ -57,7 +60,7 @@ export async function getPage(page: number, bearer: string): Promise<any[]> {
 }
 
 // Nueva función para obtener actividades recientes (sin filtro de tiempo)
-export async function getRecentActivities(
+export async function fetchActivities(
   perPage: number = 10
 ): Promise<StravaActivity[]> {
   try {
@@ -79,6 +82,61 @@ export async function getRecentActivities(
   }
 }
 
+export interface ActivityTypeStats {
+  count: number;
+  distance: number;
+  time: number;
+  avgPace: number | null; // minutes per kilometer, or null if distance is 0
+}
+
+export interface ActivityStats {
+  totalDistance: number;
+  totalTime: number;
+  byType: {
+    [type: string]: ActivityTypeStats;
+  };
+}
+
+export function getActivityStats(activities: StravaActivity[]): ActivityStats {
+  const stats: ActivityStats = {
+    totalDistance: 0,
+    totalTime: 0,
+    byType: {},
+  };
+
+  for (const activity of activities) {
+    stats.totalDistance += activity.distance;
+    stats.totalTime += activity.moving_time;
+
+    const activityType = activity.type || activity.sport_type || "Unknown";
+
+    if (!stats.byType[activityType]) {
+      stats.byType[activityType] = {
+        count: 0,
+        distance: 0,
+        time: 0,
+        avgPace: null,
+      };
+    }
+
+    stats.byType[activityType].count++;
+    stats.byType[activityType].distance += activity.distance;
+    stats.byType[activityType].time += activity.moving_time;
+  }
+
+  for (const type in stats.byType) {
+    const typeStats = stats.byType[type];
+    if (typeStats.distance > 0) {
+      // Calculate pace as minutes per kilometer
+      typeStats.avgPace = typeStats.time / 60 / (typeStats.distance / 1000);
+    } else {
+      typeStats.avgPace = null;
+    }
+  }
+
+  return stats;
+}
+
 // Nueva función para obtener la última actividad de un tipo específico
 export async function getLastActivityDate(
   activityType?: string
@@ -92,7 +150,7 @@ export async function getLastActivityDate(
       return testDate;
     }
 
-    const activities = await getRecentActivities(20); // Obtener más actividades para encontrar el tipo específico
+    const activities = await fetchActivities(20); // Obtener más actividades para encontrar el tipo específico
 
     if (activities.length === 0) {
       return null;
@@ -159,7 +217,7 @@ export async function getLastActivityInfo(activityType?: string): Promise<{
       };
     }
 
-    const activities = await getRecentActivities(20);
+    const activities = await fetchActivities(20);
 
     if (activities.length === 0) {
       return null;
