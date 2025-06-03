@@ -2,28 +2,130 @@
 export interface Props {
   lastRunDate?: string | Date;
   activityType?: string;
+  stravaUrl?: string;
+  lastDistance?: number;
+  lastDuration?: number;
+  averageWeekly?: number;
 }
 
-const { 
-  lastRunDate = new Date(), // Default to today if no date provided
-  activityType = "RUN" 
+const {
+  lastRunDate = new Date(),
+  activityType = "RUN",
+  stravaUrl = "",
+  lastDistance = 0,
+  lastDuration = 0,
+  averageWeekly = 0
 } = Astro.props;
 
-// Calculate days since last run
+// Calculate days since last activity
 const lastDate = new Date(lastRunDate);
 const today = new Date();
 const timeDiff = today.getTime() - lastDate.getTime();
 const daysSince = Math.floor(timeDiff / (1000 * 3600 * 24));
 
+// Activity-specific configuration
+const getActivityConfig = (type: string) => {
+  const configs = {
+    'RUN': {
+      icon: '🏃‍♂️',
+      unit: 'km',
+      terminalCommand: './analyze_running_metrics.exe',
+      systemMessages: {
+        0: 'ENDURANCE_SYSTEMS: OPTIMAL',
+        1: 'CARDIOVASCULAR_STATUS: ACTIVE',
+        2: 'RUNNING_PROTOCOL: STABLE',
+        warning: 'TRAINING_DECLINE_DETECTED',
+        critical: 'RUNNING_ROUTINE_RESTART_REQUIRED'
+      },
+      motivationalMessages: {
+        0: 'Fresh legs, clear mind! 🚀',
+        1: 'Recovery day complete ✅',
+        2: 'Still in rhythm 🎵',
+        warning: 'Time to lace up those shoes! 👟',
+        critical: 'Your running streak is calling! 📞'
+      }
+    },
+    'RIDE': {
+      icon: '🚴‍♂️',
+      unit: 'km',
+      terminalCommand: './check_cycling_performance.exe',
+      systemMessages: {
+        0: 'POWER_OUTPUT: MAXIMIZED',
+        1: 'CYCLING_EFFICIENCY: OPTIMAL',
+        2: 'BIKE_SYSTEMS: OPERATIONAL',
+        warning: 'PEDAL_CADENCE_DROPPING',
+        critical: 'BIKE_MAINTENANCE_OVERDUE'
+      },
+      motivationalMessages: {
+        0: 'Wheels spinning strong! 💪',
+        1: 'Momentum maintained 🔄',
+        2: 'Cruising speed achieved 🌟',
+        warning: 'Time to hit the road! 🛣️',
+        critical: 'Your bike misses you! 🚲'
+      }
+    },
+    'SWIM': {
+      icon: '🏊‍♂️',
+      unit: 'm',
+      terminalCommand: './evaluate_swim_technique.exe',
+      systemMessages: {
+        0: 'STROKE_EFFICIENCY: PERFECTED',
+        1: 'AQUATIC_PERFORMANCE: SMOOTH',
+        2: 'SWIMMING_FORM: MAINTAINED',
+        warning: 'WATER_TIME_INSUFFICIENT',
+        critical: 'POOL_ACCESS_REQUIRED'
+      },
+      motivationalMessages: {
+        0: 'Making waves! 🌊',
+        1: 'Stroke technique locked in 🔒',
+        2: 'Water confidence high 📈',
+        warning: 'Time to dive back in! 🏊',
+        critical: 'The pool is waiting! 🏊‍♀️'
+      }
+    },
+    'Swim': { // Handle both cases
+      icon: '🏊‍♂️',
+      unit: 'm',
+      terminalCommand: './evaluate_swim_technique.exe',
+      systemMessages: {
+        0: 'STROKE_EFFICIENCY: PERFECTED',
+        1: 'AQUATIC_PERFORMANCE: SMOOTH',
+        2: 'SWIMMING_FORM: MAINTAINED',
+        warning: 'WATER_TIME_INSUFFICIENT',
+        critical: 'POOL_ACCESS_REQUIRED'
+      },
+      motivationalMessages: {
+        0: 'Making waves! 🌊',
+        1: 'Stroke technique locked in 🔒',
+        2: 'Water confidence high 📈',
+        warning: 'Time to dive back in! 🏊',
+        critical: 'The pool is waiting! 🏊‍♀️'
+      }
+    }
+  };
+
+  return configs[type] || configs['RUN'];
+};
+
 // Determine status color and message based on days
-const getStatusInfo = (days: number) => {
+const getStatusInfo = (days: number, activityConfig: any) => {
   if (days === 0) {
     return {
       color: 'text-green-400',
       bgColor: 'bg-green-500/20',
       borderColor: 'border-green-500/40',
       status: 'OPTIMAL',
-      message: 'NEURAL_PATHWAYS: ACTIVE'
+      systemMessage: activityConfig.systemMessages[0],
+      motivationalMessage: activityConfig.motivationalMessages[0]
+    };
+  } else if (days === 1) {
+    return {
+      color: 'text-green-300',
+      bgColor: 'bg-green-500/15',
+      borderColor: 'border-green-500/30',
+      status: 'EXCELLENT',
+      systemMessage: activityConfig.systemMessages[1],
+      motivationalMessage: activityConfig.motivationalMessages[1]
     };
   } else if (days <= 2) {
     return {
@@ -31,7 +133,8 @@ const getStatusInfo = (days: number) => {
       bgColor: 'bg-green-500/15',
       borderColor: 'border-green-500/30',
       status: 'STABLE',
-      message: 'SYSTEM_READY'
+      systemMessage: activityConfig.systemMessages[2],
+      motivationalMessage: activityConfig.motivationalMessages[2]
     };
   } else if (days <= 7) {
     return {
@@ -39,7 +142,8 @@ const getStatusInfo = (days: number) => {
       bgColor: 'bg-yellow-500/20',
       borderColor: 'border-yellow-500/40',
       status: 'WARNING',
-      message: 'ACTIVITY_DECLINING'
+      systemMessage: activityConfig.systemMessages.warning,
+      motivationalMessage: activityConfig.motivationalMessages.warning
     };
   } else {
     return {
@@ -47,36 +151,60 @@ const getStatusInfo = (days: number) => {
       bgColor: 'bg-red-500/20',
       borderColor: 'border-red-500/40',
       status: 'CRITICAL',
-      message: 'REBOOT_REQUIRED'
+      systemMessage: activityConfig.systemMessages.critical,
+      motivationalMessage: activityConfig.motivationalMessages.critical
     };
   }
 };
 
-const statusInfo = getStatusInfo(daysSince);
+const activityConfig = getActivityConfig(activityType);
+const statusInfo = getStatusInfo(daysSince, activityConfig);
+
 const formattedDate = lastDate.toLocaleDateString('en-US', {
   year: 'numeric',
   month: 'short',
   day: 'numeric'
 });
+
+// Format duration from seconds to readable format
+const formatDuration = (seconds: number) => {
+  const hours = Math.floor(seconds / 3600);
+  const minutes = Math.floor((seconds % 3600) / 60);
+  if (hours > 0) {
+    return `${hours}h ${minutes}m`;
+  }
+  return `${minutes}m`;
+};
+
+// Format distance based on activity type
+const formatDistance = (distance: number, unit: string) => {
+  if (unit === 'm') {
+    return distance >= 1000 ? `${(distance / 1000).toFixed(1)}km` : `${distance}m`;
+  }
+  return `${distance.toFixed(1)}${unit}`;
+};
 ---
 
-<div class="relative z-10 mb-8">
+<div class="relative z-10 mb-8 group">
   <div class={`
-    border ${statusInfo.borderColor} ${statusInfo.bgColor} 
-    backdrop-blur-sm rounded-lg p-6 shadow-xl shadow-black/50
+    border ${statusInfo.borderColor} ${statusInfo.bgColor}
+    backdrop-blur-sm rounded-lg p-4 sm:p-6 shadow-xl shadow-black/50
     transition-all duration-500 hover:shadow-xl hover:${statusInfo.borderColor.replace('/40', '/60')}
+    hover:scale-[1.02] transform-gpu
   `}>
-    
+
     <!-- Terminal header -->
-    <div class="flex items-center justify-between mb-4">
-      <div class="flex items-center space-x-2">
-        <span class="text-green-400 text-sm animate-pulse">system@matrix:~$</span>
-        <span class="text-green-300 text-sm typing-effect">./check_last_activity.exe</span>
+    <div class="flex flex-col sm:flex-row sm:items-center justify-between mb-4 gap-2">
+      <div class="flex items-center space-x-2 min-w-0">
+        <span class="text-green-400 text-xs sm:text-sm animate-pulse shrink-0">matrix@athlete:~$</span>
+        <span class="text-green-300 text-xs sm:text-sm typing-effect truncate">
+          {activityConfig.terminalCommand}
+        </span>
       </div>
       <div class={`
-        px-3 py-1 rounded-full text-xs font-bold tracking-wider
+        px-2 sm:px-3 py-1 rounded-full text-xs font-bold tracking-wider
         ${statusInfo.bgColor} ${statusInfo.borderColor} border
-        ${statusInfo.color} animate-pulse
+        ${statusInfo.color} animate-pulse shrink-0 self-start sm:self-center
       `}>
         [{statusInfo.status}]
       </div>
@@ -84,18 +212,21 @@ const formattedDate = lastDate.toLocaleDateString('en-US', {
 
     <!-- Main display -->
     <div class="text-center space-y-4">
-      <!-- Days counter -->
+      <!-- Days counter with activity icon -->
       <div class="relative">
-        <div class={`
-          text-6xl md:text-8xl font-bold ${statusInfo.color} 
-          filter drop-shadow-lg counter-glow
-        `}>
-          {daysSince.toString().padStart(2, '0')}
-        </div>
-        <div class="absolute inset-0 opacity-30">
+        <div class="flex items-center justify-center space-x-2 sm:space-x-4 mb-2">
+          <span class="text-2xl sm:text-4xl">{activityConfig.icon}</span>
           <div class={`
-            text-6xl md:text-8xl font-bold ${statusInfo.color} 
-            animate-pulse blur-sm
+            text-4xl sm:text-6xl md:text-8xl font-bold ${statusInfo.color}
+            filter drop-shadow-lg counter-glow
+          `}>
+            {daysSince.toString().padStart(2, '0')}
+          </div>
+        </div>
+        <div class="absolute inset-0 opacity-30 pointer-events-none">
+          <div class={`
+            text-4xl sm:text-6xl md:text-8xl font-bold ${statusInfo.color}
+            animate-pulse blur-sm flex items-center justify-center
           `}>
             {daysSince.toString().padStart(2, '0')}
           </div>
@@ -104,33 +235,109 @@ const formattedDate = lastDate.toLocaleDateString('en-US', {
 
       <!-- Label -->
       <div class="space-y-2">
-        <div class={`text-xl md:text-2xl font-bold ${statusInfo.color} tracking-wider`}>
+        <div class={`text-lg sm:text-xl md:text-2xl font-bold ${statusInfo.color} tracking-wider`}>
           {daysSince === 1 ? 'DAY' : 'DAYS'} SINCE LAST
         </div>
-        <div class="text-green-400 text-lg md:text-xl font-mono tracking-widest">
+        <div class="text-green-400 text-base sm:text-lg md:text-xl font-mono tracking-widest">
           [{activityType}]
+        </div>
+
+        <!-- Motivational message -->
+        <div class={`text-sm sm:text-base ${statusInfo.color} italic opacity-80 mt-2`}>
+          {statusInfo.motivationalMessage}
         </div>
       </div>
 
-      <!-- System info -->
+      <!-- Enhanced System info -->
       <div class="mt-6 pt-4 border-t border-green-500/20">
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 text-xs sm:text-sm">
           <div class="space-y-1">
-            <div class="text-green-400/60 text-xs">LAST_ACTIVITY_DATE:</div>
-            <div class="text-green-300 font-mono">{formattedDate}</div>
+            <div class="text-green-400/60 text-xs">LAST_DATE:</div>
+            <div class="text-green-300 font-mono text-xs sm:text-sm">{formattedDate}</div>
           </div>
-          <div class="space-y-1">
-            <div class="text-green-400/60 text-xs">SYSTEM_MESSAGE:</div>
-            <div class={`${statusInfo.color} font-mono text-xs animate-pulse`}>
-              {statusInfo.message}
+
+          {lastDistance > 0 && (
+            <div class="space-y-1">
+              <div class="text-green-400/60 text-xs">DISTANCE:</div>
+              <div class="text-green-300 font-mono text-xs sm:text-sm">
+                {formatDistance(lastDistance, activityConfig.unit)}
+              </div>
+            </div>
+          )}
+
+          {lastDuration > 0 && (
+            <div class="space-y-1">
+              <div class="text-green-400/60 text-xs">DURATION:</div>
+              <div class="text-green-300 font-mono text-xs sm:text-sm">
+                {formatDuration(lastDuration)}
+              </div>
+            </div>
+          )}
+
+          <div class="space-y-1 sm:col-span-1 lg:col-span-1">
+            <div class="text-green-400/60 text-xs">STATUS:</div>
+            <div class={`${statusInfo.color} font-mono text-xs animate-pulse break-words`}>
+              {statusInfo.systemMessage}
             </div>
           </div>
         </div>
+
+        {averageWeekly > 0 && (
+          <div class="mt-4 pt-4 border-t border-green-500/10">
+            <div class="text-center">
+              <div class="text-green-400/60 text-xs mb-1">WEEKLY_AVERAGE:</div>
+              <div class="text-green-300 font-mono text-sm">
+                {averageWeekly.toFixed(1)} {activityConfig.unit}/week
+              </div>
+            </div>
+          </div>
+        )}
+      </div>
+
+      <!-- Action buttons -->
+      <div class="flex flex-col sm:flex-row gap-3 mt-6 pt-4 border-t border-green-500/20">
+        {stravaUrl && (
+          <a
+            href={stravaUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            class={`
+              flex-1 px-4 py-2 rounded-lg font-mono text-sm
+              bg-orange-500/20 border border-orange-500/40 text-orange-400
+              hover:bg-orange-500/30 hover:border-orange-500/60 hover:text-orange-300
+              transition-all duration-300 transform hover:scale-105
+              focus:outline-none focus:ring-2 focus:ring-orange-500/50
+              no-underline hover:no-underline
+            `}
+          >
+            <span class="flex items-center justify-center space-x-2">
+              <span>📊</span>
+              <span>VIEW_ON_STRAVA</span>
+            </span>
+          </a>
+        )}
+
+        <button
+          class={`
+            flex-1 px-4 py-2 rounded-lg font-mono text-sm
+            ${statusInfo.bgColor} ${statusInfo.borderColor} border ${statusInfo.color}
+            hover:${statusInfo.bgColor.replace('/20', '/30')} hover:${statusInfo.borderColor.replace('/40', '/60')}
+            transition-all duration-300 transform hover:scale-105
+            focus:outline-none focus:ring-2 focus:ring-green-500/50
+            activity-details-btn
+          `}
+          data-activity-type={activityType}
+        >
+          <span class="flex items-center justify-center space-x-2">
+            <span>🔍</span>
+            <span>DETAILED_ANALYSIS</span>
+          </span>
+        </button>
       </div>
     </div>
 
     <!-- Digital noise overlay -->
-    <div class="absolute inset-0 pointer-events-none opacity-20">
+    <div class="absolute inset-0 pointer-events-none opacity-20 rounded-lg overflow-hidden">
       <div class="digital-noise-overlay"></div>
     </div>
   </div>
@@ -143,26 +350,26 @@ const formattedDate = lastDate.toLocaleDateString('en-US', {
     border-right: 1px solid rgba(0, 255, 0, 0.6);
     animation: typing 2s steps(25, end), blink-caret 1s step-end infinite;
   }
-  
+
   @keyframes typing {
     from { width: 0; }
     to { width: 100%; }
   }
-  
+
   @keyframes blink-caret {
     from, to { border-color: transparent; }
     50% { border-color: rgba(0, 255, 0, 0.6); }
   }
 
   .counter-glow {
-    text-shadow: 
+    text-shadow:
       0 0 10px currentColor,
       0 0 20px currentColor,
       0 0 40px currentColor;
   }
 
   .digital-noise-overlay {
-    background-image: 
+    background-image:
       radial-gradient(circle at 25% 25%, rgba(0, 255, 0, 0.1) 0%, transparent 50%),
       radial-gradient(circle at 75% 75%, rgba(0, 255, 0, 0.1) 0%, transparent 50%),
       radial-gradient(circle at 50% 50%, rgba(0, 255, 0, 0.05) 0%, transparent 50%);
@@ -170,13 +377,13 @@ const formattedDate = lastDate.toLocaleDateString('en-US', {
   }
 
   @keyframes digitalGlitch {
-    0%, 100% { 
-      opacity: 0.1; 
-      filter: hue-rotate(0deg) brightness(1); 
+    0%, 100% {
+      opacity: 0.1;
+      filter: hue-rotate(0deg) brightness(1);
     }
-    50% { 
-      opacity: 0.3; 
-      filter: hue-rotate(120deg) brightness(1.2); 
+    50% {
+      opacity: 0.3;
+      filter: hue-rotate(120deg) brightness(1.2);
     }
   }
 
@@ -184,6 +391,71 @@ const formattedDate = lastDate.toLocaleDateString('en-US', {
   @media (max-width: 768px) {
     .typing-effect {
       font-size: 0.75rem;
+      border-right-width: 1px;
+    }
+
+    .counter-glow {
+      text-shadow:
+        0 0 5px currentColor,
+        0 0 10px currentColor,
+        0 0 20px currentColor;
+    }
+  }
+
+  @media (max-width: 640px) {
+    .typing-effect {
+      font-size: 0.7rem;
+      max-width: 200px;
     }
   }
 </style>
+
+<script>
+  // Add interactivity for detailed analysis button
+  document.addEventListener('DOMContentLoaded', () => {
+    const detailButtons = document.querySelectorAll('.activity-details-btn');
+
+    detailButtons.forEach(button => {
+      button.addEventListener('click', (e) => {
+        const activityType = e.currentTarget.getAttribute('data-activity-type');
+
+        // Create a modal or expand the component with more details
+        // For now, we'll show an alert, but this could be enhanced to show a modal
+        // with detailed analytics, trends, personal records, etc.
+
+        const detailsModal = document.createElement('div');
+        detailsModal.className = 'fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4';
+        detailsModal.innerHTML = `
+          <div class="bg-black/90 border border-green-500/40 rounded-lg p-6 max-w-md w-full">
+            <div class="text-center space-y-4">
+              <div class="text-green-400 text-lg font-mono">[${activityType}_ANALYSIS]</div>
+              <div class="text-green-300 text-sm">
+                Detailed analytics feature coming soon...
+                <br><br>
+                This will include:
+                <br>• Performance trends
+                <br>• Personal records
+                <br>• Training zones
+                <br>• Goal tracking
+              </div>
+              <button class="mt-4 px-4 py-2 bg-green-500/20 border border-green-500/40 text-green-400 rounded hover:bg-green-500/30 transition-all duration-300 close-modal">
+                [CLOSE]
+              </button>
+            </div>
+          </div>
+        `;
+
+        document.body.appendChild(detailsModal);
+
+        // Close modal functionality
+        const closeBtn = detailsModal.querySelector('.close-modal');
+        const closeModal = () => document.body.removeChild(detailsModal);
+
+        closeBtn.addEventListener('click', closeModal);
+        detailsModal.addEventListener('click', (e) => {
+          if (e.target === detailsModal) closeModal();
+        });
+      });
+    });
+  });
+</script>
