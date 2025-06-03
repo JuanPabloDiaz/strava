@@ -1,0 +1,75 @@
+---
+// Define possible activity types. This could be dynamic in a real app.
+const activityTypes = ["All", "Run", "Ride", "Swim", "Walk"];
+
+// This component will receive the current filter via props (handled in a later step)
+// For now, let's assume a 'currentFilter' prop might be passed.
+export interface Props {
+  currentFilter?: string;
+}
+const { currentFilter = 'All' } = Astro.props;
+---
+
+<div class="activity-filters mb-6">
+  <div class="filter-buttons-container flex flex-wrap gap-2 justify-center">
+    {activityTypes.map(type => (
+      <button
+        class:list={[
+          "filter-button px-4 py-2 border rounded-md text-sm font-mono transition-all duration-200 ease-in-out",
+          "hover:bg-green-500/30 hover:border-green-500/60",
+          currentFilter === type
+            ? "bg-green-500/40 border-green-500/70 text-green-300 ring-1 ring-green-400"
+            : "bg-black/50 border-green-500/30 text-green-400 hover:text-green-200",
+        ]}
+        data-filter-type={type}
+      >
+        {type.toUpperCase()}
+      </button>
+    ))}
+  </div>
+</div>
+
+<script>
+  // Get all filter buttons
+  const filterButtons = document.querySelectorAll('.filter-button');
+
+  // Add event listener to each button
+  filterButtons.forEach(button => {
+    button.addEventListener('click', () => {
+      const filterType = button.getAttribute('data-filter-type');
+
+      // Create a custom event to notify the parent page of the filter change
+      const filterChangeEvent = new CustomEvent('filterchange', {
+        detail: { filterType }
+      });
+      // Dispatch the event from a known element or the window
+      // Parent page (last.astro) will listen for this.
+      window.dispatchEvent(filterChangeEvent);
+    });
+  });
+</script>
+
+<style>
+  .activity-filters {
+    /* Optional: Add a container background or border if needed */
+    /* background: rgba(0, 0, 0, 0.2); */
+    /* border: 1px solid rgba(0, 255, 0, 0.1); */
+    /* border-radius: 8px; */
+    /* padding: 1rem; */
+  }
+
+  .filter-buttons-container {
+    /* Styles for the button container */
+  }
+
+  .filter-button {
+    /* Base styles are handled by Tailwind classes */
+    /* Add any specific non-Tailwind overrides or base styles here if necessary */
+    cursor: pointer;
+  }
+
+  .filter-button:focus {
+    outline: none;
+    box-shadow: 0 0 0 2px rgba(0, 255, 0, 0.5); /* Focus ring similar to active state */
+  }
+</style>

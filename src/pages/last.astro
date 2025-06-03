@@ -1,5 +1,6 @@
 ---
 import DaysSinceLast from "@components/DaysSinceLast.astro";
+import ActivityFilters from '@components/ActivityFilters.astro';
 import Base from "@layouts/Base.astro";
 import { fetchMileage, processMileageData, getLastActivityDate, fetchActivities } from '@services/stravaService';
 import type { StravaActivity } from '@services/stravaService';
@@ -228,6 +229,8 @@ const isLastPage = recentActivities.length < activitiesPerPage;
     </div>
   </section>
 
+  <ActivityFilters />
+
   <!-- Recent Activities Section -->
   <section class="mb-8">
     <div class="bg-black/60 border border-green-500/30 rounded-lg p-6 backdrop-blur-sm">
@@ -320,7 +323,7 @@ const isLastPage = recentActivities.length < activitiesPerPage;
 
 <script>
   document.addEventListener('DOMContentLoaded', () => {
-    // Training Plan button functionality
+    // --- Modal Functionality ---
     const trainingPlanBtn = document.querySelector('.training-plan-btn');
     trainingPlanBtn?.addEventListener('click', () => {
       showModal('Training Plan', `
@@ -342,7 +345,6 @@ const isLastPage = recentActivities.length < activitiesPerPage;
       `);
     });
 
-    // Analytics button functionality
     const analyticsBtn = document.querySelector('.analytics-btn');
     analyticsBtn?.addEventListener('click', () => {
       showModal('Performance Analytics', `
@@ -383,7 +385,6 @@ const isLastPage = recentActivities.length < activitiesPerPage;
       `);
     });
 
-    // Modal utility function
     function showModal(title, content) {
       const modal = document.createElement('div');
       modal.className = 'fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4';
@@ -402,22 +403,78 @@ const isLastPage = recentActivities.length < activitiesPerPage;
           </div>
         </div>
       `;
-
       document.body.appendChild(modal);
-
       const closeBtn = modal.querySelector('.close-modal');
       const closeModal = () => {
         if (modal.parentNode) {
           modal.parentNode.removeChild(modal);
         }
       };
-
       if (closeBtn) {
         closeBtn.addEventListener('click', closeModal);
       }
       modal.addEventListener('click', (e) => {
         if (e.target === modal) closeModal();
       });
+    }
+
+    // --- Activity Filtering Logic ---
+    const activityContainer = document.querySelector('.activities-list');
+    if (!activityContainer) {
+      console.warn('[FILTER] Activity list container (.activities-list) not found.');
+    }
+
+    const filterButtonsContainer = document.querySelector('.filter-buttons-container');
+    if (!filterButtonsContainer) {
+      console.warn('[FILTER] Filter buttons container (.filter-buttons-container) not found.');
+    }
+
+    let currentFilter = 'All';
+
+    function applyFilter(filterType) {
+      currentFilter = filterType;
+      console.log(`[FILTER] Applying filter: ${currentFilter}`);
+
+      if (activityContainer) {
+        const activityCards = activityContainer.querySelectorAll('.activity-card[data-activity-type]');
+        activityCards.forEach(card => {
+          const cardType = card.getAttribute('data-activity-type');
+          if (currentFilter === 'All' || cardType.toLowerCase() === currentFilter.toLowerCase()) {
+            card.style.display = ''; // Reset to default display
+          } else {
+            card.style.display = 'none';
+          }
+        });
+      }
+
+      if (filterButtonsContainer) {
+        const filterButtons = filterButtonsContainer.querySelectorAll('.filter-button');
+        filterButtons.forEach(button => {
+          const buttonType = button.getAttribute('data-filter-type');
+          // Reset classes
+          button.classList.remove('bg-green-500/40', 'border-green-500/70', 'text-green-300', 'ring-1', 'ring-green-400');
+          button.classList.add('bg-black/50', 'border-green-500/30', 'text-green-400');
+
+          if (buttonType.toLowerCase() === currentFilter.toLowerCase()) {
+            // Apply active classes
+            button.classList.add('bg-green-500/40', 'border-green-500/70', 'text-green-300', 'ring-1', 'ring-green-400');
+            button.classList.remove('bg-black/50', 'border-green-500/30', 'text-green-400');
+          }
+        });
+      }
+    }
+
+    window.addEventListener('filterchange', (event) => {
+      if (event.detail && event.detail.filterType) {
+        applyFilter(event.detail.filterType);
+      }
+    });
+
+    // Initialize with "All" filter to style the button correctly on page load.
+    if (filterButtonsContainer) {
+      applyFilter('All');
+    } else {
+      console.warn('[FILTER] Filter buttons container not found at time of initial applyFilter call. "All" button may not be styled correctly.');
     }
   });
 </script>

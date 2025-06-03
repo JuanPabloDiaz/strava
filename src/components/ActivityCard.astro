@@ -13,9 +13,10 @@ const { activity } = Astro.props;
 const activityDate = formatRelativeTime(new Date(activity.start_date));
 const durationFormatted = formatDuration(activity.moving_time);
 const distanceFormatted = formatDistance(activity.distance);
+const activityType = activity.type || activity.sport_type || "Unknown";
 ---
 
-<div class="activity-card">
+<div class="activity-card" data-activity-type={activityType}>
   <h2>{activity.name}</h2>
   <p><strong>Date:</strong> {activityDate}</p>
   <p><strong>Duration:</strong> {durationFormatted}</p>
