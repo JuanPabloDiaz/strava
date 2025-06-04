@@ -18,7 +18,7 @@ export function getColor(n: number, min: number, max: number): string {
   const segmentSize = 1 / (colors.length - 1);
   const segmentIndex = Math.min(
     Math.floor(ratio / segmentSize),
-    colors.length - 2
+    colors.length - 2,
   );
   const localRatio = (ratio - segmentIndex * segmentSize) / segmentSize;
 
@@ -26,13 +26,13 @@ export function getColor(n: number, min: number, max: number): string {
   const endColor = colors[segmentIndex + 1];
 
   const r = Math.round(
-    startColor[0] + localRatio * (endColor[0] - startColor[0])
+    startColor[0] + localRatio * (endColor[0] - startColor[0]),
   );
   const g = Math.round(
-    startColor[1] + localRatio * (endColor[1] - startColor[1])
+    startColor[1] + localRatio * (endColor[1] - startColor[1]),
   );
   const b = Math.round(
-    startColor[2] + localRatio * (endColor[2] - startColor[2])
+    startColor[2] + localRatio * (endColor[2] - startColor[2]),
   );
 
   return `rgb(${r}, ${g}, ${b})`;
@@ -49,12 +49,12 @@ export function formatTimestamp(timestamp: number): string {
 
 export function getTooltipContent(
   data: [number, number],
-  formatActivityValueFn: (meters: number) => number
+  formatActivityValueFn: (meters: number) => number,
 ): string {
   return data[1] === -1
     ? ""
     : `${formatActivityValueFn(data[1])} KM_EXECUTED >> ${formatTimestamp(
-        data[0]
+        data[0],
       )}`;
 }
 

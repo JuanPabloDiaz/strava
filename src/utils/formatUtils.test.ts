@@ -37,7 +37,7 @@ describe("formatRelativeTime", () => {
 
   it("should return hours and minutes for times less than a day ago", () => {
     const date = new Date(
-      T_NOW.getTime() - (2 * 60 * 60 * 1000 + 30 * 60 * 1000)
+      T_NOW.getTime() - (2 * 60 * 60 * 1000 + 30 * 60 * 1000),
     ); // 2 hours 30 minutes ago
     expect(formatRelativeTime(date)).toBe("2hr 30min ago");
   });
@@ -49,14 +49,14 @@ describe("formatRelativeTime", () => {
 
   it("should return days and hours for times more than a day ago", () => {
     const date = new Date(
-      T_NOW.getTime() - (3 * 24 * 60 * 60 * 1000 + 5 * 60 * 60 * 1000)
+      T_NOW.getTime() - (3 * 24 * 60 * 60 * 1000 + 5 * 60 * 60 * 1000),
     ); // 3 days 5 hours ago
     expect(formatRelativeTime(date)).toBe("3 days 5hr ago");
   });
 
   it('should return singular "day" for 1 day ago', () => {
     const date = new Date(
-      T_NOW.getTime() - (1 * 24 * 60 * 60 * 1000 + 2 * 60 * 60 * 1000)
+      T_NOW.getTime() - (1 * 24 * 60 * 60 * 1000 + 2 * 60 * 60 * 1000),
     ); // 1 day 2 hours ago
     expect(formatRelativeTime(date)).toBe("1 day 2hr ago");
   });

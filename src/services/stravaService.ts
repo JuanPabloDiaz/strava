@@ -25,7 +25,7 @@ export function getYearOldEpoch(): number {
   const yearAgo = new Date(
     now.getFullYear() - 1,
     now.getMonth(),
-    now.getDate()
+    now.getDate(),
   );
   return yearAgo.getTime() / 1000;
 }
@@ -63,7 +63,7 @@ export async function getPage(page: number, bearer: string): Promise<any[]> {
 // Nueva función para obtener actividades recientes (sin filtro de tiempo)
 export async function fetchActivities(
   page: number = 1,
-  perPage: number = 10
+  perPage: number = 10,
 ): Promise<StravaActivity[]> {
   try {
     const bearer = await getBearerToken();
@@ -78,7 +78,7 @@ export async function fetchActivities(
     const rawActivities: any[] = await response.json();
     console.log(
       "Raw Strava activities sample (first 2):",
-      JSON.stringify(rawActivities.slice(0, 2), null, 2)
+      JSON.stringify(rawActivities.slice(0, 2), null, 2),
     );
 
     const activities: StravaActivity[] = rawActivities.map((activity) => {
@@ -105,7 +105,7 @@ export async function fetchActivities(
     });
     console.log(
       "Processed activities with end_latlng (first 2):",
-      JSON.stringify(activities.slice(0, 2), null, 2)
+      JSON.stringify(activities.slice(0, 2), null, 2),
     );
     return activities;
   } catch (error) {
@@ -171,7 +171,7 @@ export function getActivityStats(activities: StravaActivity[]): ActivityStats {
 
 // Nueva función para obtener la última actividad de un tipo específico
 export async function getLastActivityDate(
-  activityType?: string
+  activityType?: string,
 ): Promise<Date | null> {
   try {
     // En modo desarrollo, retorna una fecha de ejemplo
@@ -206,7 +206,7 @@ export async function getLastActivityDate(
 
     if (!targetActivity) {
       console.log(
-        `No ${activityType || "activity"} found in recent activities`
+        `No ${activityType || "activity"} found in recent activities`,
       );
       return null;
     }
@@ -215,12 +215,12 @@ export async function getLastActivityDate(
     const activityDate = new Date(targetActivity.start_date);
     // Create a new Date object that represents the equivalent local time in New York
     const newYorkDate = new Date(
-      activityDate.toLocaleString("en-US", { timeZone: "America/New_York" })
+      activityDate.toLocaleString("en-US", { timeZone: "America/New_York" }),
     );
 
     console.log(
       `Last ${activityType || "activity"} date (New York):`,
-      newYorkDate
+      newYorkDate,
     );
     return newYorkDate;
   } catch (error) {
@@ -282,7 +282,7 @@ export async function getLastActivityInfo(activityType?: string): Promise<{
     const activityDate = new Date(targetActivity.start_date);
     // Create a new Date object that represents the equivalent local time in New York
     const newYorkDate = new Date(
-      activityDate.toLocaleString("en-US", { timeZone: "America/New_York" })
+      activityDate.toLocaleString("en-US", { timeZone: "America/New_York" }),
     );
 
     return {
@@ -300,7 +300,7 @@ export async function fetchDistanceData(): Promise<DistanceData> {
 
   // Initialize all days in the last 365 days for 'America/New_York'
   const todayInNewYork = new Date(
-    new Date().toLocaleString("en-US", { timeZone: "America/New_York" })
+    new Date().toLocaleString("en-US", { timeZone: "America/New_York" }),
   );
   for (let i = 0; i < 365; i++) {
     const date = new Date(todayInNewYork);
@@ -308,7 +308,7 @@ export async function fetchDistanceData(): Promise<DistanceData> {
     // Use YYYY-MM-DD format for consistency and to avoid issues with single digit month/day
     const key = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(
       2,
-      "0"
+      "0",
     )}-${String(date.getDate()).padStart(2, "0")}`;
     distanceData[key] = 0;
   }
@@ -356,7 +356,7 @@ export async function fetchDistanceData(): Promise<DistanceData> {
 }
 
 export function processDistanceData(
-  distanceMap: DistanceData
+  distanceMap: DistanceData,
 ): [number, number][] {
   // console.log(
   //   "Distance map keys with nonzero values:",
@@ -386,10 +386,10 @@ export function processDistanceData(
       const dateInNewYork = new Date(
         new Date(newYorkDateString).toLocaleString("en-US", {
           timeZone: "America/New_York",
-        })
+        }),
       );
       return [dateInNewYork.getTime(), value];
-    }
+    },
   );
 
   distanceArray.sort((a, b) => a[0] - b[0]); // sort distance data by date
@@ -399,7 +399,7 @@ export function processDistanceData(
     let firstDate = new Date(distanceArray[0][0]);
     // Ensure we interpret this timestamp as a New York date to check its day of the week
     let firstDateInNewYork = new Date(
-      firstDate.toLocaleString("en-US", { timeZone: "America/New_York" })
+      firstDate.toLocaleString("en-US", { timeZone: "America/New_York" }),
     );
 
     while (firstDateInNewYork.getDay() !== 0) {
@@ -407,7 +407,7 @@ export function processDistanceData(
       previousDate.setDate(previousDate.getDate() - 1);
       distanceArray.unshift([previousDate.getTime(), -1]); // Store timestamp as is
       firstDateInNewYork = new Date(
-        previousDate.toLocaleString("en-US", { timeZone: "America/New_York" })
+        previousDate.toLocaleString("en-US", { timeZone: "America/New_York" }),
       );
     }
   }

@@ -8,7 +8,7 @@
     "build": "astro check && astro build",
     "preview": "astro preview",
     "astro": "astro",
-    "format": "prettier --write .",
+    "format": "prettier --write '**/*.{astro,js,ts,json,md}'",
     "strava-script": "bun scripts/strava-script.ts",
     "clean": "rm -rf dist .astro node_modules package-lock.json bun.lockb",
     "test": "vitest"
@@ -41,6 +41,8 @@
     "@types/node": "^22.15.29",
     "autoprefixer": "^10.4.21",
     "postcss": "^8.5.4",
+    "prettier": "^3.5.3",
+    "prettier-plugin-astro": "^0.14.1",
     "tailwindcss": "^3.0.24",
     "vitest": "^3.2.0"
   },

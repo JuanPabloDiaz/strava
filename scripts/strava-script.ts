@@ -109,7 +109,7 @@ const main = async (): Promise<void> => {
 
     await writeFile(
       "public/last-activities.json",
-      JSON.stringify(distanceMap, null, 2)
+      JSON.stringify(distanceMap, null, 2),
     );
     console.log("✅ Distance data saved to public/last-activities.json");
   } catch (err: any) {
