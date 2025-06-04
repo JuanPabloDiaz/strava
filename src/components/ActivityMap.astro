@@ -33,7 +33,7 @@ const mapId = `leaflet-map-${Math.random().toString(36).substring(2, 9)}`;
       return [];
     }
 
-    const poly = [];
+    const poly: [number, number][] = [];
     let index = 0;
     const len = encoded.length;
     let lat = 0;
