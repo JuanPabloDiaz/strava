@@ -48,6 +48,18 @@ const getLastActivityDetails = (activityType: string) => {
   return mockDetails[activityType] || {};
 };
 
+// Get activity details
+const runDetails = getLastActivityDetails('Run');
+const rideDetails = getLastActivityDetails('Ride');
+const swimDetails = getLastActivityDetails('Swim');
+const pageParam = Astro.url.searchParams.get('page');
+let currentPage = 1;
+if (pageParam) {
+  const parsedPage = parseInt(pageParam, 10);
+  if (!isNaN(parsedPage) && parsedPage > 0) {
+    currentPage = parsedPage;
+  }
+}
 
 ---
 
