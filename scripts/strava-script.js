@@ -49,8 +49,8 @@ const getAllActivities = async (bearer) => {
   return all;
 };
 
-const summarizeMileage = (activities) => {
-  const mileage = {};
+const summarizeDistance = (activities) => {
+  const distance = {};
 
   for (const activity of activities) {
     const date = new Date(activity.start_date);
@@ -59,23 +59,23 @@ const summarizeMileage = (activities) => {
       estDate.getMonth() + 1
     }-${estDate.getDate()}`;
 
-    mileage[key] = (mileage[key] || 0) + activity.distance;
+    distance[key] = (distance[key] || 0) + activity.distance;
   }
 
-  return mileage;
+  return distance;
 };
 
 const main = async () => {
   try {
     const bearer = await getBearerToken();
     const activities = await getAllActivities(bearer);
-    const mileageMap = summarizeMileage(activities);
+    const distanceMap = summarizeDistance(activities);
 
     await writeFile(
       "public/last-activities.json",
-      JSON.stringify(mileageMap, null, 2)
+      JSON.stringify(distanceMap, null, 2)
     );
-    console.log("✅ Mileage data saved to public/last-activities.json");
+    console.log("✅ Distance data saved to public/last-activities.json");
   } catch (err) {
     console.error("❌ Error:", err.message);
     process.exit(1);

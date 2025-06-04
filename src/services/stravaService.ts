@@ -1,4 +1,4 @@
-export interface MileageData {
+export interface DistanceData {
   [key: string]: number;
 }
 
@@ -16,8 +16,8 @@ export interface StravaActivity {
   summary_polyline?: string;
 }
 
-export function formatMileage(meters: number): number {
-  return Math.round(((meters * 0.621371) / 1000) * 100) / 100;
+export function formatDistanceInKm(meters: number): number {
+  return Math.round((meters / 1000) * 100) / 100;
 }
 
 export function getYearOldEpoch(): number {
@@ -295,8 +295,8 @@ export async function getLastActivityInfo(activityType?: string): Promise<{
   }
 }
 
-export async function fetchMileage(): Promise<MileageData> {
-  let mileage: MileageData = {};
+export async function fetchDistanceData(): Promise<DistanceData> {
+  let distanceData: DistanceData = {};
 
   // Initialize all days in the last 365 days for 'America/New_York'
   const todayInNewYork = new Date(
@@ -310,20 +310,22 @@ export async function fetchMileage(): Promise<MileageData> {
       2,
       "0"
     )}-${String(date.getDate()).padStart(2, "0")}`;
-    mileage[key] = 0;
+    distanceData[key] = 0;
   }
 
   // Uncomment for development mode bypass
-  // if (import.meta.env.MODE !== "production") return mileage;
+  // if (import.meta.env.MODE !== "production") return distanceData;
 
   try {
     const bearer = await getBearerToken();
     let i = 1;
-    let pagedMileage = await getPage(i, bearer);
+    let pagedActivities = await getPage(i, bearer); // Renamed for clarity, was pagedMileage
 
-    while (pagedMileage.length > 0) {
-      for (let data of pagedMileage) {
-        const activityDate = new Date(data.start_date);
+    while (pagedActivities.length > 0) {
+      // Renamed for clarity
+      for (let activity of pagedActivities) {
+        // Renamed for clarity, was data
+        const activityDate = new Date(activity.start_date); // Was data.start_date
         // Convert activity date to 'America/New_York' to get the correct day
         const newYorkActivityDateStr = activityDate.toLocaleString("en-US", {
           timeZone: "America/New_York",
@@ -335,35 +337,35 @@ export async function fetchMileage(): Promise<MileageData> {
         const parts = newYorkActivityDateStr.split("/"); // MM/DD/YYYY
         const key = `${parts[2]}-${parts[0]}-${parts[1]}`; // YYYY-MM-DD
 
-        if (key in mileage) {
-          mileage[key] += data.distance;
+        if (key in distanceData) {
+          distanceData[key] += activity.distance; // Was data.distance
         } else {
           // This case might happen if an activity's date falls outside the initialized 365-day window
           // after timezone conversion. For simplicity, we can log it or initialize it.
-          // console.warn(`Activity date ${key} not found in initialized mileage map. Activity time: ${data.start_date}`);
-          mileage[key] = data.distance; // Initialize if not present
+          // console.warn(`Activity date ${key} not found in initialized distanceData map. Activity time: ${activity.start_date}`);
+          distanceData[key] = activity.distance; // Initialize if not present, was data.distance
         }
       }
-      pagedMileage = await getPage(++i, bearer);
+      pagedActivities = await getPage(++i, bearer); // Renamed for clarity
     }
   } catch (error) {
     console.error("Error fetching Strava data:", error);
   }
 
-  return mileage;
+  return distanceData;
 }
 
-export function processMileageData(
-  mileageMap: MileageData
+export function processDistanceData(
+  distanceMap: DistanceData
 ): [number, number][] {
   // console.log(
-  //   "Mileage map keys with nonzero values:",
-  //   Object.entries(mileageMap).filter(([_, v]) => v > 0)
+  //   "Distance map keys with nonzero values:",
+  //   Object.entries(distanceMap).filter(([_, v]) => v > 0)
   // );
 
   // When converting to [timestamp, value] array, ensure the key is parsed correctly as a New York date
   // to get a timestamp that aligns with the intended day.
-  let mileageArray: [number, number][] = Object.entries(mileageMap).map(
+  let distanceArray: [number, number][] = Object.entries(distanceMap).map(
     ([key, value]) => {
       // Key is YYYY-MM-DD. Ensure it's treated as a local date in New York then get timestamp.
       // new Date("YYYY-MM-DD") will parse it as UTC.
@@ -390,11 +392,11 @@ export function processMileageData(
     }
   );
 
-  mileageArray.sort((a, b) => a[0] - b[0]); // sort mileage by date
+  distanceArray.sort((a, b) => a[0] - b[0]); // sort distance data by date
 
-  // prepend days to mileage until first day is Sunday (0 index for getDay()) in New York time
-  if (mileageArray.length > 0) {
-    let firstDate = new Date(mileageArray[0][0]);
+  // prepend days to distance data until first day is Sunday (0 index for getDay()) in New York time
+  if (distanceArray.length > 0) {
+    let firstDate = new Date(distanceArray[0][0]);
     // Ensure we interpret this timestamp as a New York date to check its day of the week
     let firstDateInNewYork = new Date(
       firstDate.toLocaleString("en-US", { timeZone: "America/New_York" })
@@ -403,12 +405,12 @@ export function processMileageData(
     while (firstDateInNewYork.getDay() !== 0) {
       const previousDate = new Date(firstDateInNewYork);
       previousDate.setDate(previousDate.getDate() - 1);
-      mileageArray.unshift([previousDate.getTime(), -1]); // Store timestamp as is
+      distanceArray.unshift([previousDate.getTime(), -1]); // Store timestamp as is
       firstDateInNewYork = new Date(
         previousDate.toLocaleString("en-US", { timeZone: "America/New_York" })
       );
     }
   }
 
-  return mileageArray;
+  return distanceArray;
 }

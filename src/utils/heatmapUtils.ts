@@ -49,11 +49,11 @@ export function formatTimestamp(timestamp: number): string {
 
 export function getTooltipContent(
   data: [number, number],
-  formatMileageFn: (meters: number) => number
+  formatActivityValueFn: (meters: number) => number
 ): string {
   return data[1] === -1
     ? ""
-    : `${formatMileageFn(data[1])} MILES_EXECUTED >> ${formatTimestamp(
+    : `${formatActivityValueFn(data[1])} KM_EXECUTED >> ${formatTimestamp(
         data[0]
       )}`;
 }

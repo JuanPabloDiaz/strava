@@ -2,12 +2,12 @@
 import { getColor, getAnimationStyle } from "@utils/heatmapUtils";
 
 export interface Props {
-  mileageData: [number, number][];
-  minMiles: number;
-  maxMiles: number;
+  distanceData: [number, number][];
+  minDistance: number;
+  maxDistance: number;
 }
 
-const { mileageData, minMiles, maxMiles } = Astro.props;
+const { distanceData, minDistance, maxDistance } = Astro.props;
 
 // Helper functions to generate dynamic labels
 function getWeekdayLabels() {
@@ -43,8 +43,8 @@ function getMonthLabels(data: [number, number][]) {
 }
 
 const weekdayLabels = getWeekdayLabels();
-const monthLabels = getMonthLabels(mileageData);
-const totalWeeks = Math.ceil(mileageData.length / 7);
+const monthLabels = getMonthLabels(distanceData);
+const totalWeeks = Math.ceil(distanceData.length / 7);
 ---
 
 <div class="heatmap-container">
@@ -71,10 +71,10 @@ const totalWeeks = Math.ceil(mileageData.length / 7);
 
   <!-- Main Heatmap Grid -->
   <div class="heatmap-grid" style={{ gridTemplateColumns: `repeat(${totalWeeks}, 1fr)` }}>
-    {mileageData.map((data, index) => {
+    {distanceData.map((data, index) => {
       const style = getAnimationStyle(index);
       const hasActivity = data[1] > 0;
-      const backgroundColor = getColor(data[1], minMiles, maxMiles);
+      const backgroundColor = getColor(data[1], minDistance, maxDistance);
       const row = (index % 7) + 2; // +2 to account for month labels
       const column = Math.floor(index / 7) + 2; // +2 to account for weekday labels
 

@@ -1,5 +1,5 @@
 ---
-import { fetchMileage, processMileageData, getLastActivityDate } from '@services/stravaService';
+import { fetchDistanceData, processDistanceData, getLastActivityDate } from '@services/stravaService';
 
 export interface Props {
   activityType?: string;
@@ -8,12 +8,12 @@ export interface Props {
 const { activityType = 'Run' } = Astro.props;
 
 // Fetch and process data
-const mileageMap = await fetchMileage();
-const mileageData = processMileageData(mileageMap);
+const distanceMap = await fetchDistanceData();
+const distanceData = processDistanceData(distanceMap);
 const lastActivityDate = await getLastActivityDate(activityType);
 
-const minMiles = Math.min(...mileageData.map(data => data[1]));
-const maxMiles = Math.max(...mileageData.map(data => data[1]));
+const minDistance = Math.min(...distanceData.map(data => data[1]));
+const maxDistance = Math.max(...distanceData.map(data => data[1]));
 
 ---
 

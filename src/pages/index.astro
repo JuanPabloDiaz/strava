@@ -3,15 +3,15 @@ import Base from "@layouts/Base.astro";
 import SectionLayout from "@components/SectionLayout.astro";
 import DaysSinceLast from "@components/DaysSinceLast.astro";
 import HeatmapGrid from "@components/HeatmapGrid.astro";
-import { fetchMileage, processMileageData, getLastActivityDate } from '@services/stravaService';
+import { fetchDistanceData, processDistanceData, getLastActivityDate } from '@services/stravaService';
 
 // Fetch and process data
-const mileageMap = await fetchMileage();
-const mileageData = processMileageData(mileageMap);
+const distanceMap = await fetchDistanceData();
+const distanceData = processDistanceData(distanceMap);
 const lastRunDate = await getLastActivityDate('Run');
 
-const minMiles = Math.min(...mileageData.map(data => data[1]));
-const maxMiles = Math.max(...mileageData.map(data => data[1]));
+const minDistance = Math.min(...distanceData.map(data => data[1]));
+const maxDistance = Math.max(...distanceData.map(data => data[1]));
 ---
 
 <Base
@@ -42,11 +42,11 @@ const maxMiles = Math.max(...mileageData.map(data => data[1]));
             </div>
             <div class="info-block">
               <span class="text-green-400/60">MIN_ACTIVITY:</span>
-              <span class="text-green-300 ml-2">{minMiles.toFixed(1)} MI</span>
+              <span class="text-green-300 ml-2">{minDistance.toFixed(1)} KM</span>
             </div>
             <div class="info-block">
               <span class="text-green-400/60">MAX_ACTIVITY:</span>
-              <span class="text-green-300 ml-2">{maxMiles.toFixed(1)} MI</span>
+              <span class="text-green-300 ml-2">{maxDistance.toFixed(1)} KM</span>
             </div>
           </div>
         </div>
@@ -54,9 +54,9 @@ const maxMiles = Math.max(...mileageData.map(data => data[1]));
         <!-- Main Heatmap Grid -->
         <div class="heatmap-display">
           <HeatmapGrid
-            mileageData={mileageData}
-            minMiles={minMiles}
-            maxMiles={maxMiles}
+            distanceData={distanceData}
+            minDistance={minDistance}
+            maxDistance={maxDistance}
           />
         </div>
 

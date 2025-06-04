@@ -3,12 +3,12 @@ import SectionLayout from "@components/SectionLayout.astro";
 import DaysSinceLast from "@components/DaysSinceLast.astro";
 import ActivityFilters from '@components/ActivityFilters.astro';
 import Base from "@layouts/Base.astro";
-import { fetchMileage, processMileageData, getLastActivityDate, fetchActivities } from '@services/stravaService';
+import { fetchDistanceData, processDistanceData, getLastActivityDate, fetchActivities } from '@services/stravaService';
 import ActivityCard from '@components/ActivityCard.astro';
 
 // Fetch and process data for each activity type
-const mileageMap = await fetchMileage();
-const mileageData = processMileageData(mileageMap);
+const distanceMap = await fetchDistanceData();
+const distanceData = processDistanceData(distanceMap);
 
 // Get last activity dates and detailed info for each activity type
 const lastRunDate = await getLastActivityDate('Run');
