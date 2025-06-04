@@ -11,15 +11,19 @@ const { distanceData, minDistance, maxDistance } = Astro.props;
 
 // Enhanced color function with Matrix green colors
 function getEnhancedColor(value: number, min: number, max: number) {
-  if (value === 0) return 'bg-black/40 border-green-500/20';
+  if (value === 0) return "bg-black/40 border-green-500/20";
 
   const intensity = (value - min) / (max - min);
 
-  if (intensity < 0.2) return 'bg-green-500/10 border-green-500/30 shadow-green-500/10';
-  if (intensity < 0.4) return 'bg-green-500/20 border-green-500/50 shadow-green-500/20';
-  if (intensity < 0.6) return 'bg-green-500/40 border-green-500/70 shadow-green-500/30';
-  if (intensity < 0.8) return 'bg-green-400/60 border-green-400/80 shadow-green-400/40';
-  return 'bg-green-400/80 border-green-400 shadow-green-400/60';
+  if (intensity < 0.2)
+    return "bg-green-500/10 border-green-500/30 shadow-green-500/10";
+  if (intensity < 0.4)
+    return "bg-green-500/20 border-green-500/50 shadow-green-500/20";
+  if (intensity < 0.6)
+    return "bg-green-500/40 border-green-500/70 shadow-green-500/30";
+  if (intensity < 0.8)
+    return "bg-green-400/60 border-green-400/80 shadow-green-400/40";
+  return "bg-green-400/80 border-green-400 shadow-green-400/60";
 }
 
 // Helper functions to generate dynamic labels
@@ -58,43 +62,64 @@ const monthLabels = getMonthLabels(distanceData);
 const totalWeeks = Math.ceil(distanceData.length / 7);
 ---
 
-<div class="relative w-full max-w-full p-6 bg-black rounded-xl border border-green-500/30 shadow-2xl shadow-green-500/20 overflow-hidden">
-
+<div
+  class="relative w-full max-w-full p-6 bg-black rounded-xl border border-green-500/30 shadow-2xl shadow-green-500/20 overflow-hidden"
+>
   <!-- Matrix digital rain effect -->
   <div class="absolute inset-0 opacity-10 pointer-events-none">
-    <div class="absolute top-0 left-1/4 w-px h-full bg-gradient-to-b from-transparent via-green-400 to-transparent animate-pulse"></div>
-    <div class="absolute top-0 left-2/4 w-px h-full bg-gradient-to-b from-transparent via-green-400 to-transparent animate-pulse" style="animation-delay: 1s;"></div>
-    <div class="absolute top-0 left-3/4 w-px h-full bg-gradient-to-b from-transparent via-green-400 to-transparent animate-pulse" style="animation-delay: 2s;"></div>
+    <div
+      class="absolute top-0 left-1/4 w-px h-full bg-gradient-to-b from-transparent via-green-400 to-transparent animate-pulse"
+    >
+    </div>
+    <div
+      class="absolute top-0 left-2/4 w-px h-full bg-gradient-to-b from-transparent via-green-400 to-transparent animate-pulse"
+      style="animation-delay: 1s;"
+    >
+    </div>
+    <div
+      class="absolute top-0 left-3/4 w-px h-full bg-gradient-to-b from-transparent via-green-400 to-transparent animate-pulse"
+      style="animation-delay: 2s;"
+    >
+    </div>
   </div>
 
   <!-- Glowing corner accents -->
-  <div class="absolute top-0 left-0 w-20 h-20 bg-green-500/10 rounded-full blur-xl"></div>
-  <div class="absolute bottom-0 right-0 w-32 h-32 bg-green-400/10 rounded-full blur-2xl"></div>
+  <div
+    class="absolute top-0 left-0 w-20 h-20 bg-green-500/10 rounded-full blur-xl"
+  >
+  </div>
+  <div
+    class="absolute bottom-0 right-0 w-32 h-32 bg-green-400/10 rounded-full blur-2xl"
+  >
+  </div>
 
   <div class="relative grid grid-cols-[auto_1fr] grid-rows-[auto_1fr] gap-3">
-
     <!-- Month Labels -->
     <div class="col-span-2 grid gap-2 h-6 ml-8 relative">
-      {monthLabels.map(({ label, column }) => (
-        <div
-          class="absolute text-green-400 text-xs font-bold font-mono tracking-wider hover:text-green-300 transition-colors duration-300"
-          style={{
-            left: `${(column * 100) / totalWeeks}%`,
-            top: '0'
-          }}
-        >
-          {label}
-        </div>
-      ))}
+      {
+        monthLabels.map(({ label, column }) => (
+          <div
+            class="absolute text-green-400 text-xs font-bold font-mono tracking-wider hover:text-green-300 transition-colors duration-300"
+            style={{
+              left: `${(column * 100) / totalWeeks}%`,
+              top: "0",
+            }}
+          >
+            {label}
+          </div>
+        ))
+      }
     </div>
 
     <!-- Weekday Labels -->
     <div class="grid grid-rows-7 gap-0.5 w-7 pr-1">
-      {weekdayLabels.map((day, index) => (
-        <div class="text-green-400 text-xs font-mono font-semibold text-right flex items-center justify-end h-full hover:text-green-300 transition-colors duration-300">
-          {day}
-        </div>
-      ))}
+      {
+        weekdayLabels.map((day, index) => (
+          <div class="text-green-400 text-xs font-mono font-semibold text-right flex items-center justify-end h-full hover:text-green-300 transition-colors duration-300">
+            {day}
+          </div>
+        ))
+      }
     </div>
 
     <!-- Main Heatmap Grid -->
@@ -102,77 +127,94 @@ const totalWeeks = Math.ceil(distanceData.length / 7);
       class="grid grid-rows-7 grid-flow-col gap-0.5 w-full min-h-[140px] relative"
       style={{ gridTemplateColumns: `repeat(${totalWeeks}, 1fr)` }}
     >
-      {distanceData.map((data, index) => {
-        const style = getAnimationStyle(index);
-        const hasActivity = data[1] > 0;
-        const colorClasses = getEnhancedColor(data[1], minDistance, maxDistance);
-        const intensityLevel = hasActivity ? Math.min(Math.floor(((data[1] - minDistance) / (maxDistance - minDistance)) * 5) + 1, 5) : 0;
+      {
+        distanceData.map((data, index) => {
+          const style = getAnimationStyle(index);
+          const hasActivity = data[1] > 0;
+          const colorClasses = getEnhancedColor(
+            data[1],
+            minDistance,
+            maxDistance,
+          );
+          const intensityLevel = hasActivity
+            ? Math.min(
+                Math.floor(
+                  ((data[1] - minDistance) / (maxDistance - minDistance)) * 5,
+                ) + 1,
+                5,
+              )
+            : 0;
 
-        return (
-          <div
-            class={`
+          return (
+            <div
+              class={`
               group relative aspect-square min-w-3 min-h-3 rounded-sm border cursor-pointer
               transition-all duration-300 ease-out transform scale-0
               hover:scale-125 hover:z-50 hover:rotate-1 hover:shadow-lg
               ${colorClasses}
-              ${hasActivity ? 'hover:shadow-green-400/50' : 'hover:shadow-green-400/30'}
-              ${intensityLevel >= 4 ? 'animate-pulse' : ''}
+              ${hasActivity ? "hover:shadow-green-400/50" : "hover:shadow-green-400/30"}
+              ${intensityLevel >= 4 ? "animate-pulse" : ""}
             `}
-            style={{
-              animation: `scaleIn 0.3s ease-out ${style.animationDelay} forwards`,
-              animationDelay: style.animationDelay,
-            }}
-          >
+              style={{
+                animation: `scaleIn 0.3s ease-out ${style.animationDelay} forwards`,
+                animationDelay: style.animationDelay,
+              }}
+            >
+              {/* Glow effect for high activity */}
+              {intensityLevel >= 3 && (
+                <div class="absolute inset-0 rounded-sm bg-green-400/20 blur-sm scale-150 group-hover:bg-green-300/30 transition-all duration-300" />
+              )}
 
-            {/* Glow effect for high activity */}
-            {intensityLevel >= 3 && (
-              <div class="absolute inset-0 rounded-sm bg-green-400/20 blur-sm scale-150 group-hover:bg-green-300/30 transition-all duration-300"></div>
-            )}
-
-            {/* Activity indicator dot */}
-            {hasActivity && (
-              <div class={`
+              {/* Activity indicator dot */}
+              {hasActivity && (
+                <div
+                  class={`
                 absolute top-0.5 right-0.5 w-1 h-1 rounded-full
-                ${intensityLevel >= 4 ? 'bg-green-300 shadow-green-300/50 shadow-sm' : 'bg-green-500/60'}
+                ${intensityLevel >= 4 ? "bg-green-300 shadow-green-300/50 shadow-sm" : "bg-green-500/60"}
                 group-hover:scale-150 transition-transform duration-300
-              `}></div>
-            )}
+              `}
+                />
+              )}
 
-            {/* Matrix-style tooltip */}
-            <div class="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-3 opacity-0 group-hover:opacity-100 transition-all duration-300 pointer-events-none z-50">
-              <div class="bg-black/95 backdrop-blur-sm border border-green-500/50 text-green-300 text-xs px-3 py-2 rounded-lg shadow-xl shadow-green-900/50 font-mono whitespace-nowrap">
-                <div class="flex items-center gap-2 mb-1">
-                  <div class="w-1.5 h-1.5 bg-green-400 rounded-full animate-pulse"></div>
-                  <div class="text-green-400/80 text-xs">
-                    {new Date(data[0]).toLocaleDateString("en-US", {
-                      year: "numeric",
-                      month: "short",
-                      day: "numeric",
-                    })}
+              {/* Matrix-style tooltip */}
+              <div class="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-3 opacity-0 group-hover:opacity-100 transition-all duration-300 pointer-events-none z-50">
+                <div class="bg-black/95 backdrop-blur-sm border border-green-500/50 text-green-300 text-xs px-3 py-2 rounded-lg shadow-xl shadow-green-900/50 font-mono whitespace-nowrap">
+                  <div class="flex items-center gap-2 mb-1">
+                    <div class="w-1.5 h-1.5 bg-green-400 rounded-full animate-pulse" />
+                    <div class="text-green-400/80 text-xs">
+                      {new Date(data[0]).toLocaleDateString("en-US", {
+                        year: "numeric",
+                        month: "short",
+                        day: "numeric",
+                      })}
+                    </div>
                   </div>
-                </div>
-                <div class="text-green-300 font-semibold">
-                  {data[1] > 0
-                    ? `${(data[1] / 1000).toFixed(2)} km`
-                    : "No activity"}
-                </div>
+                  <div class="text-green-300 font-semibold">
+                    {data[1] > 0
+                      ? `${(data[1] / 1000).toFixed(2)} km`
+                      : "No activity"}
+                  </div>
 
-                {/* Tooltip arrow */}
-                <div class="absolute top-full left-1/2 transform -translate-x-1/2 border-4 border-transparent border-t-black/95"></div>
+                  {/* Tooltip arrow */}
+                  <div class="absolute top-full left-1/2 transform -translate-x-1/2 border-4 border-transparent border-t-black/95" />
+                </div>
               </div>
-            </div>
 
-            {/* Hover ripple effect */}
-            <div class="absolute inset-0 rounded-sm opacity-0 group-hover:opacity-100 bg-green-400/10 group-hover:animate-ping transition-opacity duration-300"></div>
-          </div>
-        );
-      })}
+              {/* Hover ripple effect */}
+              <div class="absolute inset-0 rounded-sm opacity-0 group-hover:opacity-100 bg-green-400/10 group-hover:animate-ping transition-opacity duration-300" />
+            </div>
+          );
+        })
+      }
     </div>
   </div>
 
   <!-- Scanning line effect -->
   <div class="absolute inset-0 pointer-events-none overflow-hidden">
-    <div class="absolute top-0 left-0 w-full h-0.5 bg-gradient-to-r from-transparent via-green-400/30 to-transparent transform -skew-x-12 animate-scan"></div>
+    <div
+      class="absolute top-0 left-0 w-full h-0.5 bg-gradient-to-r from-transparent via-green-400/30 to-transparent transform -skew-x-12 animate-scan"
+    >
+    </div>
   </div>
 </div>
 
