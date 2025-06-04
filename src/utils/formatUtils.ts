@@ -68,10 +68,10 @@ export function formatPace(secondsPerKilometer: number): string {
 }
 
 export function formatWorkoutDateTime(date: Date): string {
-  const weekday = date.toLocaleDateString(undefined, { weekday: 'long' });
+  const weekday = date.toLocaleDateString(undefined, { weekday: "long" });
   const time = date.toLocaleTimeString(undefined, {
-    hour: 'numeric',
-    minute: '2-digit',
+    hour: "numeric",
+    minute: "2-digit",
     hour12: true,
   });
   return `${weekday} at ${time}`;

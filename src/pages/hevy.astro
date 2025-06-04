@@ -1,8 +1,8 @@
 ---
 import Base from "@layouts/Base.astro";
-import HevyWorkoutCard from '@components/HevyWorkoutCard.astro';
-import type { Workout } from '@services/hevyService';
-import { fetchHevyData } from '@services/hevyService';
+import HevyWorkoutCard from "@components/HevyWorkoutCard.astro";
+import type { Workout } from "@services/hevyService";
+import { fetchHevyData } from "@services/hevyService";
 
 const hevyWorkout: Workout = await fetchHevyData();
 ---
@@ -14,6 +14,5 @@ const hevyWorkout: Workout = await fetchHevyData();
     <section class="my-8">
       <HevyWorkoutCard workout={hevyWorkout} />
     </section>
-
   </main>
 </Base>
