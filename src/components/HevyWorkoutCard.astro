@@ -1,0 +1,153 @@
+---
+import type { Workout, Exercise, Set } from "@services/hevyService"; // Import the Workout interface
+import { formatDuration, formatRelativeTime, formatWorkoutDateTime } from "@utils/formatUtils";
+
+// Define the component's props
+export interface Props {
+  workout: Workout;
+}
+
+const { workout } = Astro.props;
+
+// Placeholder data for development and testing directly within the component
+const mockWorkout: Workout = {
+  workout_id: "mock-workout-001",
+  user_id: "mock-user-123",
+  workout_template_id: null,
+  name: "Matrix Green Workout",
+  notes: "Full body session, targeting major muscle groups. Cybergoth vibes.",
+  started_at: new Date(Date.now() - 2 * 60 * 60 * 1000 - 30 * 60 * 1000).toISOString(), // 2.5 hours ago
+  ended_at: new Date(Date.now() - 30 * 60 * 1000).toISOString(), // 0.5 hours ago
+  created_at: new Date(Date.now() - 3 * 60 * 60 * 1000).toISOString(),
+  updated_at: new Date(Date.now() - 15 * 60 * 1000).toISOString(), // 15 mins ago
+  exercises: [
+    {
+      exercise_id: "mock-exercise-001",
+      workout_id: "mock-workout-001",
+      exercise_order: 1,
+      exercise_type_id: "Digital Squats", // Using string names for simplicity in mock
+      notes: "Focus on deep matrix power.",
+      created_at: new Date().toISOString(),
+      updated_at: new Date().toISOString(),
+      sets: [
+        { set_id: "set001", exercise_id: "ex001", workout_id: "w001", set_order: 1, weight_kg: 100, reps: 10, distance_km: null, duration_seconds: 60, rpe: 7, notes: "Warm-up", created_at: new Date().toISOString(), updated_at: new Date().toISOString() },
+        { set_id: "set002", exercise_id: "ex001", workout_id: "w001", set_order: 2, weight_kg: 120, reps: 8, distance_km: null, duration_seconds: 50, rpe: 8, notes: "Working set", created_at: new Date().toISOString(), updated_at: new Date().toISOString() },
+        { set_id: "set003", exercise_id: "ex001", workout_id: "w001", set_order: 3, weight_kg: 120, reps: 8, distance_km: null, duration_seconds: 50, rpe: 8.5, notes: null, created_at: new Date().toISOString(), updated_at: new Date().toISOString() },
+      ],
+    },
+    {
+      exercise_id: "mock-exercise-002",
+      workout_id: "mock-workout-001",
+      exercise_order: 2,
+      exercise_type_id: "Code Push-ups",
+      notes: "Push to the limits of the system.",
+      created_at: new Date().toISOString(),
+      updated_at: new Date().toISOString(),
+      sets: [
+        { set_id: "set004", exercise_id: "ex002", workout_id: "w001", set_order: 1, weight_kg: 0, reps: 20, distance_km: null, duration_seconds: 45, rpe: 7, notes: null, created_at: new Date().toISOString(), updated_at: new Date().toISOString() },
+        { set_id: "set005", exercise_id: "ex002", workout_id: "w001", set_order: 2, weight_kg: 0, reps: 25, distance_km: null, duration_seconds: 55, rpe: 8, notes: "Max effort", created_at: new Date().toISOString(), updated_at: new Date().toISOString() },
+      ],
+    },
+    {
+      exercise_id: "mock-exercise-003",
+      workout_id: "mock-workout-001",
+      exercise_order: 3,
+      exercise_type_id: "Kernel Panic Kurls",
+      notes: "For the biceps. Beware of system crashes.",
+      created_at: new Date().toISOString(),
+      updated_at: new Date().toISOString(),
+      sets: [
+        { set_id: "set006", exercise_id: "ex003", workout_id: "w001", set_order: 1, weight_kg: 15, reps: 12, distance_km: null, duration_seconds: null, rpe: 7, notes: "Left arm", created_at: new Date().toISOString(), updated_at: new Date().toISOString() },
+        { set_id: "set007", exercise_id: "ex003", workout_id: "w001", set_order: 2, weight_kg: 15, reps: 12, distance_km: null, duration_seconds: null, rpe: 7, notes: "Right arm", created_at: new Date().toISOString(), updated_at: new Date().toISOString() },
+      ],
+    },
+     {
+      exercise_id: "mock-exercise-004",
+      workout_id: "mock-workout-001",
+      exercise_order: 4,
+      exercise_type_id: "Data Stream Sprints",
+      notes: "Cardio burst.",
+      created_at: new Date().toISOString(),
+      updated_at: new Date().toISOString(),
+      sets: [
+        { set_id: "set008", exercise_id: "ex004", workout_id: "w001", set_order: 1, weight_kg: 0, reps: 0, distance_km: 0.5, duration_seconds: 180, rpe: 8, notes: "Treadmill", created_at: new Date().toISOString(), updated_at: new Date().toISOString() },
+      ],
+    },
+  ],
+};
+
+// Use the passed workout prop if available, otherwise fall back to mockWorkout for development
+const displayWorkout = workout || mockWorkout;
+
+// Calculate summary data
+const workoutDurationSeconds = (new Date(displayWorkout.ended_at).getTime() - new Date(displayWorkout.started_at).getTime()) / 1000;
+const totalSets = displayWorkout.exercises.reduce((sum, ex) => sum + ex.sets.length, 0);
+const totalVolumeKg = displayWorkout.exercises.reduce((sum, ex) => {
+  return sum + ex.sets.reduce((exSum, set) => exSum + (set.weight_kg || 0) * (set.reps || 0), 0);
+}, 0);
+
+const workoutStartedAtDate = new Date(displayWorkout.started_at);
+const formattedWorkoutDateTime = formatWorkoutDateTime(workoutStartedAtDate);
+const relativeWorkoutTime = formatRelativeTime(workoutStartedAtDate);
+const workoutDateTimeInfo = `${formattedWorkoutDateTime} [${relativeWorkoutTime}]`;
+
+const lastUpdated = formatRelativeTime(new Date(displayWorkout.updated_at));
+---
+
+<div class="hevy-workout-card bg-black text-green-400 font-mono p-4 rounded-lg border border-green-700 shadow-lg shadow-green-500/30 max-w-2xl mx-auto">
+  <header class="mb-4">
+    <h3 class="text-2xl font-bold text-green-300 glow-text-green">{displayWorkout.name}</h3>
+    <p class="text-sm text-green-500">SESSION START: {workoutDateTimeInfo}</p>
+    {displayWorkout.notes && <p class="text-sm mt-1 italic text-green-600">> {displayWorkout.notes}</p>}
+  </header>
+
+  <section class="mb-4 border-t border-b border-green-700 py-2">
+    <h4 class="text-lg font-semibold text-green-300 mb-2">> WORKOUT SUMMARY_</h4>
+    <div class="grid grid-cols-3 gap-2 text-sm">
+      <div><span class="text-green-500">DURATION:</span> {formatDuration(workoutDurationSeconds)}</div>
+      <div><span class="text-green-500">VOLUME:</span> {totalVolumeKg.toLocaleString()} kg</div>
+      <div><span class="text-green-500">SETS:</span> {totalSets}</div>
+    </div>
+  </section>
+
+  <section>
+    <h4 class="text-lg font-semibold text-green-300 mb-2">> EXERCISES_LOGGED_</h4>
+    <ul class="space-y-3">
+      {displayWorkout.exercises.map((exercise, index) => (
+        <li class="border border-green-800 p-2 rounded">
+          <div class="flex justify-between items-center">
+            <h5 class="text-md font-semibold text-green-300">
+              <span class="text-green-600">{String(index + 1).padStart(2, '0')}.</span> {exercise.exercise_type_id}
+            </h5>
+            {exercise.notes && <p class="text-xs text-green-600 italic hidden md:block">> {exercise.notes}</p>}
+          </div>
+          <ul class="mt-1 space-y-1 pl-4">
+            {exercise.sets.map((set, setIndex) => (
+              <li class="text-xs grid grid-cols-5 gap-x-1">
+                <span class="text-green-600">SET {String(setIndex + 1).padStart(2, '0')}:</span>
+                <span class="col-span-1"><span class="text-green-500">W:</span> {set.weight_kg != null ? `${set.weight_kg}kg` : '--'}</span>
+                <span class="col-span-1"><span class="text-green-500">R:</span> {set.reps != null ? `${set.reps}` : '--'}</span>
+                {set.distance_km != null && <span class="col-span-1"><span class="text-green-500">D:</span> {set.distance_km}km</span>}
+                {set.duration_seconds != null && <span class="col-span-1"><span class="text-green-500">T:</span> {formatDuration(set.duration_seconds)}</span>}
+                {set.rpe != null && <span class="text-green-500 hidden sm:inline">RPE: {set.rpe}</span>}
+                {set.notes && <p class="text-xs text-green-700 italic col-span-5 sm:col-span-2 truncate" title={set.notes}>> {set.notes}</p>}
+              </li>
+            ))}
+          </ul>
+        </li>
+      ))}
+    </ul>
+  </section>
+
+  <footer class="mt-4 pt-2 border-t border-green-700 text-xs text-green-600">
+    <p>Workout ID: {displayWorkout.workout_id}</p>
+    <p>Last Updated: {lastUpdated}</p>
+    <p class="text-center pt-2 text-green-700">-- END OF TRANSMISSION --</p>
+  </footer>
+</div>
+
+<style is:global>
+  .glow-text-green {
+    text-shadow: 0 0 5px theme('colors.green.500'), 0 0 10px theme('colors.green.700');
+  }
+</style>
