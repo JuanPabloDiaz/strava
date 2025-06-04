@@ -196,7 +196,7 @@ const formatDistance = (distance: number, unit: string) => {
     <!-- Terminal header -->
     <div class="flex flex-col sm:flex-row sm:items-center justify-between mb-4 gap-2">
       <div class="flex items-center space-x-2 min-w-0">
-        <span class="text-green-400 text-xs sm:text-sm animate-pulse shrink-0">matrix@athlete:~$</span>
+        <span class="text-green-400 text-xs sm:text-sm shrink-0">matrix@athlete:~$</span>
         <span class="text-green-300 text-xs sm:text-sm typing-effect truncate">
           {activityConfig.terminalCommand}
         </span>
@@ -204,7 +204,7 @@ const formatDistance = (distance: number, unit: string) => {
       <div class={`
         px-2 sm:px-3 py-1 rounded-full text-xs font-bold tracking-wider
         ${statusInfo.bgColor} ${statusInfo.borderColor} border
-        ${statusInfo.color} animate-pulse shrink-0 self-start sm:self-center
+        ${statusInfo.color} shrink-0 self-start sm:self-center
       `}>
         [{statusInfo.status}]
       </div>
@@ -226,7 +226,7 @@ const formatDistance = (distance: number, unit: string) => {
         <div class="absolute inset-0 opacity-30 pointer-events-none">
           <div class={`
             text-4xl sm:text-6xl md:text-8xl font-bold ${statusInfo.color}
-            animate-pulse blur-sm flex items-center justify-center
+            blur-sm flex items-center justify-center
           `}>
             {daysSince.toString().padStart(2, '0')}
           </div>
@@ -276,7 +276,7 @@ const formatDistance = (distance: number, unit: string) => {
 
           <div class="space-y-1 sm:col-span-1 lg:col-span-1">
             <div class="text-green-400/60 text-xs">STATUS:</div>
-            <div class={`${statusInfo.color} font-mono text-xs animate-pulse break-words`}>
+            <div class={`${statusInfo.color} font-mono text-xs break-words`}>
               {statusInfo.systemMessage}
             </div>
           </div>

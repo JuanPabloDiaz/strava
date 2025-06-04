@@ -50,12 +50,12 @@ const currentPath = Astro.url.pathname;
             <div class="control-button maximize"></div>
           </div>
           <div class="window-title">
-            <span class="text-green-400 text-sm font-bold animate-pulse">
+            <span class="text-green-400 text-sm font-bold">
               [{windowTitle}]
             </span>
           </div>
           <div class="system-info hidden sm:block">
-            <span class="text-green-500 text-xs animate-pulse">
+            <span class="text-green-500 text-xs">
               MATRIX_OS v2.1
             </span>
           </div>
@@ -66,10 +66,10 @@ const currentPath = Astro.url.pathname;
         <!-- Terminal Header -->
         <div class="terminal-header">
           <div class="flex items-center space-x-2 mb-2">
-            <div class="text-green-400 text-sm animate-pulse">root@matrix:~$</div>
+            <div class="text-green-400 text-sm">root@matrix:~$</div>
             <div class="text-green-300 text-sm">{terminalCommand}</div>
           </div>
-          <div class="text-green-500 text-xs animate-pulse opacity-80">
+          <div class="text-green-500 text-xs opacity-80">
             {systemMessage}
           </div>
           <div class="terminal-separator"></div>
