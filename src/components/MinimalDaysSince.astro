@@ -1,0 +1,388 @@
+---
+import { getLastActivityInfo } from "../services/stravaService";
+
+export interface Props {
+  activityType: string;
+  label?: string;
+  icon?: string;
+}
+
+const {
+  activityType,
+  label = activityType.toUpperCase(),
+  icon = "🏃‍♂️",
+} = Astro.props;
+
+// Get last activity info from Strava
+const lastActivityInfo = await getLastActivityInfo(activityType);
+const lastDate = lastActivityInfo?.date || new Date();
+const lastActivity = lastActivityInfo?.activity;
+
+// Calculate days since last activity
+const today = new Date();
+const timeDiff = today.getTime() - lastDate.getTime();
+const daysSince = Math.floor(timeDiff / (1000 * 3600 * 24));
+
+// Determine status based on days and activity type
+const getStatusColor = (days: number, type: string) => {
+  const thresholds = {
+    run: { warning: 3, critical: 7 },
+    ride: { warning: 5, critical: 10 },
+    swim: { warning: 7, critical: 14 },
+    walk: { warning: 2, critical: 5 },
+    workout: { warning: 3, critical: 7 },
+  };
+
+  const threshold = thresholds[type.toLowerCase()] || thresholds.run;
+
+  if (days === 0) return "optimal";
+  if (days <= 1) return "excellent";
+  if (days <= threshold.warning) return "good";
+  if (days <= threshold.critical) return "warning";
+  return "critical";
+};
+
+const statusColor = getStatusColor(daysSince, activityType);
+
+const colorClasses = {
+  optimal: "text-green-400 border-green-500/40",
+  excellent: "text-green-300 border-green-500/30",
+  good: "text-green-300 border-green-500/20",
+  warning: "text-yellow-400 border-yellow-500/40",
+  critical: "text-red-400 border-red-500/40",
+};
+
+const bgClasses = {
+  optimal: "bg-green-500/10",
+  excellent: "bg-green-500/8",
+  good: "bg-green-500/5",
+  warning: "bg-yellow-500/10",
+  critical: "bg-red-500/10",
+};
+
+const getLastDistance = () => {
+  if (!lastActivity) return null;
+  const distance = lastActivity.distance;
+  if (distance === 0) return null;
+
+  // Convert meters to appropriate unit
+  if (activityType.toLowerCase() === "swim") {
+    return distance >= 1000
+      ? `${(distance / 1000).toFixed(1)}km`
+      : `${distance}m`;
+  }
+  return `${(distance / 1000).toFixed(1)}km`;
+};
+
+const getLastDuration = () => {
+  if (!lastActivity || !lastActivity.moving_time) return null;
+  const seconds = lastActivity.moving_time;
+  const hours = Math.floor(seconds / 3600);
+  const minutes = Math.floor((seconds % 3600) / 60);
+  return hours > 0 ? `${hours}h ${minutes}m` : `${minutes}m`;
+};
+
+const lastDistance = getLastDistance();
+const lastDuration = getLastDuration();
+const formattedDate = lastDate.toLocaleDateString("en-US", {
+  month: "short",
+  day: "numeric",
+});
+---
+
+<div class="minimal-activity-card">
+  <div
+    class={`activity-display ${bgClasses[statusColor]} border ${colorClasses[statusColor]}`}
+  >
+    <!-- Header with icon and activity type -->
+    <div class="activity-header">
+      <span class="activity-icon">{icon}</span>
+      <span class="activity-label">{label}</span>
+    </div>
+
+    <!-- Days counter -->
+    <div class="days-counter">
+      <span class={`days-number ${colorClasses[statusColor]}`}>
+        {daysSince.toString().padStart(2, "0")}
+      </span>
+      <span class="days-text">
+        {daysSince === 1 ? "DAY" : "DAYS"}
+      </span>
+    </div>
+
+    <!-- Activity details -->
+    <div class="activity-details">
+      <div class="detail-row">
+        <span class="detail-label">LAST:</span>
+        <span class="detail-value">{formattedDate}</span>
+      </div>
+
+      {
+        lastDistance && (
+          <div class="detail-row">
+            <span class="detail-label">DIST:</span>
+            <span class="detail-value">{lastDistance}</span>
+          </div>
+        )
+      }
+
+      {
+        lastDuration && (
+          <div class="detail-row">
+            <span class="detail-label">TIME:</span>
+            <span class="detail-value">{lastDuration}</span>
+          </div>
+        )
+      }
+    </div>
+
+    <!-- Status indicator -->
+    <div class="status-indicator">
+      <div class={`status-dot ${colorClasses[statusColor]} animate-pulse`}>
+      </div>
+      <span class={`status-text ${colorClasses[statusColor]}`}>
+        {statusColor.toUpperCase()}
+      </span>
+    </div>
+
+    <!-- Matrix rain effect -->
+    <div class="matrix-rain">
+      {
+        Array.from({ length: 6 }).map((_, i) => (
+          <div
+            class={`rain-column rain-column-${i + 1}`}
+            style={`animation-delay: ${i * 0.4}s;`}
+          >
+            {Array.from({ length: 4 }).map(() => (
+              <span class="rain-char">{Math.floor(Math.random() * 2)}</span>
+            ))}
+          </div>
+        ))
+      }
+    </div>
+  </div>
+</div>
+
+<style>
+  .minimal-activity-card {
+    width: 100%;
+    max-width: 280px;
+  }
+
+  .activity-display {
+    position: relative;
+    padding: 20px;
+    border-radius: 8px;
+    backdrop-filter: blur(10px);
+    background: linear-gradient(
+      135deg,
+      rgba(0, 0, 0, 0.8) 0%,
+      rgba(0, 20, 0, 0.6) 100%
+    );
+    box-shadow:
+      0 0 20px rgba(0, 255, 0, 0.1),
+      inset 0 0 20px rgba(0, 255, 0, 0.05);
+    overflow: hidden;
+    transition: all 0.3s ease;
+  }
+
+  .activity-display:hover {
+    transform: translateY(-2px);
+    box-shadow:
+      0 0 30px rgba(0, 255, 0, 0.2),
+      inset 0 0 30px rgba(0, 255, 0, 0.08);
+  }
+
+  .activity-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 16px;
+  }
+
+  .activity-icon {
+    font-size: 1.2rem;
+  }
+
+  .activity-label {
+    font-family: "Courier New", monospace;
+    font-size: 0.75rem;
+    font-weight: bold;
+    color: rgba(0, 255, 0, 0.8);
+    letter-spacing: 0.05em;
+  }
+
+  .days-counter {
+    text-align: center;
+    margin-bottom: 16px;
+  }
+
+  .days-number {
+    display: block;
+    font-family: "Courier New", monospace;
+    font-size: 2.5rem;
+    font-weight: bold;
+    line-height: 1;
+    text-shadow:
+      0 0 10px currentColor,
+      0 0 20px currentColor;
+    animation: numberPulse 2s ease-in-out infinite;
+  }
+
+  .days-text {
+    display: block;
+    font-family: "Courier New", monospace;
+    font-size: 0.6rem;
+    color: rgba(0, 255, 0, 0.6);
+    margin-top: 4px;
+    letter-spacing: 0.1em;
+  }
+
+  .activity-details {
+    space-y: 4px;
+    margin-bottom: 12px;
+  }
+
+  .detail-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 4px;
+  }
+
+  .detail-label {
+    font-family: "Courier New", monospace;
+    font-size: 0.6rem;
+    color: rgba(0, 255, 0, 0.5);
+    letter-spacing: 0.05em;
+  }
+
+  .detail-value {
+    font-family: "Courier New", monospace;
+    font-size: 0.65rem;
+    color: rgba(0, 255, 0, 0.8);
+  }
+
+  .status-indicator {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    justify-content: center;
+  }
+
+  .status-dot {
+    width: 4px;
+    height: 4px;
+    border-radius: 50%;
+    background: currentColor;
+  }
+
+  .status-text {
+    font-family: "Courier New", monospace;
+    font-size: 0.5rem;
+    font-weight: bold;
+    letter-spacing: 0.1em;
+  }
+
+  /* Matrix rain effect */
+  .matrix-rain {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    pointer-events: none;
+    overflow: hidden;
+    opacity: 0.3;
+  }
+
+  .rain-column {
+    position: absolute;
+    top: -100%;
+    font-family: "Courier New", monospace;
+    font-size: 8px;
+    color: rgba(0, 255, 0, 0.4);
+    animation: matrixRain 6s linear infinite;
+    white-space: nowrap;
+  }
+
+  .rain-char {
+    display: block;
+    line-height: 1.2;
+    animation: charFlicker 0.8s ease-in-out infinite;
+  }
+
+  /* Position rain columns */
+  .rain-column-1 {
+    left: 10%;
+  }
+  .rain-column-2 {
+    left: 25%;
+  }
+  .rain-column-3 {
+    left: 40%;
+  }
+  .rain-column-4 {
+    left: 55%;
+  }
+  .rain-column-5 {
+    left: 70%;
+  }
+  .rain-column-6 {
+    left: 85%;
+  }
+
+  @keyframes numberPulse {
+    0%,
+    100% {
+      transform: scale(1);
+      opacity: 0.9;
+    }
+    50% {
+      transform: scale(1.02);
+      opacity: 1;
+    }
+  }
+
+  @keyframes matrixRain {
+    0% {
+      transform: translateY(-100%);
+      opacity: 0;
+    }
+    10% {
+      opacity: 1;
+    }
+    90% {
+      opacity: 1;
+    }
+    100% {
+      transform: translateY(calc(100vh + 100%));
+      opacity: 0;
+    }
+  }
+
+  @keyframes charFlicker {
+    0%,
+    100% {
+      opacity: 0.4;
+    }
+    50% {
+      opacity: 0.8;
+    }
+  }
+
+  /* Responsive design */
+  @media (max-width: 640px) {
+    .minimal-activity-card {
+      max-width: 240px;
+    }
+
+    .days-number {
+      font-size: 2rem;
+    }
+
+    .activity-display {
+      padding: 16px;
+    }
+  }
+</style>

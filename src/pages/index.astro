@@ -1,7 +1,7 @@
 ---
 import Base from "@layouts/Base.astro";
 import SectionLayout from "@components/SectionLayout.astro";
-import DaysSinceLast from "@components/DaysSinceLast.astro";
+// import DaysSinceLast from "@components/DaysSinceLast.astro";
 import HeatmapGrid from "@components/HeatmapGrid.astro";
 import HevyWorkoutCount from "@components/HevyWorkoutCount.astro";
 import { fetchWorkoutCount } from "@services/hevyService.ts";
@@ -10,6 +10,7 @@ import {
   processDistanceData,
   getLastActivityDate,
 } from "@services/stravaService";
+import ActivityDashboard from "@components/ActivityDashboard.astro";
 
 // Fetch and process Strava data
 const distanceMap = await fetchDistanceData();
@@ -36,10 +37,14 @@ try {
   terminalCommand="./run_activity_monitor.exe"
   systemMessage="[SYSTEM] Loading neural activity patterns... Strava API connected."
 >
-  <!-- Days Since Last Activity Section -->
   <SectionLayout title="[ACTIVITY_STATUS]">
-    <DaysSinceLast lastRunDate={lastRunDate || undefined} activityType="RUN" />
+    <ActivityDashboard />
   </SectionLayout>
+
+  <!-- Days Since Last Activity Section -->
+  <!-- <SectionLayout title="[ACTIVITY_STATUS]">
+    <DaysSinceLast lastRunDate={lastRunDate || undefined} activityType="RUN" />
+  </SectionLayout> -->
 
   <!-- Heatmap Analysis Section -->
   <SectionLayout title="[ANALYTICS]" rightHeaderText="[365_DAY_NEURAL_MAPPING]">

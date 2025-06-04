@@ -1,0 +1,18 @@
+---
+// Import the MinimalDaysSince component
+import MinimalDaysSince from "@components/MinimalDaysSince.astro";
+---
+
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 p-4">
+  <MinimalDaysSince activityType="run" label="RUNNING" icon="🏃‍♂️" />
+
+  <MinimalDaysSince activityType="ride" label="CYCLING" icon="🚴‍♂️" />
+
+  <MinimalDaysSince activityType="swim" label="SWIMMING" icon="🏊‍♂️" />
+
+  <MinimalDaysSince activityType="walk" label="WALKING" icon="🚶‍♂️" />
+
+  <!-- <MinimalDaysSince activityType="workout" label="WORKOUT" icon="💪" /> -->
+
+  <!-- <MinimalDaysSince activityType="hike" label="HIKING" icon="🥾" /> -->
+</div>
