@@ -3,14 +3,11 @@ import Base from "@layouts/Base.astro";
 import SectionLayout from "@components/SectionLayout.astro";
 import DaysSinceLast from "@components/DaysSinceLast.astro";
 import HeatmapGrid from "@components/HeatmapGrid.astro";
-import HevyWorkoutCard from "@components/HevyWorkoutCard.astro";
-import { fetchHevyData, fetchWorkoutCount } from "@services/hevyService.ts"; // <--- IMPORT FUNCTIONS
-import type { Workout } from "@services/hevyService.ts"; // <--- IMPORT TYPE
+import { fetchWorkoutCount } from "@services/hevyService.ts";
 import {
   fetchDistanceData,
   processDistanceData,
   getLastActivityDate,
-  fetchWorkoutCount,
 } from "@services/stravaService";
 
 // Fetch and process Strava data
@@ -20,6 +17,16 @@ const lastRunDate = await getLastActivityDate("Run");
 
 const minDistance = Math.min(...distanceData.map(data => data[1]));
 const maxDistance = Math.max(...distanceData.map(data => data[1]));
+
+// Fetch Hevy workout count with error handling
+let workoutCount = 0;
+try {
+  workoutCount = await fetchWorkoutCount();
+  console.log("Fetched workout count:", workoutCount);
+} catch (error) {
+  console.error("Error fetching workout count:", error);
+  workoutCount = 0; // Fallback to 0 if fetch fails
+}
 ---
 
 <Base
@@ -120,29 +127,85 @@ const maxDistance = Math.max(...distanceData.map(data => data[1]));
     </div>
   </SectionLayout>
 
-  <!-- Hevy Workout Section -->
-  <SectionLayout title="[LATEST_HEVY_WORKOUT_LOG]">
-    number of workouts: {workoutCount}
-    {/* <--- USE FETCHED COUNT DIRECTLY */}
-  </SectionLayout>
+  <!-- Hevy Workout Count Section -->
+  <SectionLayout
+    title="[HEVY_WORKOUT_MATRIX]"
+    rightHeaderText="[TOTAL_WORKOUT_COUNT]"
+  >
+    <div
+      slot="headerElements"
+      class="w-2 h-2 bg-cyan-400 rounded-full animate-pulse"
+    >
+    </div>
 
-  <SectionLayout title="[LATEST_HEVY_WORKOUT_LOG]">
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-      {/* Use the already fetched hevyWorkoutsData if you fetched it above */}
-      {
-        /* Otherwise, call fetchHevyData() again if it's meant to be a separate fetch for this section */
-      }
-      {
-        hevyWorkoutsData.map((workout: Workout) => (
-          <HevyWorkoutCard workout={workout} />
-        ))
-      }
+    <div class="workout-count-container">
+      <div class="workout-count-wrapper">
+        <!-- Matrix-style workout count display -->
+        <div class="workout-count-display">
+          <div class="count-grid">
+            <div class="count-label">
+              <span class="text-cyan-400/60 text-sm font-mono"
+                >TOTAL_WORKOUTS:</span
+              >
+            </div>
+            <div class="count-value">
+              <span
+                class="text-cyan-300 text-4xl font-mono font-bold tracking-wider"
+              >
+                {(workoutCount || 0).toString().padStart(4, "0")}
+              </span>
+            </div>
+          </div>
+
+          <!-- Matrix rain effect elements -->
+          <div class="matrix-rain">
+            {
+              Array.from({ length: 12 }).map((_, i) => (
+                <div
+                  class={`rain-column rain-column-${i + 1}`}
+                  style={`animation-delay: ${i * 0.3}s;`}
+                >
+                  {Array.from({ length: 8 }).map((_, j) => (
+                    <span class="rain-char">
+                      {Math.floor(Math.random() * 2)}
+                    </span>
+                  ))}
+                </div>
+              ))
+            }
+          </div>
+        </div>
+
+        <!-- Status indicators -->
+        <div class="workout-status mt-6">
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-4 text-xs">
+            <div class="status-block">
+              <span class="text-cyan-400/60">API_STATUS:</span>
+              <span class="text-green-300 ml-2 flex items-center">
+                <div
+                  class="w-1 h-1 bg-green-500 rounded-full mr-1 animate-pulse"
+                >
+                </div>
+                CONNECTED
+              </span>
+            </div>
+            <div class="status-block">
+              <span class="text-cyan-400/60">DATA_SOURCE:</span>
+              <span class="text-cyan-300 ml-2">HEVY_API_V1</span>
+            </div>
+            <div class="status-block">
+              <span class="text-cyan-400/60">SYNC_STATUS:</span>
+              <span class="text-cyan-300 ml-2">REAL_TIME</span>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
   </SectionLayout>
 </Base>
 
 <style>
-  /* Heatmap Container */
+  /* Existing heatmap styles */
   .heatmap-container {
     background: linear-gradient(
       135deg,
@@ -208,7 +271,6 @@ const maxDistance = Math.max(...distanceData.map(data => data[1]));
     padding: 4px 0;
   }
 
-  /* Strava Link Button */
   .strava-link-button {
     position: relative;
     padding: 6px 12px;
@@ -226,149 +288,215 @@ const maxDistance = Math.max(...distanceData.map(data => data[1]));
     transform: translateY(-1px);
   }
 
-  .strava-link-button::before {
+  /* Workout Count Container Styles */
+  .workout-count-container {
+    background: linear-gradient(
+      135deg,
+      rgba(0, 0, 0, 0.9) 0%,
+      rgba(0, 40, 40, 0.7) 100%
+    );
+    border: 1px solid rgba(0, 255, 255, 0.3);
+    border-radius: 8px;
+    padding: 24px;
+    box-shadow:
+      0 0 25px rgba(0, 255, 255, 0.2),
+      inset 0 0 25px rgba(0, 255, 255, 0.05);
+    position: relative;
+    overflow: hidden;
+  }
+
+  .workout-count-container::before {
     content: "";
     position: absolute;
-    inset: 0;
-    border-radius: 4px;
+    inset: -1px;
+    border-radius: 9px;
+    padding: 1px;
     background: linear-gradient(
       45deg,
+      rgba(0, 255, 255, 0.4),
       transparent,
-      rgba(0, 255, 0, 0.1),
-      transparent
+      rgba(0, 255, 255, 0.4)
     );
-    opacity: 0;
-    transition: opacity 0.3s ease;
+    mask:
+      linear-gradient(#fff 0 0) content-box,
+      linear-gradient(#fff 0 0);
+    mask-composite: xor;
+    animation: workoutBorderGlow 3s ease-in-out infinite;
   }
 
-  .strava-link-button:hover::before {
-    opacity: 1;
-  }
-
-  /* Diagnostics Section */
-  .diagnostics-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-    gap: 16px;
-    background: rgba(0, 0, 0, 0.4);
-    border: 1px solid rgba(0, 255, 0, 0.2);
-    border-radius: 6px;
-    padding: 16px;
-  }
-
-  .diagnostic-item {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 8px 12px;
-    background: rgba(0, 255, 0, 0.05);
-    border: 1px solid rgba(0, 255, 0, 0.1);
-    border-radius: 4px;
-    font-size: 0.75rem;
-  }
-
-  .diagnostic-label {
-    color: rgba(0, 255, 0, 0.7);
-    font-weight: bold;
-  }
-
-  .diagnostic-value {
-    font-family: "Courier New", monospace;
-    font-weight: bold;
-    animation: diagnosticPulse 2s ease-in-out infinite;
-  }
-
-  .diagnostic-value.success {
-    color: #00ff00;
-  }
-
-  .diagnostic-value.warning {
-    color: #ffff00;
-  }
-
-  .diagnostic-value.error {
-    color: #ff4444;
-  }
-
-  @keyframes diagnosticPulse {
+  @keyframes workoutBorderGlow {
     0%,
     100% {
-      opacity: 0.8;
+      opacity: 0.4;
     }
     50% {
+      opacity: 0.9;
+    }
+  }
+
+  .workout-count-wrapper {
+    position: relative;
+    z-index: 2;
+  }
+
+  .workout-count-display {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 120px;
+    background: rgba(0, 0, 0, 0.6);
+    border: 1px solid rgba(0, 255, 255, 0.2);
+    border-radius: 6px;
+    overflow: hidden;
+  }
+
+  .count-grid {
+    text-align: center;
+    z-index: 3;
+    position: relative;
+  }
+
+  .count-value {
+    margin-top: 8px;
+    text-shadow:
+      0 0 10px rgba(0, 255, 255, 0.8),
+      0 0 20px rgba(0, 255, 255, 0.5),
+      0 0 30px rgba(0, 255, 255, 0.3);
+    animation: countPulse 2s ease-in-out infinite;
+  }
+
+  @keyframes countPulse {
+    0%,
+    100% {
+      transform: scale(1);
+      opacity: 0.9;
+    }
+    50% {
+      transform: scale(1.05);
       opacity: 1;
     }
   }
 
+  /* Matrix Rain Effect */
+  .matrix-rain {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    pointer-events: none;
+    overflow: hidden;
+  }
+
+  .rain-column {
+    position: absolute;
+    top: -100%;
+    font-family: "Courier New", monospace;
+    font-size: 12px;
+    color: rgba(0, 255, 255, 0.3);
+    animation: matrixRain 4s linear infinite;
+    white-space: nowrap;
+  }
+
+  .rain-char {
+    display: block;
+    line-height: 1.2;
+    animation: charFlicker 0.5s ease-in-out infinite;
+  }
+
+  @keyframes matrixRain {
+    0% {
+      transform: translateY(-100%);
+      opacity: 0;
+    }
+    10% {
+      opacity: 1;
+    }
+    90% {
+      opacity: 1;
+    }
+    100% {
+      transform: translateY(calc(100vh + 100%));
+      opacity: 0;
+    }
+  }
+
+  @keyframes charFlicker {
+    0%,
+    100% {
+      opacity: 0.3;
+    }
+    50% {
+      opacity: 0.8;
+    }
+  }
+
+  /* Position rain columns */
+  .rain-column-1 {
+    left: 5%;
+  }
+  .rain-column-2 {
+    left: 12%;
+  }
+  .rain-column-3 {
+    left: 19%;
+  }
+  .rain-column-4 {
+    left: 26%;
+  }
+  .rain-column-5 {
+    left: 33%;
+  }
+  .rain-column-6 {
+    left: 40%;
+  }
+  .rain-column-7 {
+    left: 47%;
+  }
+  .rain-column-8 {
+    left: 54%;
+  }
+  .rain-column-9 {
+    left: 61%;
+  }
+  .rain-column-10 {
+    left: 68%;
+  }
+  .rain-column-11 {
+    left: 75%;
+  }
+  .rain-column-12 {
+    left: 82%;
+  }
+
+  .workout-status {
+    font-family: "Courier New", monospace;
+  }
+
+  .status-block {
+    padding: 8px 12px;
+    background: rgba(0, 255, 255, 0.05);
+    border: 1px solid rgba(0, 255, 255, 0.1);
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
   /* Responsive Design */
-  @media (max-width: 1200px) {
-    .heatmap-display {
-      max-width: 1000px;
-    }
-  }
-
-  @media (max-width: 1024px) {
-    .heatmap-display {
-      max-width: 900px;
-    }
-  }
-
   @media (max-width: 768px) {
-    .heatmap-container {
+    .workout-count-container {
       padding: 16px;
     }
 
-    .heatmap-display {
-      max-width: 100%;
+    .count-value span {
+      font-size: 2.5rem;
     }
 
-    .heatmap-info .grid {
+    .workout-status .grid {
       grid-template-columns: 1fr;
       gap: 8px;
-    }
-
-    .diagnostics-grid {
-      grid-template-columns: 1fr;
-      gap: 12px;
-    }
-
-    .section-header .text-sm {
-      font-size: 0.75rem;
-    }
-
-    .heatmap-footer {
-      flex-direction: column;
-      gap: 12px;
-      align-items: flex-start;
-    }
-
-    .strava-link-button {
-      align-self: flex-end;
-    }
-  }
-
-  @media (max-width: 680px) {
-    .heatmap-display {
-      aspect-ratio: 26/7;
-    }
-  }
-
-  @media (max-width: 480px) {
-    .heatmap-container {
-      padding: 12px;
-      margin: 0 -4px;
-    }
-
-    .diagnostics-grid {
-      padding: 12px;
-    }
-
-    .diagnostic-item {
-      padding: 6px 8px;
-    }
-
-    .strava-link-button span {
-      font-size: 0.7rem;
     }
   }
 </style>

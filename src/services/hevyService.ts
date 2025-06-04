@@ -19,13 +19,11 @@ interface Exercise {
   workout_id: string;
   exercise_order: number;
   title: string;
-  exercise_type_id: string; // Mantener por si se usa para otra cosa, o si es el 'exercise_template_id' del ejemplo
+  exercise_type_id: string;
   notes: string | null;
   created_at: string; // ISO 8601 date string
   updated_at: string; // ISO 8601 date string
   sets: Set[];
-  // Considerar añadir también 'index: number;' y 'exercise_template_id: string;' si son consistentes y necesarios
-  // y 'superset_id: string | null;' basado en tu ejemplo.
 }
 
 interface Workout {
@@ -56,7 +54,7 @@ const getApiKey = (): string | undefined => {
 };
 
 // Function to fetch data from the Hevy API
-export const fetchHevyData = async (apiKey?: string): Promise<Workout[]> => {
+const fetchHevyData = async (apiKey?: string): Promise<Workout[]> => {
   // Get API key from parameter or environment
   const key = apiKey || getApiKey();
 
@@ -132,11 +130,10 @@ export const fetchHevyData = async (apiKey?: string): Promise<Workout[]> => {
 };
 
 // Alternative function with different endpoint (in case the main one doesn't work)
-export const fetchHevyWorkouts = async (
+const fetchHevyWorkouts = async (
   apiKey?: string,
   limit: number = 1,
 ): Promise<any> => {
-  // Consider defining a more specific return type if possible
   const key = apiKey || getApiKey();
 
   if (!key) {
@@ -169,7 +166,7 @@ export const fetchHevyWorkouts = async (
 };
 
 // Function to fetch the total number of workouts
-export const fetchWorkoutCount = async (apiKey?: string): Promise<number> => {
+const fetchWorkoutCount = async (apiKey?: string): Promise<number> => {
   const key = apiKey || getApiKey();
 
   if (!key) {
@@ -195,7 +192,19 @@ export const fetchWorkoutCount = async (apiKey?: string): Promise<number> => {
     }
 
     const data = await response.json();
-    return data.count;
+    console.log("Workout count API response:", data);
+
+    // Handle different possible response structures
+    if (typeof data === "number") {
+      return data;
+    } else if (data && typeof data.count === "number") {
+      return data.count;
+    } else if (data && typeof data.total === "number") {
+      return data.total;
+    } else {
+      console.warn("Unexpected response structure for workout count:", data);
+      return 0;
+    }
   } catch (error) {
     console.error("Error fetching workout count:", error);
     throw error;
@@ -247,5 +256,6 @@ if (
   main();
 }
 
+// Export all functions and types - SINGLE EXPORT STATEMENT
 export { fetchHevyData, fetchHevyWorkouts, getApiKey, fetchWorkoutCount };
 export type { Workout, Exercise, Set };
