@@ -20,5 +20,7 @@ pnpm-debug.log*
 # strava secret
 secret.json
 
+UNDER_CONSTRUCTION.md
+
 # macOS-specific files
 .DS_Store
