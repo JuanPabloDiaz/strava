@@ -68,11 +68,25 @@ export function formatPace(secondsPerKilometer: number): string {
 }
 
 export function formatWorkoutDateTime(date: Date): string {
-  const weekday = date.toLocaleDateString(undefined, { weekday: "long" });
+  const options: Intl.DateTimeFormatOptions = {
+    weekday: "long",
+    month: "long",
+    day: "numeric",
+  };
+  const formattedDate = date.toLocaleDateString(undefined, options);
   const time = date.toLocaleTimeString(undefined, {
     hour: "numeric",
     minute: "2-digit",
     hour12: true,
   });
-  return `${weekday} at ${time}`;
+  return `${formattedDate} at ${time}`;
+}
+
+export function roundToOneDecimal(num: number): number {
+  return Math.round(num * 10) / 10;
+}
+
+export function kgToLbs(kg: number): number {
+  const lbs = kg * 2.20462;
+  return roundToOneDecimal(lbs);
 }

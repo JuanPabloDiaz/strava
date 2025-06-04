@@ -4,6 +4,8 @@ import {
   formatDuration,
   formatRelativeTime,
   formatWorkoutDateTime,
+  roundToOneDecimal,
+  kgToLbs,
 } from "@utils/formatUtils";
 
 // Define the component's props
@@ -44,7 +46,7 @@ const lastUpdated = formatRelativeTime(new Date(displayWorkout.updated_at));
 ---
 
 <div
-  class="hevy-workout-card bg-black text-green-400 font-mono p-4 sm:p-6 rounded-md border border-green-700 shadow-md shadow-green-500/20 max-w-2xl mx-auto"
+  class="hevy-workout-card bg-black text-green-400 font-mono p-3 sm:p-4 rounded-md border border-green-700 shadow-md shadow-green-500/20 max-w-2xl mx-auto"
 >
   <header class="mb-4">
     <h3
@@ -68,14 +70,35 @@ const lastUpdated = formatRelativeTime(new Date(displayWorkout.updated_at));
     >
       Exercises
     </h4>
-    <ul class="space-y-4">
+    <ul class="space-y-4 overflow-y-auto max-h-64 sm:max-h-72">
       {
         displayWorkout.exercises.map((exercise, index) => (
           <li class="border border-green-800 p-3 rounded-md bg-green-900/10">
             <div class="flex justify-between items-center mb-2">
-              <h5 class="text-md sm:text-lg font-semibold text-green-300">
-                {exercise.exercise_type_id}
-              </h5>
+              {() => {
+                let exerciseName = exercise.exercise_type_id;
+                let machineType = "";
+                if (
+                  typeof exercise.exercise_type_id === "string" &&
+                  exercise.exercise_type_id.includes("[") &&
+                  exercise.exercise_type_id.includes("]")
+                ) {
+                  const parts = exercise.exercise_type_id.split("[");
+                  exerciseName = parts[0].trim();
+                  machineType = parts[1].replace("]", "").trim();
+                }
+                return (
+                  <h5 class="text-md sm:text-lg font-semibold text-green-300">
+                    {exerciseName}
+                    {machineType && (
+                      <span class="text-sm text-green-400">
+                        {" "}
+                        [{machineType}]
+                      </span>
+                    )}
+                  </h5>
+                );
+              }}
               {exercise.notes && (
                 <p class="text-xs text-green-500 italic hidden md:block">
                   {exercise.notes}
@@ -88,7 +111,9 @@ const lastUpdated = formatRelativeTime(new Date(displayWorkout.updated_at));
                   <span class="text-green-500 mr-1">Set {setIndex + 1}:</span>
                   <span>
                     <span class="text-green-600">Wt:</span>{" "}
-                    {set.weight_kg != null ? `${set.weight_kg}kg` : "--"}
+                    {set.weight_kg != null
+                      ? `${roundToOneDecimal(set.weight_kg)}kg / ${kgToLbs(set.weight_kg)}lbs`
+                      : "--"}
                   </span>
                   <span>
                     <span class="text-green-600">Reps:</span>{" "}
@@ -127,4 +152,24 @@ const lastUpdated = formatRelativeTime(new Date(displayWorkout.updated_at));
       }
     </ul>
   </section>
+
+  <footer class="mt-4 pt-4 border-t border-green-700 text-xs sm:text-sm">
+    <p>
+      <span class="text-green-500 font-semibold">Duration:</span>
+      {formatDuration(workoutDurationSeconds)}
+    </p>
+    <p>
+      <span class="text-green-500 font-semibold">Total Volume:</span>
+      {
+        totalVolumeKg.toLocaleString(undefined, {
+          maximumFractionDigits: 0,
+          minimumFractionDigits: 0,
+        })
+      } kg
+    </p>
+    <p>
+      <span class="text-green-500 font-semibold">Total Sets:</span>
+      {totalSets}
+    </p>
+  </footer>
 </div>
