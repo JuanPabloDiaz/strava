@@ -18,11 +18,14 @@ interface Exercise {
   exercise_id: string;
   workout_id: string;
   exercise_order: number;
-  exercise_type_id: string; // Assuming there's a separate type for exercise types
+  title: string; // <--- AÑADIR ESTA LÍNEA
+  exercise_type_id: string; // Mantener por si se usa para otra cosa, o si es el 'exercise_template_id' del ejemplo
   notes: string | null;
   created_at: string; // ISO 8601 date string
   updated_at: string; // ISO 8601 date string
   sets: Set[];
+  // Considerar añadir también 'index: number;' y 'exercise_template_id: string;' si son consistentes y necesarios
+  // y 'superset_id: string | null;' basado en tu ejemplo.
 }
 
 interface Workout {

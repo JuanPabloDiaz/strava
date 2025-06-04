@@ -76,26 +76,30 @@ const lastUpdated = formatRelativeTime(new Date(displayWorkout.updated_at));
           <li class="border border-green-800 p-3 rounded-md bg-green-900/10">
             <div class="flex justify-between items-center mb-2">
               {() => {
-                let exerciseName = exercise.exercise_type_id;
-                let machineType = "";
-                if (
-                  typeof exercise.exercise_type_id === "string" &&
-                  exercise.exercise_type_id.includes("[") &&
-                  exercise.exercise_type_id.includes("]")
-                ) {
-                  const parts = exercise.exercise_type_id.split("[");
-                  exerciseName = parts[0].trim();
-                  machineType = parts[1].replace("]", "").trim();
-                }
+                // Usar directamente exercise.title
+                const exerciseName = exercise.title;
+                // La lógica para machineType podría necesitar ajustarse o eliminarse
+                // si exercise.title ya es suficientemente descriptivo o si
+                // exercise_type_id (o exercise_template_id) ya no se usa para esto.
+                // Por ahora, la eliminaremos para simplificar, asumiendo que exercise.title es el nombre completo.
+                // let machineType = "";
+                // if (
+                //   typeof exercise.exercise_type_id === "string" &&
+                //   exercise.exercise_type_id.includes("[") &&
+                //   exercise.exercise_type_id.includes("]")
+                // ) {
+                //   const parts = exercise.exercise_type_id.split("[");
+                //   machineType = parts[1].replace("]", "").trim();
+                // }
                 return (
                   <h5 class="text-md sm:text-lg font-semibold text-green-300">
                     {exerciseName}
-                    {machineType && (
+                    {/* {machineType && (
                       <span class="text-sm text-green-400">
                         {" "}
                         [{machineType}]
                       </span>
-                    )}
+                    )} */}
                   </h5>
                 );
               }}
