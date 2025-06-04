@@ -197,6 +197,9 @@ const fetchWorkoutCount = async (apiKey?: string): Promise<number> => {
     // Handle different possible response structures
     if (typeof data === "number") {
       return data;
+    } else if (data && typeof data.workout_count === "number") {
+      // Fixed: Added support for workout_count key
+      return data.workout_count;
     } else if (data && typeof data.count === "number") {
       return data.count;
     } else if (data && typeof data.total === "number") {
