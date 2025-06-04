@@ -7,27 +7,16 @@
     "dev": "astro dev",
     "build": "astro check && astro build",
     "preview": "astro preview",
-    "astro": "astro",
     "format": "prettier --write '**/*.{astro,js,ts,json,md}'",
-    "strava-script": "bun scripts/strava-script.ts",
-    "clean": "rm -rf dist .astro node_modules package-lock.json bun.lockb",
-    "test": "vitest"
+    "clean": "rm -rf dist .astro node_modules package-lock.json bun.lockb && bun install",
+    "lint": "bunx eslint . --ext .js,.ts,.astro",
+    "test": "vitest",
+    "strava-script": "bun scripts/strava-script.ts"
   },
   "dependencies": {
-    "@astrojs/check": "^0.9.4",
-    "@astrojs/prefetch": "^0.4.1",
-    "@astrojs/sitemap": "3.3.1",
     "@mapbox/polyline": "^1.2.1",
-    "@tailwindcss/vite": "^4.1.8",
-    "@types/mapbox__polyline": "^1.0.5",
-    "astro": "5.7.11",
-    "astro-compress": "^2.2.15",
     "lenis": "^1.2.3",
-    "puppeteer": "^23.8.0",
-    "rehype-katex": "^7.0.0",
-    "sharp": "^0.33.3",
-    "simplify-js": "^1.2.4",
-    "typescript": "^5.8.3"
+    "simplify-js": "^1.2.4"
   },
   "engines": {
     "node": ">=18.17.1",
@@ -44,7 +33,18 @@
     "prettier": "^3.5.3",
     "prettier-plugin-astro": "^0.14.1",
     "tailwindcss": "^3.0.24",
-    "vitest": "^3.2.0"
+    "vitest": "^3.2.0",
+    "@astrojs/check": "^0.9.4",
+    "@astrojs/prefetch": "^0.4.1",
+    "@astrojs/sitemap": "3.3.1",
+    "@tailwindcss/vite": "^4.1.8",
+    "@types/mapbox__polyline": "^1.0.5",
+    "astro": "5.7.11",
+    "astro-compress": "^2.2.15",
+    "puppeteer": "^23.8.0",
+    "rehype-katex": "^7.0.0",
+    "sharp": "^0.33.3",
+    "typescript": "^5.8.3"
   },
   "license": "MIT",
   "packageManager": "bun@1.1.10"
