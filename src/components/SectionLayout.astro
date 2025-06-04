@@ -26,9 +26,19 @@ const {
   <div class={`base-section-header ${headerClass}`}>
     <div class={headerContainerClass}>
       <span>{title}</span>
-      {Astro.slots.has('headerElements') ? <slot name="headerElements" /> : <div class={hrClass}></div>}
+      {
+        Astro.slots.has("headerElements") ? (
+          <slot name="headerElements" />
+        ) : (
+          <div class={hrClass} />
+        )
+      }
     </div>
-    {rightHeaderText && <span class="text-green-300 text-xs">{rightHeaderText}</span>}
+    {
+      rightHeaderText && (
+        <span class="text-green-300 text-xs">{rightHeaderText}</span>
+      )
+    }
   </div>
   <slot />
 </section>

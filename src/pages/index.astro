@@ -3,12 +3,16 @@ import Base from "@layouts/Base.astro";
 import SectionLayout from "@components/SectionLayout.astro";
 import DaysSinceLast from "@components/DaysSinceLast.astro";
 import HeatmapGrid from "@components/HeatmapGrid.astro";
-import { fetchDistanceData, processDistanceData, getLastActivityDate } from '@services/stravaService';
+import {
+  fetchDistanceData,
+  processDistanceData,
+  getLastActivityDate,
+} from "@services/stravaService";
 
 // Fetch and process data
 const distanceMap = await fetchDistanceData();
 const distanceData = processDistanceData(distanceMap);
-const lastRunDate = await getLastActivityDate('Run');
+const lastRunDate = await getLastActivityDate("Run");
 
 const minDistance = Math.min(...distanceData.map(data => data[1]));
 const maxDistance = Math.max(...distanceData.map(data => data[1]));
@@ -22,15 +26,19 @@ const maxDistance = Math.max(...distanceData.map(data => data[1]));
 >
   <!-- Days Since Last Activity Section -->
   <SectionLayout title="[ACTIVITY_STATUS]">
-    <DaysSinceLast
-      lastRunDate={lastRunDate || undefined}
-      activityType="RUN"
-    />
+    <DaysSinceLast lastRunDate={lastRunDate || undefined} activityType="RUN" />
   </SectionLayout>
 
   <!-- Heatmap Analysis Section -->
-  <SectionLayout title="[TEMPORAL_ANALYSIS_GRID]" rightHeaderText="[365_DAY_NEURAL_MAPPING]">
-    <div slot="headerElements" class="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
+  <SectionLayout
+    title="[TEMPORAL_ANALYSIS_GRID]"
+    rightHeaderText="[365_DAY_NEURAL_MAPPING]"
+  >
+    <div
+      slot="headerElements"
+      class="w-2 h-2 bg-green-500 rounded-full animate-pulse"
+    >
+    </div>
     <div class="heatmap-container">
       <div class="heatmap-wrapper">
         <!-- Heatmap Header Info -->
@@ -42,11 +50,15 @@ const maxDistance = Math.max(...distanceData.map(data => data[1]));
             </div>
             <div class="info-block">
               <span class="text-green-400/60">MIN_ACTIVITY:</span>
-              <span class="text-green-300 ml-2">{minDistance.toFixed(1)} KM</span>
+              <span class="text-green-300 ml-2"
+                >{minDistance.toFixed(1)} KM</span
+              >
             </div>
             <div class="info-block">
               <span class="text-green-400/60">MAX_ACTIVITY:</span>
-              <span class="text-green-300 ml-2">{maxDistance.toFixed(1)} KM</span>
+              <span class="text-green-300 ml-2"
+                >{maxDistance.toFixed(1)} KM</span
+              >
             </div>
           </div>
         </div>
@@ -66,7 +78,8 @@ const maxDistance = Math.max(...distanceData.map(data => data[1]));
             <div class="flex items-center space-x-4">
               <span class="text-green-400/60">NEURAL_ACTIVITY_TRACKING</span>
               <div class="flex items-center space-x-1">
-                <div class="w-1 h-1 bg-green-500 rounded-full animate-pulse"></div>
+                <div class="w-1 h-1 bg-green-500 rounded-full animate-pulse">
+                </div>
                 <span class="text-green-500">ONLINE</span>
               </div>
             </div>
@@ -78,7 +91,9 @@ const maxDistance = Math.max(...distanceData.map(data => data[1]));
               rel="noopener noreferrer"
               class="strava-link-button group"
             >
-              <span class="text-green-300 hover:text-green-100 transition-colors duration-300 font-mono text-xs flex items-center space-x-2">
+              <span
+                class="text-green-300 hover:text-green-100 transition-colors duration-300 font-mono text-xs flex items-center space-x-2"
+              >
                 <span>[VERIFY_ON_STRAVA]</span>
                 <svg
                   class="w-3 h-3 transition-transform duration-300 group-hover:translate-x-1"
@@ -86,7 +101,12 @@ const maxDistance = Math.max(...distanceData.map(data => data[1]));
                   stroke="currentColor"
                   viewBox="0 0 24 24"
                 >
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/>
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"
+                  ></path>
                 </svg>
               </span>
             </a>
@@ -100,7 +120,11 @@ const maxDistance = Math.max(...distanceData.map(data => data[1]));
 <style>
   /* Heatmap Container */
   .heatmap-container {
-    background: linear-gradient(135deg, rgba(0, 0, 0, 0.8) 0%, rgba(0, 20, 0, 0.6) 100%);
+    background: linear-gradient(
+      135deg,
+      rgba(0, 0, 0, 0.8) 0%,
+      rgba(0, 20, 0, 0.6) 100%
+    );
     border: 1px solid rgba(0, 255, 0, 0.3);
     border-radius: 8px;
     padding: 20px;
@@ -112,24 +136,32 @@ const maxDistance = Math.max(...distanceData.map(data => data[1]));
   }
 
   .heatmap-container::before {
-    content: '';
+    content: "";
     position: absolute;
     inset: -1px;
     border-radius: 9px;
     padding: 1px;
-    background: linear-gradient(45deg,
+    background: linear-gradient(
+      45deg,
       rgba(0, 255, 0, 0.4),
       transparent,
       rgba(0, 255, 0, 0.4)
     );
-    mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    mask:
+      linear-gradient(#fff 0 0) content-box,
+      linear-gradient(#fff 0 0);
     mask-composite: xor;
     animation: heatmapBorderGlow 4s ease-in-out infinite;
   }
 
   @keyframes heatmapBorderGlow {
-    0%, 100% { opacity: 0.3; }
-    50% { opacity: 0.8; }
+    0%,
+    100% {
+      opacity: 0.3;
+    }
+    50% {
+      opacity: 0.8;
+    }
   }
 
   .heatmap-wrapper {
@@ -143,8 +175,9 @@ const maxDistance = Math.max(...distanceData.map(data => data[1]));
     aspect-ratio: 53/7;
   }
 
-  .heatmap-info, .heatmap-footer {
-    font-family: 'Courier New', monospace;
+  .heatmap-info,
+  .heatmap-footer {
+    font-family: "Courier New", monospace;
   }
 
   .info-block {
@@ -170,11 +203,16 @@ const maxDistance = Math.max(...distanceData.map(data => data[1]));
   }
 
   .strava-link-button::before {
-    content: '';
+    content: "";
     position: absolute;
     inset: 0;
     border-radius: 4px;
-    background: linear-gradient(45deg, transparent, rgba(0, 255, 0, 0.1), transparent);
+    background: linear-gradient(
+      45deg,
+      transparent,
+      rgba(0, 255, 0, 0.1),
+      transparent
+    );
     opacity: 0;
     transition: opacity 0.3s ease;
   }
@@ -211,7 +249,7 @@ const maxDistance = Math.max(...distanceData.map(data => data[1]));
   }
 
   .diagnostic-value {
-    font-family: 'Courier New', monospace;
+    font-family: "Courier New", monospace;
     font-weight: bold;
     animation: diagnosticPulse 2s ease-in-out infinite;
   }
@@ -229,8 +267,13 @@ const maxDistance = Math.max(...distanceData.map(data => data[1]));
   }
 
   @keyframes diagnosticPulse {
-    0%, 100% { opacity: 0.8; }
-    50% { opacity: 1; }
+    0%,
+    100% {
+      opacity: 0.8;
+    }
+    50% {
+      opacity: 1;
+    }
   }
 
   /* Responsive Design */

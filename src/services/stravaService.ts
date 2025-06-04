@@ -81,7 +81,7 @@ export async function fetchActivities(
       JSON.stringify(rawActivities.slice(0, 2), null, 2),
     );
 
-    const activities: StravaActivity[] = rawActivities.map((activity) => {
+    const activities: StravaActivity[] = rawActivities.map(activity => {
       const mappedActivity: StravaActivity = {
         id: activity.id,
         name: activity.name,
@@ -192,7 +192,7 @@ export async function getLastActivityDate(
 
     if (activityType) {
       // Buscar la actividad más reciente del tipo especificado
-      targetActivity = activities.find((activity) => {
+      targetActivity = activities.find(activity => {
         const type = activity.type || activity.sport_type || "";
         return (
           type.toLowerCase() === activityType.toLowerCase() ||
@@ -264,7 +264,7 @@ export async function getLastActivityInfo(activityType?: string): Promise<{
     let targetActivity: StravaActivity | undefined;
 
     if (activityType) {
-      targetActivity = activities.find((activity) => {
+      targetActivity = activities.find(activity => {
         const type = activity.type || activity.sport_type || "";
         return (
           type.toLowerCase() === activityType.toLowerCase() ||

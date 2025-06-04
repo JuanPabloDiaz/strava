@@ -6,40 +6,42 @@ const activityTypes = ["All", "Run", "Ride", "Swim", "Walk"];
 export interface Props {
   currentFilter?: string;
 }
-const { currentFilter = 'All' } = Astro.props;
+const { currentFilter = "All" } = Astro.props;
 ---
 
 <div class="activity-filters mb-6">
   <div class="filter-buttons-container flex flex-wrap gap-2 justify-center">
-    {activityTypes.map(type => (
-      <button
-        class:list={[
-          "filter-button px-4 py-2 border rounded-md text-sm font-mono transition-all duration-200 ease-in-out",
-          "hover:bg-green-500/30 hover:border-green-500/60",
-          currentFilter === type
-            ? "bg-green-500/40 border-green-500/70 text-green-300 ring-1 ring-green-400"
-            : "bg-black/50 border-green-500/30 text-green-400 hover:text-green-200",
-        ]}
-        data-filter-type={type}
-      >
-        {type.toUpperCase()}
-      </button>
-    ))}
+    {
+      activityTypes.map(type => (
+        <button
+          class:list={[
+            "filter-button px-4 py-2 border rounded-md text-sm font-mono transition-all duration-200 ease-in-out",
+            "hover:bg-green-500/30 hover:border-green-500/60",
+            currentFilter === type
+              ? "bg-green-500/40 border-green-500/70 text-green-300 ring-1 ring-green-400"
+              : "bg-black/50 border-green-500/30 text-green-400 hover:text-green-200",
+          ]}
+          data-filter-type={type}
+        >
+          {type.toUpperCase()}
+        </button>
+      ))
+    }
   </div>
 </div>
 
 <script>
   // Get all filter buttons
-  const filterButtons = document.querySelectorAll('.filter-button');
+  const filterButtons = document.querySelectorAll(".filter-button");
 
   // Add event listener to each button
   filterButtons.forEach(button => {
-    button.addEventListener('click', () => {
-      const filterType = button.getAttribute('data-filter-type');
+    button.addEventListener("click", () => {
+      const filterType = button.getAttribute("data-filter-type");
 
       // Create a custom event to notify the parent page of the filter change
-      const filterChangeEvent = new CustomEvent('filterchange', {
-        detail: { filterType }
+      const filterChangeEvent = new CustomEvent("filterchange", {
+        detail: { filterType },
       });
       // Dispatch the event from a known element or the window
       // Parent page (last.astro) will listen for this.

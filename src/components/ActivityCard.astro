@@ -1,7 +1,11 @@
 ---
-import type { StravaActivity } from '@services/stravaService';
-import ActivityMap from './ActivityMap.astro';
-import { formatRelativeTime, formatDuration, formatDistance } from '@utils/formatUtils';
+import type { StravaActivity } from "@services/stravaService";
+import ActivityMap from "@components/ActivityMap.astro";
+import {
+  formatRelativeTime,
+  formatDuration,
+  formatDistance,
+} from "@utils/formatUtils";
 
 export interface Props {
   activity: StravaActivity;
@@ -9,7 +13,10 @@ export interface Props {
 
 const { activity } = Astro.props;
 
-const hasGpsData = !!(activity.summary_polyline || (activity.start_latlng && activity.start_latlng.length >= 2));
+const hasGpsData = !!(
+  activity.summary_polyline ||
+  (activity.start_latlng && activity.start_latlng.length >= 2)
+);
 
 // Basic formatting (can be improved later)
 const activityDate = formatRelativeTime(new Date(activity.start_date));
@@ -24,18 +31,30 @@ const activityType = activity.type || activity.sport_type || "Unknown";
   <p><strong>Duration:</strong> {durationFormatted}</p>
   <p><strong>Distance:</strong> {distanceFormatted}</p>
   <p><strong>Type:</strong> {activity.type} ({activity.sport_type})</p>
-  {hasGpsData ? (
-    <ActivityMap activities={[activity]} />
-  ) : (
-    <div class="activity-no-map-placeholder">
-      <p>No map data available for this activity.</p>
-      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-        <path d="M12 22s-8-4.5-8-11.5a8 8 0 0 1 16 0c0 7-8 11.5-8 11.5z"/>
-        <line x1="7" y1="7" x2="17" y2="17"/>
-        <path d="M10 9a3 3 0 0 1 3-3"/>
-      </svg>
-    </div>
-  )}
+  {
+    hasGpsData ? (
+      <ActivityMap activities={[activity]} />
+    ) : (
+      <div class="activity-no-map-placeholder">
+        <p>No map data available for this activity.</p>
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          width="24"
+          height="24"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+        >
+          <path d="M12 22s-8-4.5-8-11.5a8 8 0 0 1 16 0c0 7-8 11.5-8 11.5z" />
+          <line x1="7" y1="7" x2="17" y2="17" />
+          <path d="M10 9a3 3 0 0 1 3-3" />
+        </svg>
+      </div>
+    )
+  }
   <!-- TODO: Display heart rate if available -->
 </div>
 
@@ -46,7 +65,7 @@ const activityType = activity.type || activity.sport_type || "Unknown";
     margin-bottom: 1.5em;
     background-color: #0a0a0a; /* Darker background */
     color: #ccc;
-    font-family: 'Courier New', Courier, monospace; /* Monospaced font */
+    font-family: "Courier New", Courier, monospace; /* Monospaced font */
     box-shadow: 0 0 10px #0f0; /* Green glow effect */
   }
 
@@ -73,7 +92,7 @@ const activityType = activity.type || activity.sport_type || "Unknown";
     margin-top: 1em; /* Space below activity details */
     background-color: #0a0a0a; /* Darker background, same as card */
     color: #ccc; /* Main text color */
-    font-family: 'Courier New', Courier, monospace; /* Monospaced font */
+    font-family: "Courier New", Courier, monospace; /* Monospaced font */
     box-shadow: 0 0 10px #0f0; /* Green glow effect */
     text-align: center; /* Center the message and icon */
   }

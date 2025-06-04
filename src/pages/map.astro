@@ -1,23 +1,21 @@
 ---
 import Base from "@layouts/Base.astro";
 import SectionLayout from "@components/SectionLayout.astro";
-// import ActivityMap from "@components/ActivityMap.astro";
-import ActivityFilters from '@components/ActivityFilters.astro';
-import ActivityCard from '@components/ActivityCard.astro';
-import { fetchActivities, getActivityStats} from '@services/stravaService';
-
+import ActivityFilters from "@components/ActivityFilters.astro";
+import ActivityCard from "@components/ActivityCard.astro";
+import { fetchActivities, getActivityStats } from "@services/stravaService";
 
 // Fetch activities data
 const activities = await fetchActivities();
 const stats = getActivityStats(activities);
 
 // Filter activities with GPS data for map display
-const activitiesWithGPS = activities.filter(activity =>
-  activity.start_latlng && activity.start_latlng.length === 2
+const activitiesWithGPS = activities.filter(
+  activity => activity.start_latlng && activity.start_latlng.length === 2,
 );
 
 const activitiesPerPage = 10;
-const pageParam = Astro.url.searchParams.get('page');
+const pageParam = Astro.url.searchParams.get("page");
 let currentPage = 1;
 if (pageParam) {
   const parsedPage = parseInt(pageParam, 10);
@@ -36,90 +34,114 @@ const isLastPage = recentActivities.length < activitiesPerPage;
   terminalCommand="./initialize_gps_matrix.exe"
   systemMessage="[SYSTEM] Loading geospatial neural network... GPS satellites locked."
 >
-
-
   <!-- Activity Map Section -->
-  <SectionLayout title="[NEURAL_MAPPING_INTERFACE]" rightHeaderText="[REAL_TIME_GPS_TRACKING]">
+  <SectionLayout
+    title="[NEURAL_MAPPING_INTERFACE]"
+    rightHeaderText="[REAL_TIME_GPS_TRACKING]"
+  >
+    <ActivityFilters />
 
-      <ActivityFilters />
-
-  <!-- Recent Activities Section -->
-  <section class="mb-8">
-    <div class="bg-black/60 border border-green-500/30 rounded-lg p-6 backdrop-blur-sm">
-      <div class="text-center space-y-4">
-        <div class="text-green-400 font-mono text-lg mb-4">[RECENT_ACTIVITIES]</div>
-        <div class="activities-list space-y-6">
-          {recentActivities && recentActivities.length > 0 ? (
-            recentActivities.map(activity => (
-              <ActivityCard activity={activity} />
-            ))
-          ) : (
-            <p class="text-center text-gray-400">No recent activities found.</p>
-          )}
-        </div>
-        <div class="mt-8 text-center">
-          <a
-            href={currentPage > 1 ? `?page=${currentPage - 1}` : undefined}
-            class:list={[
-              "px-4 py-2 bg-green-500/20 border border-green-500/40 text-green-400 rounded hover:bg-green-500/30 mx-2",
-              currentPage === 1 && "opacity-50 cursor-not-allowed"
-            ]}
-            aria-disabled={currentPage === 1}
-          >
-            &lt; Previous
-          </a>
-          <span class="text-green-400 mx-2">Page {currentPage}</span>
-          <a
-            href={!isLastPage ? `?page=${currentPage + 1}` : undefined}
-            class:list={[
-              "px-4 py-2 bg-green-500/20 border border-green-500/40 text-green-400 rounded hover:bg-green-500/30 mx-2",
-              isLastPage && "opacity-50 cursor-not-allowed"
-            ]}
-            aria-disabled={isLastPage}
-          >
-            Next &gt;
-          </a>
+    <!-- Recent Activities Section -->
+    <section class="mb-8">
+      <div
+        class="bg-black/60 border border-green-500/30 rounded-lg p-6 backdrop-blur-sm"
+      >
+        <div class="text-center space-y-4">
+          <div class="text-green-400 font-mono text-lg mb-4">
+            [RECENT_ACTIVITIES]
+          </div>
+          <div class="activities-list space-y-6">
+            {
+              recentActivities && recentActivities.length > 0 ? (
+                recentActivities.map(activity => (
+                  <ActivityCard activity={activity} />
+                ))
+              ) : (
+                <p class="text-center text-gray-400">
+                  No recent activities found.
+                </p>
+              )
+            }
+          </div>
+          <div class="mt-8 text-center">
+            <a
+              href={currentPage > 1 ? `?page=${currentPage - 1}` : undefined}
+              class:list={[
+                "px-4 py-2 bg-green-500/20 border border-green-500/40 text-green-400 rounded hover:bg-green-500/30 mx-2",
+                currentPage === 1 && "opacity-50 cursor-not-allowed",
+              ]}
+              aria-disabled={currentPage === 1}
+            >
+              &lt; Previous
+            </a>
+            <span class="text-green-400 mx-2">Page {currentPage}</span>
+            <a
+              href={!isLastPage ? `?page=${currentPage + 1}` : undefined}
+              class:list={[
+                "px-4 py-2 bg-green-500/20 border border-green-500/40 text-green-400 rounded hover:bg-green-500/30 mx-2",
+                isLastPage && "opacity-50 cursor-not-allowed",
+              ]}
+              aria-disabled={isLastPage}
+            >
+              Next &gt;
+            </a>
+          </div>
         </div>
       </div>
-    </div>
-  </section>
+    </section>
   </SectionLayout>
 
   <!-- Activity Types Breakdown -->
   <SectionLayout title="[ACTIVITY_CLASSIFICATION]">
     <div class="breakdown-grid">
-      {Object.entries(stats.byType).map(([type, typeStats]) => (
-        <div class="breakdown-item">
-          <div class="breakdown-header">
-            <div class="breakdown-type">[{type.toUpperCase()}]</div>
-            <div class="breakdown-count">{typeStats.count}</div>
+      {
+        Object.entries(stats.byType).map(([type, typeStats]) => (
+          <div class="breakdown-item">
+            <div class="breakdown-header">
+              <div class="breakdown-type">[{type.toUpperCase()}]</div>
+              <div class="breakdown-count">{typeStats.count}</div>
+            </div>
+            <div class="breakdown-details">
+              <div class="detail-row">
+                <span class="detail-label">DISTANCE:</span>
+                <span class="detail-value">
+                  {(typeStats.distance / 1000).toFixed(1)} KM
+                </span>
+              </div>
+              <div class="detail-row">
+                <span class="detail-label">TIME:</span>
+                <span class="detail-value">
+                  {Math.floor(typeStats.time / 3600)}H{" "}
+                  {Math.floor((typeStats.time % 3600) / 60)}M
+                </span>
+              </div>
+              <div class="detail-row">
+                <span class="detail-label">AVG_PACE:</span>
+                <span class="detail-value">{typeStats.avgPace}</span>
+              </div>
+            </div>
           </div>
-          <div class="breakdown-details">
-            <div class="detail-row">
-              <span class="detail-label">DISTANCE:</span>
-              <span class="detail-value">{(typeStats.distance / 1000).toFixed(1)} KM</span>
-            </div>
-            <div class="detail-row">
-              <span class="detail-label">TIME:</span>
-              <span class="detail-value">{Math.floor(typeStats.time / 3600)}H {Math.floor((typeStats.time % 3600) / 60)}M</span>
-            </div>
-            <div class="detail-row">
-              <span class="detail-label">AVG_PACE:</span>
-              <span class="detail-value">{typeStats.avgPace}</span>
-            </div>
-          </div>
-        </div>
-      ))}
+        ))
+      }
     </div>
-  </section>
+  </SectionLayout>
 
   <!-- Navigation Links -->
   <section class="navigation-section mt-8">
     <div class="nav-links">
       <a href="/" class="nav-link">
         <span>[RETURN_TO_MAIN_TERMINAL]</span>
-        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
+        <svg
+          class="w-4 h-4"
+          fill="none"
+          stroke="currentColor"
+          viewBox="0 0 24 24"
+        >
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
         </svg>
       </a>
 
@@ -130,8 +152,18 @@ const isLastPage = recentActivities.length < activitiesPerPage;
         class="nav-link external"
       >
         <span>[ACCESS_STRAVA_DATABASE]</span>
-        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/>
+        <svg
+          class="w-4 h-4"
+          fill="none"
+          stroke="currentColor"
+          viewBox="0 0 24 24"
+        >
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"
+          ></path>
         </svg>
       </a>
     </div>
@@ -168,7 +200,7 @@ const isLastPage = recentActivities.length < activitiesPerPage;
     background: rgba(0, 255, 0, 0.05);
     border: 1px solid rgba(0, 255, 0, 0.1);
     border-radius: 4px;
-    font-family: 'Courier New', monospace;
+    font-family: "Courier New", monospace;
   }
 
   .stat-label {
@@ -187,8 +219,13 @@ const isLastPage = recentActivities.length < activitiesPerPage;
   }
 
   @keyframes statPulse {
-    0%, 100% { opacity: 0.8; }
-    50% { opacity: 1; }
+    0%,
+    100% {
+      opacity: 0.8;
+    }
+    50% {
+      opacity: 1;
+    }
   }
 
   /* Breakdown Grid */
@@ -199,34 +236,46 @@ const isLastPage = recentActivities.length < activitiesPerPage;
   }
 
   .breakdown-item {
-    background: linear-gradient(135deg, rgba(0, 0, 0, 0.8) 0%, rgba(0, 20, 0, 0.6) 100%);
+    background: linear-gradient(
+      135deg,
+      rgba(0, 0, 0, 0.8) 0%,
+      rgba(0, 20, 0, 0.6) 100%
+    );
     border: 1px solid rgba(0, 255, 0, 0.3);
     border-radius: 6px;
     padding: 16px;
-    font-family: 'Courier New', monospace;
+    font-family: "Courier New", monospace;
     position: relative;
     overflow: hidden;
   }
 
   .breakdown-item::before {
-    content: '';
+    content: "";
     position: absolute;
     inset: -1px;
     border-radius: 7px;
     padding: 1px;
-    background: linear-gradient(45deg,
+    background: linear-gradient(
+      45deg,
       rgba(0, 255, 0, 0.3),
       transparent,
       rgba(0, 255, 0, 0.3)
     );
-    mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    mask:
+      linear-gradient(#fff 0 0) content-box,
+      linear-gradient(#fff 0 0);
     mask-composite: xor;
     animation: breakdownGlow 3s ease-in-out infinite;
   }
 
   @keyframes breakdownGlow {
-    0%, 100% { opacity: 0.3; }
-    50% { opacity: 0.7; }
+    0%,
+    100% {
+      opacity: 0.3;
+    }
+    50% {
+      opacity: 0.7;
+    }
   }
 
   .breakdown-header {
@@ -287,105 +336,145 @@ const isLastPage = recentActivities.length < activitiesPerPage;
     border: 1px solid rgba(0, 255, 0, 0.3);
     border-radius: 6px;
     color: #00ff00;
-		font-family: 'Courier New', monospace;
-		text-decoration: none;
-		transition: background 0.3s, transform 0.2s;
-	}
+    font-family: "Courier New", monospace;
+    text-decoration: none;
+    transition:
+      background 0.3s,
+      transform 0.2s;
+  }
 
-	.nav-link:hover {
-		background: rgba(0, 255, 0, 0.1);
-		transform: translateY(-2px);
-	}
+  .nav-link:hover {
+    background: rgba(0, 255, 0, 0.1);
+    transform: translateY(-2px);
+  }
 
-	.nav-link.external {
-		background: rgba(0, 255, 0, 0.05);
-		color: #00ff00;
-	}
+  .nav-link.external {
+    background: rgba(0, 255, 0, 0.05);
+    color: #00ff00;
+  }
 
-	.nav-link svg {
-		margin-left: 4px;
-		width: 16px;
-		height: 16px;
-		stroke-width: 2;
-	}
-	.nav-link svg:hover {
-		stroke: #00ff00;
-	}
+  .nav-link svg {
+    margin-left: 4px;
+    width: 16px;
+    height: 16px;
+    stroke-width: 2;
+  }
+  .nav-link svg:hover {
+    stroke: #00ff00;
+  }
 
-	/* Responsive Adjustments */
-	@media (max-width: 768px) {
-		.stats-grid, .breakdown-grid {
-			grid-template-columns: 1fr;
-		}
+  /* Responsive Adjustments */
+  @media (max-width: 768px) {
+    .stats-grid,
+    .breakdown-grid {
+      grid-template-columns: 1fr;
+    }
 
-		.nav-links {
-			flex-direction: column;
-			align-items: center;
-		}
-	}
+    .nav-links {
+      flex-direction: column;
+      align-items: center;
+    }
+  }
 </style>
 
 <script>
+  // --- Activity Filtering Logic ---
+  const activityContainer = document.querySelector(".activities-list");
+  if (!activityContainer) {
+    console.warn(
+      "[FILTER] Activity list container (.activities-list) not found.",
+    );
+  }
 
-    // --- Activity Filtering Logic ---
-    const activityContainer = document.querySelector('.activities-list');
-    if (!activityContainer) {
-      console.warn('[FILTER] Activity list container (.activities-list) not found.');
+  const filterButtonsContainer = document.querySelector(
+    ".filter-buttons-container",
+  );
+  if (!filterButtonsContainer) {
+    console.warn(
+      "[FILTER] Filter buttons container (.filter-buttons-container) not found.",
+    );
+  }
+
+  let currentFilter = "All";
+
+  function applyFilter(filterType: string) {
+    currentFilter = filterType;
+    console.log(`[FILTER] Applying filter: ${currentFilter}`);
+
+    if (activityContainer) {
+      const activityCards = activityContainer.querySelectorAll(
+        ".activity-card[data-activity-type]",
+      );
+      activityCards.forEach(card => {
+        const cardElement = card as HTMLElement; // Cast to HTMLElement
+        const cardType = cardElement.getAttribute("data-activity-type");
+        if (
+          cardType &&
+          (currentFilter === "All" ||
+            cardType.toLowerCase() === currentFilter.toLowerCase())
+        ) {
+          cardElement.style.display = ""; // Reset to default display
+        } else if (cardType) {
+          // ensure cardType is not null before hiding
+          cardElement.style.display = "none";
+        }
+      });
     }
 
-    const filterButtonsContainer = document.querySelector('.filter-buttons-container');
-    if (!filterButtonsContainer) {
-      console.warn('[FILTER] Filter buttons container (.filter-buttons-container) not found.');
-    }
-
-    let currentFilter = 'All';
-
-    function applyFilter(filterType: string) {
-      currentFilter = filterType;
-      console.log(`[FILTER] Applying filter: ${currentFilter}`);
-
-      if (activityContainer) {
-        const activityCards = activityContainer.querySelectorAll('.activity-card[data-activity-type]');
-        activityCards.forEach(card => {
-          const cardElement = card as HTMLElement; // Cast to HTMLElement
-          const cardType = cardElement.getAttribute('data-activity-type');
-          if (cardType && (currentFilter === 'All' || cardType.toLowerCase() === currentFilter.toLowerCase())) {
-            cardElement.style.display = ''; // Reset to default display
-          } else if (cardType) { // ensure cardType is not null before hiding
-            cardElement.style.display = 'none';
-          }
-        });
-      }
-
-      if (filterButtonsContainer) {
-        const filterButtons = filterButtonsContainer.querySelectorAll('.filter-button');
-        filterButtons.forEach(button => {
-          const buttonType = button.getAttribute('data-filter-type');
-          // Reset classes
-          button.classList.remove('bg-green-500/40', 'border-green-500/70', 'text-green-300', 'ring-1', 'ring-green-400');
-          button.classList.add('bg-black/50', 'border-green-500/30', 'text-green-400');
-
-          if (buttonType && buttonType.toLowerCase() === currentFilter.toLowerCase()) {
-            // Apply active classes
-            button.classList.add('bg-green-500/40', 'border-green-500/70', 'text-green-300', 'ring-1', 'ring-green-400');
-            button.classList.remove('bg-black/50', 'border-green-500/30', 'text-green-400');
-          }
-        });
-      }
-    }
-
-    window.addEventListener('filterchange', (event: Event) => {
-      const customEvent = event as CustomEvent<{ filterType: string }>;
-      if (customEvent.detail && customEvent.detail.filterType) {
-        applyFilter(customEvent.detail.filterType);
-      }
-    });
-
-    // Initialize with "All" filter to style the button correctly on page load.
     if (filterButtonsContainer) {
-      applyFilter('All');
-    } else {
-      console.warn('[FILTER] Filter buttons container not found at time of initial applyFilter call. "All" button may not be styled correctly.');
-    }
+      const filterButtons =
+        filterButtonsContainer.querySelectorAll(".filter-button");
+      filterButtons.forEach(button => {
+        const buttonType = button.getAttribute("data-filter-type");
+        // Reset classes
+        button.classList.remove(
+          "bg-green-500/40",
+          "border-green-500/70",
+          "text-green-300",
+          "ring-1",
+          "ring-green-400",
+        );
+        button.classList.add(
+          "bg-black/50",
+          "border-green-500/30",
+          "text-green-400",
+        );
 
+        if (
+          buttonType &&
+          buttonType.toLowerCase() === currentFilter.toLowerCase()
+        ) {
+          // Apply active classes
+          button.classList.add(
+            "bg-green-500/40",
+            "border-green-500/70",
+            "text-green-300",
+            "ring-1",
+            "ring-green-400",
+          );
+          button.classList.remove(
+            "bg-black/50",
+            "border-green-500/30",
+            "text-green-400",
+          );
+        }
+      });
+    }
+  }
+
+  window.addEventListener("filterchange", (event: Event) => {
+    const customEvent = event as CustomEvent<{ filterType: string }>;
+    if (customEvent.detail && customEvent.detail.filterType) {
+      applyFilter(customEvent.detail.filterType);
+    }
+  });
+
+  // Initialize with "All" filter to style the button correctly on page load.
+  if (filterButtonsContainer) {
+    applyFilter("All");
+  } else {
+    console.warn(
+      '[FILTER] Filter buttons container not found at time of initial applyFilter call. "All" button may not be styled correctly.',
+    );
+  }
 </script>

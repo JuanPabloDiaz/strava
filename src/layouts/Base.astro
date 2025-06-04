@@ -1,7 +1,7 @@
 ---
-import '@styles/matrixAnimations.css';
-import Footer from '@components/Footer.astro';
-import Navigation from '@components/Navigation.astro';
+import "@styles/matrixAnimations.css";
+import Footer from "@components/Footer.astro";
+import Navigation from "@components/Navigation.astro";
 
 export interface Props {
   title?: string;
@@ -14,17 +14,20 @@ const {
   title = "Matrix Terminal",
   windowTitle = "NEURAL_INTERFACE_v2.1",
   terminalCommand = "./boot_system.exe",
-  systemMessage = "[SYSTEM] Initializing neural pathways..."
+  systemMessage = "[SYSTEM] Initializing neural pathways...",
 } = Astro.props;
 
 const currentPath = Astro.url.pathname;
 ---
 
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <meta name="description" content="Matrix-themed Hacker Terminal Interface" />
+    <meta
+      name="description"
+      content="Matrix-themed Hacker Terminal Interface"
+    />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="author" content="Juan Diaz" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
@@ -55,9 +58,7 @@ const currentPath = Astro.url.pathname;
             </span>
           </div>
           <div class="system-info hidden sm:block">
-            <span class="text-green-500 text-xs">
-              MATRIX_OS v2.1
-            </span>
+            <span class="text-green-500 text-xs"> MATRIX_OS v2.1 </span>
           </div>
         </div>
 
@@ -94,14 +95,18 @@ const currentPath = Astro.url.pathname;
         left: 0;
         width: 100%;
         height: 100%;
-        background-image:
-          linear-gradient(to bottom, transparent 0%, rgba(0, 255, 0, 0.1) 50%, transparent 100%);
+        background-image: linear-gradient(
+          to bottom,
+          transparent 0%,
+          rgba(0, 255, 0, 0.1) 50%,
+          transparent 100%
+        );
         opacity: 0.3;
         animation: matrixRainFall 20s linear infinite;
       }
 
       .matrix-rain::before {
-        content: '01010101010101010101010101010101010101010101010101010101010101010101010101010101';
+        content: "01010101010101010101010101010101010101010101010101010101010101010101010101010101";
         position: absolute;
         top: -100px;
         left: 0;
@@ -112,19 +117,33 @@ const currentPath = Astro.url.pathname;
         color: rgba(0, 255, 0, 0.3);
         animation: matrixRainDrop 15s linear infinite;
         word-wrap: break-word;
-        font-family: 'Courier New', monospace;
+        font-family: "Courier New", monospace;
       }
 
       @keyframes matrixRainFall {
-        0% { transform: translateY(-100vh); }
-        100% { transform: translateY(100vh); }
+        0% {
+          transform: translateY(-100vh);
+        }
+        100% {
+          transform: translateY(100vh);
+        }
       }
 
       @keyframes matrixRainDrop {
-        0% { opacity: 0; transform: translateY(-200px); }
-        10% { opacity: 1; }
-        90% { opacity: 1; }
-        100% { opacity: 0; transform: translateY(calc(100vh + 200px)); }
+        0% {
+          opacity: 0;
+          transform: translateY(-200px);
+        }
+        10% {
+          opacity: 1;
+        }
+        90% {
+          opacity: 1;
+        }
+        100% {
+          opacity: 0;
+          transform: translateY(calc(100vh + 200px));
+        }
       }
 
       /* Grid Overlay */
@@ -153,8 +172,12 @@ const currentPath = Astro.url.pathname;
       }
 
       @keyframes gridShift {
-        0% { transform: translate(0, 0); }
-        100% { transform: translate(30px, 30px); }
+        0% {
+          transform: translate(0, 0);
+        }
+        100% {
+          transform: translate(30px, 30px);
+        }
       }
 
       /* Scanlines */
@@ -176,13 +199,21 @@ const currentPath = Astro.url.pathname;
       }
 
       @keyframes scanlineMove {
-        0% { transform: translateY(0); }
-        100% { transform: translateY(4px); }
+        0% {
+          transform: translateY(0);
+        }
+        100% {
+          transform: translateY(4px);
+        }
       }
 
       /* Terminal Window */
       .terminal-window {
-        background: linear-gradient(135deg, rgba(0, 0, 0, 0.95) 0%, rgba(0, 20, 0, 0.9) 100%);
+        background: linear-gradient(
+          135deg,
+          rgba(0, 0, 0, 0.95) 0%,
+          rgba(0, 20, 0, 0.9) 100%
+        );
         border: 2px solid rgba(0, 255, 0, 0.4);
         border-radius: 8px;
         box-shadow:
@@ -195,25 +226,33 @@ const currentPath = Astro.url.pathname;
       }
 
       .terminal-window::before {
-        content: '';
+        content: "";
         position: absolute;
         inset: -2px;
         border-radius: 10px;
         padding: 2px;
-        background: linear-gradient(45deg,
+        background: linear-gradient(
+          45deg,
           rgba(0, 255, 0, 0.3),
           transparent,
           rgba(0, 255, 0, 0.3),
           transparent
         );
-        mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+        mask:
+          linear-gradient(#fff 0 0) content-box,
+          linear-gradient(#fff 0 0);
         mask-composite: xor;
         animation: borderGlow 3s ease-in-out infinite;
       }
 
       @keyframes borderGlow {
-        0%, 100% { opacity: 0.3; }
-        50% { opacity: 0.8; }
+        0%,
+        100% {
+          opacity: 0.3;
+        }
+        50% {
+          opacity: 0.8;
+        }
       }
 
       /* Window Title Bar */
@@ -222,7 +261,11 @@ const currentPath = Astro.url.pathname;
         align-items: center;
         justify-content: space-between;
         padding: 8px 16px;
-        background: linear-gradient(90deg, rgba(0, 255, 0, 0.1), rgba(0, 255, 0, 0.05));
+        background: linear-gradient(
+          90deg,
+          rgba(0, 255, 0, 0.1),
+          rgba(0, 255, 0, 0.05)
+        );
         border-bottom: 1px solid rgba(0, 255, 0, 0.3);
         backdrop-filter: blur(5px);
       }
@@ -255,8 +298,15 @@ const currentPath = Astro.url.pathname;
       }
 
       @keyframes controlPulse {
-        0%, 100% { opacity: 0.7; transform: scale(1); }
-        50% { opacity: 1; transform: scale(1.1); }
+        0%,
+        100% {
+          opacity: 0.7;
+          transform: scale(1);
+        }
+        50% {
+          opacity: 1;
+          transform: scale(1.1);
+        }
       }
 
       .window-title {
@@ -278,7 +328,8 @@ const currentPath = Astro.url.pathname;
 
       .terminal-separator {
         height: 1px;
-        background: linear-gradient(90deg,
+        background: linear-gradient(
+          90deg,
           transparent,
           rgba(0, 255, 0, 0.5),
           transparent
@@ -288,8 +339,12 @@ const currentPath = Astro.url.pathname;
       }
 
       @keyframes separatorGlow {
-        0% { opacity: 0.3; }
-        100% { opacity: 0.8; }
+        0% {
+          opacity: 0.3;
+        }
+        100% {
+          opacity: 0.8;
+        }
       }
 
       /* Terminal Content */

@@ -2,25 +2,30 @@
 import SectionLayout from "@components/SectionLayout.astro";
 import DaysSinceLast from "@components/DaysSinceLast.astro";
 import Base from "@layouts/Base.astro";
-import { fetchDistanceData, processDistanceData, getLastActivityDate, fetchActivities } from '@services/stravaService';
+import {
+  fetchDistanceData,
+  processDistanceData,
+  getLastActivityDate,
+  fetchActivities,
+} from "@services/stravaService";
 
 // Fetch and process data for each activity type
 const distanceMap = await fetchDistanceData();
 const distanceData = processDistanceData(distanceMap);
 
 // Get last activity dates and detailed info for each activity type
-const lastRunDate = await getLastActivityDate('Run');
-const lastRideDate = await getLastActivityDate('Ride');
-const lastSwimDate = await getLastActivityDate('Swim');
+const lastRunDate = await getLastActivityDate("Run");
+const lastRideDate = await getLastActivityDate("Ride");
+const lastSwimDate = await getLastActivityDate("Swim");
 
 // Calculate weekly averages (mock data - replace with actual calculations)
 const calculateWeeklyAverage = (activityType: string) => {
   // This would typically come from your Strava service
   // For now, returning mock data based on activity type
   const mockAverages: { [key: string]: number } = {
-    'Run': 25.5,
-    'Ride': 45.2,
-    'Swim': 2.8
+    Run: 25.5,
+    Ride: 45.2,
+    Swim: 2.8,
   };
   return mockAverages[activityType] || 0;
 };
@@ -29,30 +34,30 @@ const calculateWeeklyAverage = (activityType: string) => {
 const getLastActivityDetails = (activityType: string) => {
   // This would come from your Strava service
   const mockDetails: { [key: string]: any } = {
-    'Run': {
+    Run: {
       distance: 8.5, // km
       duration: 2580, // seconds (43 minutes)
-      stravaUrl: 'https://www.strava.com/activities/12345678'
+      stravaUrl: "https://www.strava.com/activities/12345678",
     },
-    'Ride': {
+    Ride: {
       distance: 32.1, // km
       duration: 4320, // seconds (1h 12m)
-      stravaUrl: 'https://www.strava.com/activities/12345679'
+      stravaUrl: "https://www.strava.com/activities/12345679",
     },
-    'Swim': {
+    Swim: {
       distance: 1200, // meters
       duration: 1800, // seconds (30 minutes)
-      stravaUrl: 'https://www.strava.com/activities/12345680'
-    }
+      stravaUrl: "https://www.strava.com/activities/12345680",
+    },
   };
   return mockDetails[activityType] || {};
 };
 
 // Get activity details
-const runDetails = getLastActivityDetails('Run');
-const rideDetails = getLastActivityDetails('Ride');
-const swimDetails = getLastActivityDetails('Swim');
-const pageParam = Astro.url.searchParams.get('page');
+const runDetails = getLastActivityDetails("Run");
+const rideDetails = getLastActivityDetails("Ride");
+const swimDetails = getLastActivityDetails("Swim");
+const pageParam = Astro.url.searchParams.get("page");
 let currentPage = 1;
 if (pageParam) {
   const parsedPage = parseInt(pageParam, 10);
@@ -60,7 +65,6 @@ if (pageParam) {
     currentPage = parsedPage;
   }
 }
-
 ---
 
 <Base
@@ -69,18 +73,21 @@ if (pageParam) {
   terminalCommand="./monitor_athlete_performance.exe"
   systemMessage="[NEURAL_NETWORK] Analyzing training patterns and performance metrics..."
 >
-
   <!-- Header Section -->
   <section class="mb-8">
     <div class="text-center space-y-4">
-      <div class="inline-flex items-center space-x-2 px-4 py-2 bg-green-500/10 border border-green-500/30 rounded-lg">
+      <div
+        class="inline-flex items-center space-x-2 px-4 py-2 bg-green-500/10 border border-green-500/30 rounded-lg"
+      >
         <span class="text-green-400 animate-pulse">●</span>
-        <span class="text-green-300 font-mono text-sm">REAL_TIME_ACTIVITY_MONITORING</span>
+        <span class="text-green-300 font-mono text-sm"
+          >REAL_TIME_ACTIVITY_MONITORING</span
+        >
       </div>
 
       <div class="text-green-400/80 text-sm max-w-2xl mx-auto">
-        Tracking your fitness journey across multiple disciplines.
-        Stay consistent, stay strong, and let the data guide your progress.
+        Tracking your fitness journey across multiple disciplines. Stay
+        consistent, stay strong, and let the data guide your progress.
       </div>
     </div>
   </section>
@@ -93,14 +100,18 @@ if (pageParam) {
     sectionClass="activity-section mb-12"
     headerClass="mb-6 text-green-400 text-sm"
   >
-    <div slot="headerElements" class="flex-1 h-px bg-gradient-to-r from-green-500/50 via-green-500/20 to-transparent"></div>
+    <div
+      slot="headerElements"
+      class="flex-1 h-px bg-gradient-to-r from-green-500/50 via-green-500/20 to-transparent"
+    >
+    </div>
     <DaysSinceLast
       lastRunDate={lastRunDate || new Date()}
       activityType="RUN"
       stravaUrl={runDetails.stravaUrl}
       lastDistance={runDetails.distance || 0}
       lastDuration={runDetails.duration || 0}
-      averageWeekly={calculateWeeklyAverage('Run')}
+      averageWeekly={calculateWeeklyAverage("Run")}
     />
   </SectionLayout>
 
@@ -112,14 +123,18 @@ if (pageParam) {
     sectionClass="activity-section mb-12"
     headerClass="mb-6 text-green-400 text-sm"
   >
-    <div slot="headerElements" class="flex-1 h-px bg-gradient-to-r from-green-500/50 via-green-500/20 to-transparent"></div>
+    <div
+      slot="headerElements"
+      class="flex-1 h-px bg-gradient-to-r from-green-500/50 via-green-500/20 to-transparent"
+    >
+    </div>
     <DaysSinceLast
       lastRunDate={lastRideDate || new Date()}
       activityType="RIDE"
       stravaUrl={rideDetails.stravaUrl}
       lastDistance={rideDetails.distance || 0}
       lastDuration={rideDetails.duration || 0}
-      averageWeekly={calculateWeeklyAverage('Ride')}
+      averageWeekly={calculateWeeklyAverage("Ride")}
     />
   </SectionLayout>
 
@@ -131,22 +146,30 @@ if (pageParam) {
     sectionClass="activity-section mb-12"
     headerClass="mb-6 text-green-400 text-sm"
   >
-    <div slot="headerElements" class="flex-1 h-px bg-gradient-to-r from-green-500/50 via-green-500/20 to-transparent"></div>
+    <div
+      slot="headerElements"
+      class="flex-1 h-px bg-gradient-to-r from-green-500/50 via-green-500/20 to-transparent"
+    >
+    </div>
     <DaysSinceLast
       lastRunDate={lastSwimDate || new Date()}
       activityType="Swim"
       stravaUrl={swimDetails.stravaUrl}
       lastDistance={swimDetails.distance || 0}
       lastDuration={swimDetails.duration || 0}
-      averageWeekly={calculateWeeklyAverage('Swim')}
+      averageWeekly={calculateWeeklyAverage("Swim")}
     />
   </SectionLayout>
 
   <!-- Training Summary Section -->
   <section class="mb-8">
-    <div class="bg-black/60 border border-green-500/30 rounded-lg p-6 backdrop-blur-sm">
+    <div
+      class="bg-black/60 border border-green-500/30 rounded-lg p-6 backdrop-blur-sm"
+    >
       <div class="text-center space-y-4">
-        <div class="text-green-400 font-mono text-lg mb-4">[TRAINING_SUMMARY]</div>
+        <div class="text-green-400 font-mono text-lg mb-4">
+          [TRAINING_SUMMARY]
+        </div>
 
         <div class="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
           <div class="space-y-2">
@@ -169,9 +192,12 @@ if (pageParam) {
         </div>
 
         <div class="mt-6 pt-4 border-t border-green-500/20">
-          <div class="text-green-400/80 text-xs mb-2">SYSTEM_RECOMMENDATION:</div>
+          <div class="text-green-400/80 text-xs mb-2">
+            SYSTEM_RECOMMENDATION:
+          </div>
           <div class="text-green-300 text-sm italic">
-            "Maintain cross-training balance. Consider increasing swimming frequency for optimal recovery."
+            "Maintain cross-training balance. Consider increasing swimming
+            frequency for optimal recovery."
           </div>
         </div>
       </div>
@@ -183,7 +209,9 @@ if (pageParam) {
     <div class="text-center space-y-4">
       <div class="text-green-400 font-mono text-sm mb-4">[QUICK_ACTIONS]</div>
 
-      <div class="flex flex-col sm:flex-row gap-3 justify-center max-w-2xl mx-auto">
+      <div
+        class="flex flex-col sm:flex-row gap-3 justify-center max-w-2xl mx-auto"
+      >
         <a
           href="https://www.strava.com/dashboard"
           target="_blank"
@@ -216,9 +244,6 @@ if (pageParam) {
       </div>
     </div>
   </section>
-
-
-
 </Base>
 
 <style>
@@ -233,19 +258,29 @@ if (pageParam) {
   }
 
   .activity-section .base-section-header::before {
-    content: '';
+    content: "";
     position: absolute;
     top: 0;
     left: 0;
     right: 0;
     height: 1px;
-    background: linear-gradient(90deg, transparent, rgba(0, 255, 0, 0.3), transparent);
+    background: linear-gradient(
+      90deg,
+      transparent,
+      rgba(0, 255, 0, 0.3),
+      transparent
+    );
     animation: scanLine 2s ease-in-out infinite;
   }
 
   @keyframes scanLine {
-    0%, 100% { opacity: 0; }
-    50% { opacity: 1; }
+    0%,
+    100% {
+      opacity: 0;
+    }
+    50% {
+      opacity: 1;
+    }
   }
 
   .activity-section {
@@ -269,11 +304,13 @@ if (pageParam) {
 </style>
 
 <script>
-  document.addEventListener('DOMContentLoaded', () => {
+  document.addEventListener("DOMContentLoaded", () => {
     // --- Modal Functionality ---
-    const trainingPlanBtn = document.querySelector('.training-plan-btn');
-    trainingPlanBtn?.addEventListener('click', () => {
-      showModal('Training Plan', `
+    const trainingPlanBtn = document.querySelector(".training-plan-btn");
+    trainingPlanBtn?.addEventListener("click", () => {
+      showModal(
+        "Training Plan",
+        `
         <div class="space-y-4 text-left">
           <div class="text-green-400 text-sm">WEEKLY_SCHEDULE:</div>
           <div class="space-y-2 text-sm text-green-300">
@@ -289,12 +326,15 @@ if (pageParam) {
             Adjust intensity based on current fitness level and recovery status.
           </div>
         </div>
-      `);
+      `,
+      );
     });
 
-    const analyticsBtn = document.querySelector('.analytics-btn');
-    analyticsBtn?.addEventListener('click', () => {
-      showModal('Performance Analytics', `
+    const analyticsBtn = document.querySelector(".analytics-btn");
+    analyticsBtn?.addEventListener("click", () => {
+      showModal(
+        "Performance Analytics",
+        `
         <div class="space-y-4 text-left">
           <div class="grid grid-cols-2 gap-4 text-sm">
             <div class="space-y-2">
@@ -329,16 +369,18 @@ if (pageParam) {
             </div>
           </div>
         </div>
-      `);
+      `,
+      );
     });
 
     function showModal(title: string, content: string) {
-      const modal = document.createElement('div');
-      modal.className = 'fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4';
+      const modal = document.createElement("div");
+      modal.className =
+        "fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4";
       modal.innerHTML = `
         <div class="bg-black/90 border border-green-500/40 rounded-lg p-6 max-w-lg w-full max-h-[80vh] overflow-y-auto">
           <div class="space-y-4">
-            <div class="text-green-400 text-lg font-mono text-center">[${title.toUpperCase().replace(' ', '_')}]</div>
+            <div class="text-green-400 text-lg font-mono text-center">[${title.toUpperCase().replace(" ", "_")}]</div>
             <div class="text-green-300">
               ${content}
             </div>
@@ -351,16 +393,16 @@ if (pageParam) {
         </div>
       `;
       document.body.appendChild(modal);
-      const closeBtn = modal.querySelector('.close-modal');
+      const closeBtn = modal.querySelector(".close-modal");
       const closeModal = () => {
         if (modal.parentNode) {
           modal.parentNode.removeChild(modal);
         }
       };
       if (closeBtn) {
-        closeBtn.addEventListener('click', closeModal);
+        closeBtn.addEventListener("click", closeModal);
       }
-      modal.addEventListener('click', (e) => {
+      modal.addEventListener("click", e => {
         if (e.target === modal) closeModal();
       });
     }

@@ -11,7 +11,7 @@ const { distanceData, minDistance, maxDistance } = Astro.props;
 
 // Helper functions to generate dynamic labels
 function getWeekdayLabels() {
-  return ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+  return ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 }
 
 function getMonthLabels(data: [number, number][]) {
@@ -27,7 +27,7 @@ function getMonthLabels(data: [number, number][]) {
 
     // Si cambió el mes o el año, es el inicio de un nuevo mes
     if (currentMonth !== previousMonth || currentYear !== previousYear) {
-      const monthLabel = date.toLocaleDateString('en-US', { month: 'short' });
+      const monthLabel = date.toLocaleDateString("en-US", { month: "short" });
       monthLabels.push({ label: monthLabel, column });
 
       previousMonth = currentMonth;
@@ -50,63 +50,76 @@ const totalWeeks = Math.ceil(distanceData.length / 7);
 <div class="heatmap-container">
   <!-- Month Labels -->
   <div class="month-labels">
-    {monthLabels.map(({ label, column }) => (
-      <div
-        class="month-label"
-        style={{ gridColumn: `${column + 2}`, gridRow: '1' }}
-      >
-        {label}
-      </div>
-    ))}
+    {
+      monthLabels.map(({ label, column }) => (
+        <div
+          class="month-label"
+          style={{ gridColumn: `${column + 2}`, gridRow: "1" }}
+        >
+          {label}
+        </div>
+      ))
+    }
   </div>
 
   <!-- Weekday Labels -->
   <div class="weekday-labels">
-    {weekdayLabels.map((day, index) => (
-      <div class="weekday-label" style={{ gridRow: `${index + 2}` }}>
-        {day}
-      </div>
-    ))}
+    {
+      weekdayLabels.map((day, index) => (
+        <div class="weekday-label" style={{ gridRow: `${index + 2}` }}>
+          {day}
+        </div>
+      ))
+    }
   </div>
 
   <!-- Main Heatmap Grid -->
-  <div class="heatmap-grid" style={{ gridTemplateColumns: `repeat(${totalWeeks}, 1fr)` }}>
-    {distanceData.map((data, index) => {
-      const style = getAnimationStyle(index);
-      const hasActivity = data[1] > 0;
-      const backgroundColor = getColor(data[1], minDistance, maxDistance);
-      const row = (index % 7) + 2; // +2 to account for month labels
-      const column = Math.floor(index / 7) + 2; // +2 to account for weekday labels
+  <div
+    class="heatmap-grid"
+    style={{ gridTemplateColumns: `repeat(${totalWeeks}, 1fr)` }}
+  >
+    {
+      distanceData.map((data, index) => {
+        const style = getAnimationStyle(index);
+        const hasActivity = data[1] > 0;
+        const backgroundColor = getColor(data[1], minDistance, maxDistance);
+        const row = (index % 7) + 2; // +2 to account for month labels
+        const column = Math.floor(index / 7) + 2; // +2 to account for weekday labels
 
-      return (
-        <div
-          class={`heatmap-cell ${hasActivity ? 'has-activity' : ''}`}
-          style={{
-            backgroundColor,
-            transform: 'scale(0)',
-            animation: style.animation,
-            animationDelay: style.animationDelay,
-            boxShadow: hasActivity ? `inset 0 0 10px ${backgroundColor}40` : 'none',
-            gridRow: `${row}`,
-            gridColumn: `${column}`,
-          }}
-        >
-          {/* Matrix-style tooltip */}
-          <div class="tooltip">
-            <div class="tooltip-date">
-              {new Date(data[0]).toLocaleDateString("en-US", {
-                year: "numeric",
-                month: "short",
-                day: "numeric"
-              })}
-            </div>
-            <div class="tooltip-activity">
-              {data[1] > 0 ? `${(data[1] / 1000).toFixed(2)} km ran` : 'No activity'}
+        return (
+          <div
+            class={`heatmap-cell ${hasActivity ? "has-activity" : ""}`}
+            style={{
+              backgroundColor,
+              transform: "scale(0)",
+              animation: style.animation,
+              animationDelay: style.animationDelay,
+              boxShadow: hasActivity
+                ? `inset 0 0 10px ${backgroundColor}40`
+                : "none",
+              gridRow: `${row}`,
+              gridColumn: `${column}`,
+            }}
+          >
+            {/* Matrix-style tooltip */}
+            <div class="tooltip">
+              <div class="tooltip-date">
+                {new Date(data[0]).toLocaleDateString("en-US", {
+                  year: "numeric",
+                  month: "short",
+                  day: "numeric",
+                })}
+              </div>
+              <div class="tooltip-activity">
+                {data[1] > 0
+                  ? `${(data[1] / 1000).toFixed(2)} km ran`
+                  : "No activity"}
+              </div>
             </div>
           </div>
-        </div>
-      );
-    })}
+        );
+      })
+    }
   </div>
 </div>
 
@@ -122,7 +135,11 @@ const totalWeeks = Math.ceil(distanceData.length / 7);
     width: 100%;
     max-width: 100%;
     padding: 16px;
-    background: radial-gradient(ellipse at center, rgba(0, 255, 0, 0.03) 0%, rgba(0, 0, 0, 0.8) 70%);
+    background: radial-gradient(
+      ellipse at center,
+      rgba(0, 255, 0, 0.03) 0%,
+      rgba(0, 0, 0, 0.8) 70%
+    );
     border-radius: 8px;
     border: 1px solid rgba(0, 255, 0, 0.2);
     position: relative;
@@ -141,7 +158,7 @@ const totalWeeks = Math.ceil(distanceData.length / 7);
   .month-label {
     color: rgba(0, 255, 0, 0.7);
     font-size: 11px;
-    font-family: 'Courier New', monospace;
+    font-family: "Courier New", monospace;
     font-weight: bold;
     text-align: left;
     align-self: center;
@@ -160,7 +177,7 @@ const totalWeeks = Math.ceil(distanceData.length / 7);
   .weekday-label {
     color: rgba(0, 255, 0, 0.7);
     font-size: 10px;
-    font-family: 'Courier New', monospace;
+    font-family: "Courier New", monospace;
     font-weight: bold;
     text-align: right;
     display: flex;
@@ -221,7 +238,7 @@ const totalWeeks = Math.ceil(distanceData.length / 7);
     white-space: nowrap;
     opacity: 0;
     pointer-events: none;
-    font-family: 'Courier New', monospace;
+    font-family: "Courier New", monospace;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.8);
     z-index: 100;
     transition: opacity 0.3s ease;
@@ -244,26 +261,48 @@ const totalWeeks = Math.ceil(distanceData.length / 7);
 
   /* Digital noise effect */
   .heatmap-container::before {
-    content: '';
+    content: "";
     position: absolute;
     inset: 0;
     background-image:
-      radial-gradient(circle at 20% 50%, rgba(0, 255, 0, 0.1) 0%, transparent 50%),
-      radial-gradient(circle at 80% 50%, rgba(0, 255, 0, 0.1) 0%, transparent 50%),
-      radial-gradient(circle at 40% 80%, rgba(0, 255, 0, 0.08) 0%, transparent 50%);
+      radial-gradient(
+        circle at 20% 50%,
+        rgba(0, 255, 0, 0.1) 0%,
+        transparent 50%
+      ),
+      radial-gradient(
+        circle at 80% 50%,
+        rgba(0, 255, 0, 0.1) 0%,
+        transparent 50%
+      ),
+      radial-gradient(
+        circle at 40% 80%,
+        rgba(0, 255, 0, 0.08) 0%,
+        transparent 50%
+      );
     animation: digitalNoise 3s ease-in-out infinite alternate;
     pointer-events: none;
     border-radius: 8px;
   }
 
   @keyframes digitalNoise {
-    0% { opacity: 0.1; filter: hue-rotate(0deg); }
-    100% { opacity: 0.2; filter: hue-rotate(45deg); }
+    0% {
+      opacity: 0.1;
+      filter: hue-rotate(0deg);
+    }
+    100% {
+      opacity: 0.2;
+      filter: hue-rotate(45deg);
+    }
   }
 
   @keyframes pulse {
-    0% { box-shadow: 0 0 8px rgba(0, 255, 0, 0.3); }
-    100% { box-shadow: 0 0 20px rgba(0, 255, 0, 0.6); }
+    0% {
+      box-shadow: 0 0 8px rgba(0, 255, 0, 0.3);
+    }
+    100% {
+      box-shadow: 0 0 20px rgba(0, 255, 0, 0.6);
+    }
   }
 
   /* Responsive breakpoints */
@@ -317,7 +356,8 @@ const totalWeeks = Math.ceil(distanceData.length / 7);
       padding: 6px 8px;
     }
 
-    .tooltip-date, .tooltip-activity {
+    .tooltip-date,
+    .tooltip-activity {
       font-size: 9px;
     }
   }
@@ -380,7 +420,8 @@ const totalWeeks = Math.ceil(distanceData.length / 7);
       bottom: calc(100% + 8px);
     }
 
-    .tooltip-date, .tooltip-activity {
+    .tooltip-date,
+    .tooltip-activity {
       font-size: 8px;
     }
   }

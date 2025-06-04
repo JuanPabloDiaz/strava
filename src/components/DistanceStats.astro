@@ -1,11 +1,15 @@
 ---
-import { fetchDistanceData, processDistanceData, getLastActivityDate } from '@services/stravaService';
+import {
+  fetchDistanceData,
+  processDistanceData,
+  getLastActivityDate,
+} from "@services/stravaService";
 
 export interface Props {
   activityType?: string;
 }
 
-const { activityType = 'Run' } = Astro.props;
+const { activityType = "Run" } = Astro.props;
 
 // Fetch and process data
 const distanceMap = await fetchDistanceData();
@@ -14,14 +18,11 @@ const lastActivityDate = await getLastActivityDate(activityType);
 
 const minDistance = Math.min(...distanceData.map(data => data[1]));
 const maxDistance = Math.max(...distanceData.map(data => data[1]));
-
 ---
 
-<div class="data-provider" style="display: none;">
-</div>
+<div class="data-provider" style="display: none;"></div>
 
 <script>
-
   declare global {
     interface Window {
       stravaData: {
@@ -32,6 +33,6 @@ const maxDistance = Math.max(...distanceData.map(data => data[1]));
 
   // Expose data globally if needed
   window.stravaData = {
-    processed: true
+    processed: true,
   };
 </script>

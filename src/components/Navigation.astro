@@ -9,22 +9,24 @@ const navItems = [
   { path: "/", label: "root.exe", icon: "●" },
   { path: "/last", label: "activity_monitor.exe", icon: "◐" },
   { path: "/map", label: "map.exe", icon: "◑" },
-  { path: "/404", label: "error_handler.exe", icon: "◑" }
+  { path: "/404", label: "error_handler.exe", icon: "◑" },
 ];
 ---
 
 <nav class="browser-tabs-nav">
   <div class="tabs-container">
-    {navItems.map((item) => (
-      <a
-        href={item.path}
-        class={`browser-tab ${currentPath === item.path ? 'active' : ''}`}
-      >
-        <span class="tab-icon">{item.icon}</span>
-        <span class="tab-label">{item.label}</span>
-        <span class="tab-close">×</span>
-      </a>
-    ))}
+    {
+      navItems.map(item => (
+        <a
+          href={item.path}
+          class={`browser-tab ${currentPath === item.path ? "active" : ""}`}
+        >
+          <span class="tab-icon">{item.icon}</span>
+          <span class="tab-label">{item.label}</span>
+          <span class="tab-close">×</span>
+        </a>
+      ))
+    }
 
     <!-- New Tab Button -->
     <button class="new-tab-btn">
@@ -45,7 +47,11 @@ const navItems = [
     display: flex;
     align-items: flex-end;
     justify-content: space-between;
-    background: linear-gradient(180deg, rgba(0, 0, 0, 0.9) 0%, rgba(0, 20, 0, 0.8) 100%);
+    background: linear-gradient(
+      180deg,
+      rgba(0, 0, 0, 0.9) 0%,
+      rgba(0, 20, 0, 0.8) 100%
+    );
     border-bottom: 1px solid rgba(0, 255, 0, 0.3);
     padding: 0 8px 0 0;
     position: relative;
@@ -72,7 +78,7 @@ const navItems = [
     color: rgba(0, 255, 0, 0.7);
     text-decoration: none;
     font-size: 0.75rem;
-    font-family: 'Courier New', monospace;
+    font-family: "Courier New", monospace;
     transition: all 0.2s ease;
     position: relative;
     min-width: 0;
@@ -95,7 +101,7 @@ const navItems = [
   }
 
   .browser-tab.active::after {
-    content: '';
+    content: "";
     position: absolute;
     bottom: -1px;
     left: 0;
@@ -181,8 +187,13 @@ const navItems = [
   }
 
   @keyframes pulse {
-    0%, 100% { opacity: 0.7; }
-    50% { opacity: 1; }
+    0%,
+    100% {
+      opacity: 0.7;
+    }
+    50% {
+      opacity: 1;
+    }
   }
 
   /* Responsive */
