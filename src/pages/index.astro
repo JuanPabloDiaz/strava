@@ -29,20 +29,10 @@ if (!hevyApiKey) {
   console.warn(hevyError);
 } else {
   try {
-    // hevyService.fetchHevyData now returns the raw API response.
-    // We expect it to be a single workout object or an array of workouts.
-    // For this page, we'll assume we want the latest, so if it's an array, take the first.
-    // If the API directly returns a single latest workout object, this will also work.
     const rawHevyData = await fetchHevyData(hevyApiKey);
 
-    if (Array.isArray(rawHevyData) && rawHevyData.length > 0) {
-      hevyWorkout = rawHevyData[0] as Workout; // Assuming the first one is the latest
-    } else if (typeof rawHevyData === 'object' && rawHevyData !== null && 'workout_id' in rawHevyData) {
-      // If it's a single workout object (based on having a workout_id property)
+    if (rawHevyData && typeof rawHevyData === 'object' && 'workout_id' in rawHevyData) {
       hevyWorkout = rawHevyData as Workout;
-    } else if (Array.isArray(rawHevyData) && rawHevyData.length === 0) {
-      hevyError = "[INFO] No Hevy workouts found or API returned empty array.";
-      console.log(hevyError);
     } else {
       hevyError = "[ERROR] Unexpected data structure from Hevy API.";
       console.error(hevyError, rawHevyData);
