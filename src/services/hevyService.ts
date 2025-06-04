@@ -26,15 +26,14 @@ interface Exercise {
 }
 
 interface Workout {
-  workout_id: string;
-  user_id: string;
-  workout_template_id: string | null;
-  name: string;
-  notes: string | null;
-  started_at: string; // ISO 8601 date string
-  ended_at: string; // ISO 8601 date string
-  created_at: string; // ISO 8601 date string
-  updated_at: string; // ISO 8601 date string
+  id: string;
+  user_id?: string;
+  title: string;
+  description: string | null;
+  start_time: string;
+  end_time: string;
+  created_at: string;
+  updated_at: string;
   exercises: Exercise[];
 }
 

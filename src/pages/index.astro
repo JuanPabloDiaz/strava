@@ -151,20 +151,24 @@ if (!hevyApiKey) {
   </SectionLayout>
 
   <!-- Hevy Workout Section -->
-  <SectionLayout title="[LATEST_HEVY_WORKOUT_LOG]">
-    {
-      hevyWorkout && !hevyError ? (
-        <HevyWorkoutCard workout={hevyWorkout} />
-      ) : (
-        <div class="text-center p-4 border border-yellow-500/50 bg-yellow-900/20 rounded-md">
-          <p class="text-yellow-400 font-mono text-sm">
-            {hevyError || "[INFO] Hevy workout data currently unavailable."}
+<SectionLayout title="[LATEST_HEVY_WORKOUT_LOG]">
+  {
+    hevyWorkout ? (
+      <HevyWorkoutCard workout={hevyWorkout} />
+    ) : (
+      <div class="text-center p-4 border border-yellow-500/50 bg-yellow-900/20 rounded-md">
+        <p class="text-yellow-400 font-mono text-sm">
+          {hevyError || "[INFO] Hevy workout data currently unavailable."}
+        </p>
+        {hevyApiKey && (
+          <p class="text-xs text-yellow-600 mt-2">
+            Attempted to fetch with API key: {hevyApiKey.substring(0, 5)}...
           </p>
-          { import.meta.env.PUBLIC_SHOW_HEVY_DEBUG && hevyApiKey && <p class="text-xs text-yellow-600 mt-2">Attempted to fetch with API key: {hevyApiKey.substring(0,5)}... </p>}
-        </div>
-      )
-    }
-  </SectionLayout>
+        )}
+      </div>
+    )
+  }
+</SectionLayout>
 </Base>
 
 <style>

@@ -2,52 +2,17 @@
 import Base from "@layouts/Base.astro";
 import HevyWorkoutCard from '@components/HevyWorkoutCard.astro';
 import type { Workout } from '@services/hevyService';
+import { fetchHevyData } from '@services/hevyService';
 
-// Optional: Define a workout object here to pass as a prop,
-// or let the component use its internal mock data.
-const pageWorkout: Workout = {
-  workout_id: "dummy data page-mock-002",
-  user_id: "user-page-mock",
-  workout_template_id: null,
-  name: "Workout from Page Prop",
-  notes: "This workout data is passed from hevy-test.astro page.",
-  started_at: new Date("2024-07-20T10:00:00Z").toISOString(),
-  ended_at: new Date("2024-07-20T11:00:00Z").toISOString(),
-  created_at: new Date().toISOString(),
-  updated_at: new Date().toISOString(),
-  exercises: [],
-};
+const hevyWorkout: Workout = await fetchHevyData();
 ---
 
 <Base title="Hevy Workout Test Page">
   <main class="container mx-auto p-4">
-    <h1 class="text-2xl font-bold mb-4">Hevy Workout Card Test</h1>
+    <h1 class="text-2xl font-bold mb-4">Hevy Workouts</h1>
 
     <section class="my-8">
-      <h2 class="text-xl font-semibold mb-2">Card with Internal Mock Data:</h2>
-      <HevyWorkoutCard workout={pageWorkout} />
-    </section>
-
-    <section class="my-8">
-      <h2 class="text-xl font-semibold mb-2">Card with Data Passed as Prop:</h2>
-      <HevyWorkoutCard workout={pageWorkout} />
-    </section>
-
-    <section class="my-8">
-      <h2 class="text-xl font-semibold mb-2">Card with only essential data (testing defaults/fallbacks):</h2>
-      <HevyWorkoutCard workout={{
-        workout_id: "minimal-workout",
-        name: "Minimal Workout Data",
-        started_at: new Date("2024-07-21T09:00:00Z").toISOString(),
-        // Fill other required fields from Workout interface, or adjust interface for optionality
-        user_id: "user-minimal",
-        workout_template_id: null,
-        notes: null,
-        ended_at: new Date("2024-07-21T09:30:00Z").toISOString(),
-        created_at: new Date().toISOString(),
-        updated_at: new Date().toISOString(),
-        exercises: []
-      }} />
+      <HevyWorkoutCard workout={hevyWorkout} />
     </section>
 
   </main>
