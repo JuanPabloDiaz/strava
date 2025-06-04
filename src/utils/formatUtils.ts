@@ -1,4 +1,4 @@
-// This file will contain utility functions for formatting data.
+// Formatting data.
 
 export function formatRelativeTime(date: Date): string {
   const now = new Date();

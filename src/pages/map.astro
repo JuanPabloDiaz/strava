@@ -20,35 +20,12 @@ const activitiesWithGPS = activities.filter(activity =>
   terminalCommand="./initialize_gps_matrix.exe"
   systemMessage="[SYSTEM] Loading geospatial neural network... GPS satellites locked."
 >
-  <!-- Stats Overview Section -->
-  <SectionLayout title="[ACTIVITY_ANALYTICS]">
-    <div class="stats-grid">
-      <div class="stat-block">
-        <div class="stat-label">TOTAL_ACTIVITIES</div>
-        <div class="stat-value">{activities.length}</div>
-      </div>
-      <div class="stat-block">
-        <div class="stat-label">GPS_TRACKED</div>
-        <div class="stat-value">{activitiesWithGPS.length}</div>
-      </div>
-      <div class="stat-block">
-        <div class="stat-label">TOTAL_DISTANCE</div>
-        <div class="stat-value">{(stats.totalDistance / 1000).toFixed(1)} KM</div>
-      </div>
-      <div class="stat-block">
-        <div class="stat-label">TOTAL_TIME</div>
-        <div class="stat-value">{Math.floor(stats.totalTime / 3600)}H {Math.floor((stats.totalTime % 3600) / 60)}M</div>
-      </div>
-    </div>
-  </SectionLayout>
+
 
   <!-- Activity Map Section -->
   <SectionLayout title="[NEURAL_MAPPING_INTERFACE]" rightHeaderText="[REAL_TIME_GPS_TRACKING]">
-    <div slot="headerElements" class="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
-    <ActivityMap
-      activities={activitiesWithGPS}
-      height="500px"
-    />
+  MAPAS DE ACTIVIDADES
+    <!-- <ActivityMap activities={activitiesWithGPS} /> -->
   </SectionLayout>
 
   <!-- Activity Types Breakdown -->
