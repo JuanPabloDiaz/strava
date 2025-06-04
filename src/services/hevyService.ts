@@ -18,7 +18,7 @@ interface Exercise {
   exercise_id: string;
   workout_id: string;
   exercise_order: number;
-  title: string; // <--- AÑADIR ESTA LÍNEA
+  title: string;
   exercise_type_id: string; // Mantener por si se usa para otra cosa, o si es el 'exercise_template_id' del ejemplo
   notes: string | null;
   created_at: string; // ISO 8601 date string
@@ -56,7 +56,7 @@ const getApiKey = (): string | undefined => {
 };
 
 // Function to fetch data from the Hevy API
-const fetchHevyData = async (apiKey?: string): Promise<any> => {
+export const fetchHevyData = async (apiKey?: string): Promise<Workout[]> => {
   // Get API key from parameter or environment
   const key = apiKey || getApiKey();
 
@@ -110,17 +110,20 @@ const fetchHevyData = async (apiKey?: string): Promise<any> => {
     }
 
     const data = await response.json();
-    if (!data || !Array.isArray(data.workouts) || data.workouts.length === 0) {
+    if (!data || !Array.isArray(data.workouts)) {
+      // Check if data.workouts is an array
       throw new Error(
-        "Unexpected data structure from Hevy API: No workouts found.",
+        "Unexpected data structure from Hevy API: No workouts found or data.workouts is not an array.",
       );
     }
     // Sort workouts by start_time in descending order (newest first)
-    const sortedWorkouts = data.workouts.sort((a: Workout, b: Workout) => {
-      return (
-        new Date(b.start_time).getTime() - new Date(a.start_time).getTime()
-      );
-    });
+    const sortedWorkouts: Workout[] = data.workouts.sort(
+      (a: Workout, b: Workout) => {
+        return (
+          new Date(b.start_time).getTime() - new Date(a.start_time).getTime()
+        );
+      },
+    );
     return sortedWorkouts;
   } catch (error) {
     console.error("Error during fetchHevyData execution:", error);
@@ -129,10 +132,11 @@ const fetchHevyData = async (apiKey?: string): Promise<any> => {
 };
 
 // Alternative function with different endpoint (in case the main one doesn't work)
-const fetchHevyWorkouts = async (
+export const fetchHevyWorkouts = async (
   apiKey?: string,
   limit: number = 1,
 ): Promise<any> => {
+  // Consider defining a more specific return type if possible
   const key = apiKey || getApiKey();
 
   if (!key) {
@@ -160,6 +164,40 @@ const fetchHevyWorkouts = async (
     return await response.json();
   } catch (error) {
     console.error("Error fetching workouts:", error);
+    throw error;
+  }
+};
+
+// Function to fetch the total number of workouts
+export const fetchWorkoutCount = async (apiKey?: string): Promise<number> => {
+  const key = apiKey || getApiKey();
+
+  if (!key) {
+    throw new Error("Hevy API key not provided.");
+  }
+
+  const apiUrl = "https://api.hevyapp.com/v1/workouts/count";
+
+  try {
+    const response = await fetch(apiUrl, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        "api-key": key,
+      },
+    });
+
+    if (!response.ok) {
+      const errorBody = await response.text();
+      throw new Error(
+        `Failed to fetch workout count. Status: ${response.status}, Body: ${errorBody}`,
+      );
+    }
+
+    const data = await response.json();
+    return data.count;
+  } catch (error) {
+    console.error("Error fetching workout count:", error);
     throw error;
   }
 };
@@ -209,5 +247,5 @@ if (
   main();
 }
 
-export { fetchHevyData, fetchHevyWorkouts, getApiKey };
+export { fetchHevyData, fetchHevyWorkouts, getApiKey, fetchWorkoutCount };
 export type { Workout, Exercise, Set };

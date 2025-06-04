@@ -4,11 +4,13 @@ import SectionLayout from "@components/SectionLayout.astro";
 import DaysSinceLast from "@components/DaysSinceLast.astro";
 import HeatmapGrid from "@components/HeatmapGrid.astro";
 import HevyWorkoutCard from "@components/HevyWorkoutCard.astro";
-import { fetchHevyData, type Workout } from "@services/hevyService";
+import { fetchHevyData, fetchWorkoutCount } from "@services/hevyService.ts"; // <--- IMPORT FUNCTIONS
+import type { Workout } from "@services/hevyService.ts"; // <--- IMPORT TYPE
 import {
   fetchDistanceData,
   processDistanceData,
   getLastActivityDate,
+  fetchWorkoutCount,
 } from "@services/stravaService";
 
 // Fetch and process Strava data
@@ -18,43 +20,6 @@ const lastRunDate = await getLastActivityDate("Run");
 
 const minDistance = Math.min(...distanceData.map(data => data[1]));
 const maxDistance = Math.max(...distanceData.map(data => data[1]));
-
-// Fetch Hevy data
-let hevyWorkout: Workout | null = null;
-let hevyError: string | null = null;
-const hevyApiKey = import.meta.env.HEVY_API_KEY;
-
-if (!hevyApiKey) {
-  hevyError =
-    "[ERROR] Hevy API Key not configured. Set HEVY_API_KEY in .env file.";
-  console.warn(hevyError);
-} else {
-  try {
-    const rawHevyData = await fetchHevyData(hevyApiKey);
-
-    if (
-      rawHevyData &&
-      typeof rawHevyData === "object" &&
-      "workout_id" in rawHevyData
-    ) {
-      hevyWorkout = rawHevyData as Workout;
-    } else {
-      hevyError = "[ERROR] Unexpected data structure from Hevy API.";
-      console.error(hevyError, rawHevyData);
-    }
-
-    // Log for debugging in case the structure is not what HevyWorkoutCard expects
-    if (hevyWorkout) {
-      console.log("Successfully fetched Hevy workout:", hevyWorkout.title);
-    } else if (!hevyError) {
-      // if no workout and no prior error
-      hevyError = "[INFO] No Hevy workout data to display.";
-    }
-  } catch (error: any) {
-    console.error("[ERROR] Failed to fetch Hevy workout data:", error);
-    hevyError = `[ERROR] Could not retrieve Hevy workout. ${error.message || "Please check API key and network."}`;
-  }
-}
 ---
 
 <Base
@@ -157,22 +122,22 @@ if (!hevyApiKey) {
 
   <!-- Hevy Workout Section -->
   <SectionLayout title="[LATEST_HEVY_WORKOUT_LOG]">
-    {
-      hevyWorkout ? (
-        <HevyWorkoutCard workout={hevyWorkout} />
-      ) : (
-        <div class="text-center p-4 border border-yellow-500/50 bg-yellow-900/20 rounded-md">
-          <p class="text-yellow-400 font-mono text-sm">
-            {hevyError || "[INFO] Hevy workout data currently unavailable."}
-          </p>
-          {hevyApiKey && (
-            <p class="text-xs text-yellow-600 mt-2">
-              Attempted to fetch with API key: {hevyApiKey.substring(0, 5)}...
-            </p>
-          )}
-        </div>
-      )
-    }
+    number of workouts: {workoutCount}
+    {/* <--- USE FETCHED COUNT DIRECTLY */}
+  </SectionLayout>
+
+  <SectionLayout title="[LATEST_HEVY_WORKOUT_LOG]">
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+      {/* Use the already fetched hevyWorkoutsData if you fetched it above */}
+      {
+        /* Otherwise, call fetchHevyData() again if it's meant to be a separate fetch for this section */
+      }
+      {
+        hevyWorkoutsData.map((workout: Workout) => (
+          <HevyWorkoutCard workout={workout} />
+        ))
+      }
+    </div>
   </SectionLayout>
 </Base>
 
