@@ -58,3 +58,9 @@ Matrix look and feel UI for your fitness data.
 - `bun lint`: Lints code using ESLint.
 - `bun test`: Runs tests using Vitest.
 - `bun strava-script`: Runs a specific Strava-related script.
+
+## Resources
+
+- [Hevy GitHub](https://github.com/dmzoneill/hevyapp-api): Hevy API documentation.
+- [Strava API Documentation](https://developers.strava.com/docs/reference/): Official Strava API documentation.
+- [Astro Documentation](https://docs.astro.build): Official Astro documentation for more details on building and deploying Astro sites.
