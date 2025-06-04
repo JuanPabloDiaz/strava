@@ -112,7 +112,13 @@ const fetchHevyData = async (apiKey?: string): Promise<any> => {
         "Unexpected data structure from Hevy API: No workouts found.",
       );
     }
-    return data.workouts[0];
+    // Sort workouts by start_time in descending order (newest first)
+    const sortedWorkouts = data.workouts.sort((a: Workout, b: Workout) => {
+      return (
+        new Date(b.start_time).getTime() - new Date(a.start_time).getTime()
+      );
+    });
+    return sortedWorkouts;
   } catch (error) {
     console.error("Error during fetchHevyData execution:", error);
     throw error;
