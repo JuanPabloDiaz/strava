@@ -4,7 +4,7 @@
     "": {
       "name": "fit",
       "dependencies": {
-        "@astrojs/check": "0.9.4",
+        "@astrojs/check": "^0.9.4",
         "@astrojs/prefetch": "^0.4.1",
         "@astrojs/sitemap": "3.3.1",
         "@mapbox/polyline": "^1.2.1",
@@ -17,7 +17,7 @@
         "rehype-katex": "^7.0.0",
         "sharp": "^0.33.3",
         "simplify-js": "^1.2.4",
-        "typescript": "^5.4.2",
+        "typescript": "^5.8.3",
       },
       "devDependencies": {
         "@astrojs/tailwind": "^6.0.2",
