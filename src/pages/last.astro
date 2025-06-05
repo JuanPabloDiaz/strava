@@ -2,6 +2,7 @@
 import SectionLayout from "@components/SectionLayout.astro";
 import DaysSinceLast from "@components/DaysSinceLast.astro";
 import Base from "@layouts/Base.astro";
+import { PAGE_METADATA } from "../consts";
 import {
   fetchDistanceData,
   processDistanceData,
@@ -68,6 +69,9 @@ if (pageParam) {
 ---
 
 <Base
+  title={PAGE_METADATA.last.title}
+  description={PAGE_METADATA.last.description}
+  keywords={PAGE_METADATA.last.keywords}
   title="Activity Status Monitor"
   windowTitle="LAST_ACTIVITY_TRACKER"
   terminalCommand="./monitor_athlete_performance.exe"

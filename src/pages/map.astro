@@ -1,5 +1,6 @@
 ---
 import Base from "@layouts/Base.astro";
+import { PAGE_METADATA } from "../consts";
 import SectionLayout from "@components/SectionLayout.astro";
 import ActivityFilters from "@components/ActivityFilters.astro";
 import ActivityCard from "@components/ActivityCard.astro";
@@ -29,7 +30,9 @@ const isLastPage = recentActivities.length < activitiesPerPage;
 ---
 
 <Base
-  title="Activity Map - Matrix Interface"
+  title={PAGE_METADATA.map.title}
+  description={PAGE_METADATA.map.description}
+  keywords={PAGE_METADATA.map.keywords}
   windowTitle="GEOSPATIAL_TRACKING_MODULE"
   terminalCommand="./initialize_gps_matrix.exe"
   systemMessage="[SYSTEM] Loading geospatial neural network... GPS satellites locked."

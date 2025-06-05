@@ -3,8 +3,12 @@ import "@styles/matrixAnimations.css";
 import Footer from "@components/Footer.astro";
 import Navigation from "@components/Navigation.astro";
 
+import type { PageMeta } from "../consts";
+
 export interface Props {
   title?: string;
+  description?: string;
+  keywords?: string[];
   windowTitle?: string;
   terminalCommand?: string;
   systemMessage?: string;
@@ -12,6 +16,8 @@ export interface Props {
 
 const {
   title = "Matrix Terminal",
+  description = "Matrix-themed Hacker Terminal Interface",
+  keywords = ["matrix", "terminal", "strava", "juan diaz"],
   windowTitle = "NEURAL_INTERFACE_v2.1",
   terminalCommand = "./boot_system.exe",
   systemMessage = "[SYSTEM] Initializing neural pathways...",
@@ -24,12 +30,10 @@ const currentPath = Astro.url.pathname;
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <meta
-      name="description"
-      content="Matrix-themed Hacker Terminal Interface"
-    />
+    <meta name="description" content={description} />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="author" content="Juan Diaz" />
+    <meta name="keywords" content={keywords.join(", ")} />
     <link rel="icon" type="image/x-icon" href="/favicon.ico" />
     <title>{title}</title>
   </head>

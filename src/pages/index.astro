@@ -1,5 +1,6 @@
 ---
 import Base from "@layouts/Base.astro";
+import { PAGE_METADATA } from "../consts";
 import SectionLayout from "@components/SectionLayout.astro";
 // import DaysSinceLast from "@components/DaysSinceLast.astro";
 import HeatmapGrid from "@components/HeatmapGrid.astro";
@@ -32,7 +33,9 @@ try {
 ---
 
 <Base
-  title="Strava Matrix Tracker"
+  title={PAGE_METADATA.index.title}
+  description={PAGE_METADATA.index.description}
+  keywords={PAGE_METADATA.index.keywords}
   windowTitle="ROOT"
   terminalCommand="./run_activity_monitor.exe"
   systemMessage="[SYSTEM] Loading neural activity patterns... Strava API connected."
