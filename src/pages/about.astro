@@ -1,0 +1,461 @@
+---
+import Base from "@layouts/Base.astro";
+import SectionLayout from "@components/SectionLayout.astro";
+---
+
+<Base
+  title="About - The Architect's Vision"
+  windowTitle="ARCHITECT_PROFILE_LOADED"
+  terminalCommand="./about_creator.exe --profile=juan_diaz"
+  systemMessage="[INFO] Loading architect neural profile... Connection established."
+>
+  <!-- Header Section -->
+  <div class="header-section text-center mb-12">
+    <div
+      class="text-green-400 text-4xl md:text-6xl font-bold font-mono mb-4 animate-pulse"
+    >
+      [THE_ARCHITECT]
+    </div>
+    <div class="text-green-300 text-lg md:text-xl font-mono">
+      Juan Pablo Diaz - Creator of the Fitness Matrix
+    </div>
+    <div class="text-green-400/60 text-sm font-mono mt-2 animate-pulse">
+      Reality: Technology Professional | Mission: Health Optimization
+    </div>
+  </div>
+
+  <!-- Profile Matrix Section -->
+  <SectionLayout
+    title="[NEURAL_PROFILE_SCAN]"
+    rightHeaderText="[ARCHITECT_STATUS]"
+  >
+    <div
+      slot="headerElements"
+      class="w-2 h-2 bg-green-500 rounded-full animate-pulse"
+    >
+    </div>
+
+    <div class="profile-matrix">
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6 text-sm font-mono">
+        <div class="profile-stats space-y-3">
+          <div class="stat-line">
+            <span class="text-green-500">[NAME]</span>
+            <span class="text-green-300 ml-4">Juan Pablo Diaz</span>
+          </div>
+          <div class="stat-line">
+            <span class="text-green-500">[ROLE]</span>
+            <span class="text-green-300 ml-4">Full-Stack Developer</span>
+          </div>
+          <div class="stat-line">
+            <span class="text-green-500">[SPECIALIZATION]</span>
+            <span class="text-green-300 ml-4"
+              >Data Visualization & Health Tech</span
+            >
+          </div>
+          <div class="stat-line">
+            <span class="text-green-500">[WEBSITE]</span>
+            <span class="text-green-300 ml-4">
+              <a
+                href="https://jpdiaz.dev"
+                target="_blank"
+                class="hover:text-green-400 transition-colors"
+              >
+                jpdiaz.dev ↗
+              </a>
+            </span>
+          </div>
+        </div>
+
+        <div class="mission-stats space-y-3">
+          <div class="stat-line">
+            <span class="text-yellow-500">[PROBLEM]</span>
+            <span class="text-yellow-300 ml-4">Sedentary tech lifestyle</span>
+          </div>
+          <div class="stat-line">
+            <span class="text-blue-500">[SOLUTION]</span>
+            <span class="text-blue-300 ml-4">Data-driven fitness tracking</span>
+          </div>
+          <div class="stat-line">
+            <span class="text-red-500">[MOTIVATION]</span>
+            <span class="text-red-300 ml-4"
+              >Health optimization through tech</span
+            >
+          </div>
+          <div class="stat-line">
+            <span class="text-purple-500">[STATUS]</span>
+            <span class="text-purple-300 ml-4 animate-pulse"
+              >ACTIVELY_IMPROVING</span
+            >
+          </div>
+        </div>
+      </div>
+    </div>
+  </SectionLayout>
+
+  <!-- Origin Story Section -->
+  <SectionLayout
+    title="[ORIGIN_STORY]"
+    rightHeaderText="[THE_PROBLEM_I_SOLVED]"
+  >
+    <div
+      slot="headerElements"
+      class="w-2 h-2 bg-red-500 rounded-full animate-pulse"
+    >
+    </div>
+
+    <div
+      class="story-content space-y-6 text-green-300 font-mono text-sm leading-relaxed"
+    >
+      <div class="story-block">
+        <span class="text-red-400">[PROBLEM_IDENTIFIED]</span>
+        <p class="mt-2 ml-4">
+          As a technology professional, I found myself trapped in the digital
+          matrix—spending countless hours in front of screens, building
+          software, solving complex problems, but neglecting the most important
+          system of all: my own body. The sedentary lifestyle was affecting my
+          health and energy.
+        </p>
+      </div>
+
+      <div class="story-block">
+        <span class="text-yellow-400">[WAKE_UP_CALL]</span>
+        <p class="mt-2 ml-4">
+          I realized that my passion for data and technology could be part of
+          the solution, not just the problem. If I could visualize code
+          performance and system metrics with beautiful dashboards, why couldn't
+          I do the same with my fitness journey?
+        </p>
+      </div>
+
+      <div class="story-block">
+        <span class="text-green-400">[SOLUTION_MATRIX]</span>
+        <p class="mt-2 ml-4">
+          Thus, FIT was born—not just as another fitness app, but as a way to
+          gamify my health journey. By combining my love for the Matrix
+          aesthetic with real-world fitness data from Strava and Hevy, I created
+          something that would motivate me to stay active while satisfying my
+          inner data nerd.
+        </p>
+      </div>
+
+      <div class="story-block">
+        <span class="text-blue-400">[MISSION_STATEMENT]</span>
+        <p class="mt-2 ml-4">
+          This project represents my commitment to breaking free from the
+          unhealthy patterns of tech life. Every line of code written here is a
+          step toward better health, and every workout tracked is a victory
+          against the sedentary matrix that tried to trap me.
+        </p>
+      </div>
+    </div>
+  </SectionLayout>
+
+  <!-- Philosophy Matrix Section -->
+  <SectionLayout
+    title="[ARCHITECT_PHILOSOPHY]"
+    rightHeaderText="[CORE_PRINCIPLES]"
+  >
+    <div
+      slot="headerElements"
+      class="w-2 h-2 bg-blue-500 rounded-full animate-pulse"
+    >
+    </div>
+
+    <div
+      class="philosophy-grid grid grid-cols-1 md:grid-cols-3 gap-6 font-mono"
+    >
+      <div
+        class="philosophy-item text-center p-4 bg-black/40 rounded border border-green-500/20 hover:border-green-500/50 transition-all"
+      >
+        <div class="text-green-500 text-2xl mb-3">💻</div>
+        <div class="text-green-400 mb-2 font-bold text-sm">
+          CODE_WITH_PURPOSE
+        </div>
+        <div class="text-green-300/80 text-xs">
+          Every project should solve a real problem, starting with your own
+        </div>
+      </div>
+
+      <div
+        class="philosophy-item text-center p-4 bg-black/40 rounded border border-green-500/20 hover:border-green-500/50 transition-all"
+      >
+        <div class="text-green-500 text-2xl mb-3">📊</div>
+        <div class="text-green-400 mb-2 font-bold text-sm">
+          DATA_DRIVEN_LIFE
+        </div>
+        <div class="text-green-300/80 text-xs">
+          Visualize everything—from system metrics to personal health
+        </div>
+      </div>
+
+      <div
+        class="philosophy-item text-center p-4 bg-black/40 rounded border border-green-500/20 hover:border-green-500/50 transition-all"
+      >
+        <div class="text-green-500 text-2xl mb-3">🏃‍♂️</div>
+        <div class="text-green-400 mb-2 font-bold text-sm">
+          BREAK_THE_MATRIX
+        </div>
+        <div class="text-green-300/80 text-xs">
+          Don't let technology consume you—use it to improve yourself
+        </div>
+      </div>
+    </div>
+  </SectionLayout>
+
+  <!-- Technology Matrix Section -->
+  <SectionLayout
+    title="[TECHNOLOGY_MATRIX]"
+    rightHeaderText="[TOOLS_OF_CHOICE]"
+  >
+    <div
+      slot="headerElements"
+      class="w-2 h-2 bg-purple-500 rounded-full animate-pulse"
+    >
+    </div>
+
+    <div class="tech-grid grid grid-cols-2 md:grid-cols-4 gap-4 font-mono">
+      <div
+        class="tech-item text-center p-4 bg-black/40 rounded border border-green-500/20 hover:border-green-500/50 transition-all"
+      >
+        <div class="text-green-400 font-bold text-sm">ASTRO</div>
+        <div class="text-green-300/60 text-xs mt-1">Static Generation</div>
+      </div>
+      <div
+        class="tech-item text-center p-4 bg-black/40 rounded border border-green-500/20 hover:border-green-500/50 transition-all"
+      >
+        <div class="text-green-400 font-bold text-sm">TYPESCRIPT</div>
+        <div class="text-green-300/60 text-xs mt-1">Type Safety</div>
+      </div>
+      <div
+        class="tech-item text-center p-4 bg-black/40 rounded border border-green-500/20 hover:border-green-500/50 transition-all"
+      >
+        <div class="text-green-400 font-bold text-sm">TAILWIND</div>
+        <div class="text-green-300/60 text-xs mt-1">Rapid Styling</div>
+      </div>
+      <div
+        class="tech-item text-center p-4 bg-black/40 rounded border border-green-500/20 hover:border-green-500/50 transition-all"
+      >
+        <div class="text-green-400 font-bold text-sm">BUN</div>
+        <div class="text-green-300/60 text-xs mt-1">Lightning Fast</div>
+      </div>
+      <div
+        class="tech-item text-center p-4 bg-black/40 rounded border border-green-500/20 hover:border-green-500/50 transition-all"
+      >
+        <div class="text-green-400 font-bold text-sm">STRAVA API</div>
+        <div class="text-green-300/60 text-xs mt-1">Activity Tracking</div>
+      </div>
+      <div
+        class="tech-item text-center p-4 bg-black/40 rounded border border-green-500/20 hover:border-green-500/50 transition-all"
+      >
+        <div class="text-green-400 font-bold text-sm">HEVY API</div>
+        <div class="text-green-300/60 text-xs mt-1">Workout Data</div>
+      </div>
+      <div
+        class="tech-item text-center p-4 bg-black/40 rounded border border-green-500/20 hover:border-green-500/50 transition-all"
+      >
+        <div class="text-green-400 font-bold text-sm">VITEST</div>
+        <div class="text-green-300/60 text-xs mt-1">Testing</div>
+      </div>
+      <div
+        class="tech-item text-center p-4 bg-black/40 rounded border border-green-500/20 hover:border-green-500/50 transition-all"
+      >
+        <div class="text-green-400 font-bold text-sm">VERCEL</div>
+        <div class="text-green-300/60 text-xs mt-1">Deployment</div>
+      </div>
+    </div>
+  </SectionLayout>
+
+  <!-- Project Impact Section -->
+  <SectionLayout
+    title="[PROJECT_IMPACT_ANALYSIS]"
+    rightHeaderText="[REAL_WORLD_RESULTS]"
+  >
+    <div
+      slot="headerElements"
+      class="w-2 h-2 bg-yellow-500 rounded-full animate-pulse"
+    >
+    </div>
+
+    <div
+      class="impact-grid grid grid-cols-1 md:grid-cols-2 gap-4 font-mono text-sm"
+    >
+      <div
+        class="impact-item flex items-center justify-between p-4 bg-black/40 rounded border border-green-500/20"
+      >
+        <span class="text-green-300">Personal Health Improvement:</span>
+        <span class="text-green-400 animate-pulse">ACTIVE</span>
+      </div>
+
+      <div
+        class="impact-item flex items-center justify-between p-4 bg-black/40 rounded border border-green-500/20"
+      >
+        <span class="text-green-300">Technology Skills Enhancement:</span>
+        <span class="text-green-400 animate-pulse">LEVELING_UP</span>
+      </div>
+
+      <div
+        class="impact-item flex items-center justify-between p-4 bg-black/40 rounded border border-green-500/20"
+      >
+        <span class="text-green-300">Work-Life Balance:</span>
+        <span class="text-green-400 animate-pulse">OPTIMIZING</span>
+      </div>
+
+      <div
+        class="impact-item flex items-center justify-between p-4 bg-black/40 rounded border border-green-500/20"
+      >
+        <span class="text-green-300">Open Source Contribution:</span>
+        <span class="text-green-400 animate-pulse">SHARING_KNOWLEDGE</span>
+      </div>
+    </div>
+  </SectionLayout>
+
+  <!-- Call to Action Section -->
+  <SectionLayout
+    title="[JOIN_THE_MOVEMENT]"
+    rightHeaderText="[BREAK_YOUR_MATRIX]"
+  >
+    <div
+      slot="headerElements"
+      class="w-2 h-2 bg-red-500 rounded-full animate-pulse"
+    >
+    </div>
+
+    <div class="cta-content text-center mb-8">
+      <div class="text-green-300 font-mono text-sm mb-4">
+        Ready to break free from your own digital matrix?
+      </div>
+      <div class="text-green-400/80 font-mono text-xs mb-6">
+        Transform your health journey with data-driven fitness tracking
+      </div>
+    </div>
+
+    <div class="cta-grid grid grid-cols-1 md:grid-cols-2 gap-4">
+      <a
+        href="https://github.com/JuanPabloDiaz/fit"
+        target="_blank"
+        rel="noopener noreferrer"
+        class="cta-button group bg-black/60 border border-green-500/40 rounded-lg p-6 hover:border-green-400 hover:bg-green-500/10 transition-all duration-300 text-center"
+      >
+        <div class="text-green-400 font-mono text-sm font-bold mb-2">
+          [EXPLORE_CODE]
+        </div>
+        <div class="text-green-300/80 text-xs">
+          Fork, customize, and contribute to the project
+        </div>
+        <div class="text-green-500/60 text-xs mt-2">
+          github.com/JuanPabloDiaz/fit ↗
+        </div>
+      </a>
+
+      <a
+        href="https://jpdiaz.dev"
+        target="_blank"
+        rel="noopener noreferrer"
+        class="cta-button group bg-black/60 border border-green-500/40 rounded-lg p-6 hover:border-green-400 hover:bg-green-500/10 transition-all duration-300 text-center"
+      >
+        <div class="text-green-400 font-mono text-sm font-bold mb-2">
+          [VISIT_PORTFOLIO]
+        </div>
+        <div class="text-green-300/80 text-xs">
+          Explore more projects and connect
+        </div>
+        <div class="text-green-500/60 text-xs mt-2">jpdiaz.dev ↗</div>
+      </a>
+    </div>
+  </SectionLayout>
+</Base>
+
+<style>
+  .story-block {
+    padding: 1rem;
+    border-left: 2px solid rgba(0, 255, 0, 0.3);
+    margin-left: 1rem;
+    transition: border-color 0.3s ease;
+    background: rgba(0, 0, 0, 0.2);
+    border-radius: 0 8px 8px 0;
+  }
+
+  .story-block:hover {
+    border-left-color: rgba(0, 255, 0, 0.6);
+    background: rgba(0, 255, 0, 0.05);
+  }
+
+  .philosophy-item,
+  .tech-item,
+  .impact-item {
+    transition: all 0.3s ease;
+  }
+
+  .philosophy-item:hover,
+  .tech-item:hover,
+  .impact-item:hover {
+    transform: translateY(-2px);
+    border-color: rgba(0, 255, 0, 0.6);
+    box-shadow: 0 4px 12px rgba(0, 255, 0, 0.2);
+  }
+
+  .cta-button {
+    position: relative;
+    overflow: hidden;
+    text-decoration: none;
+  }
+
+  .cta-button::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(
+      45deg,
+      transparent,
+      rgba(0, 255, 0, 0.1),
+      transparent
+    );
+    transform: translateX(-100%);
+    transition: transform 0.6s ease;
+  }
+
+  .cta-button:hover::before {
+    transform: translateX(100%);
+  }
+
+  .stat-line {
+    display: flex;
+    align-items: center;
+    padding: 0.5rem 0;
+    border-bottom: 1px solid rgba(0, 255, 0, 0.1);
+  }
+
+  .stat-line:last-child {
+    border-bottom: none;
+  }
+
+  .header-section {
+    animation: matrixFadeIn 1.5s ease-out;
+  }
+
+  @keyframes matrixFadeIn {
+    from {
+      opacity: 0;
+      transform: translateY(20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  @media (max-width: 768px) {
+    .story-block {
+      margin-left: 0.5rem;
+      padding: 0.75rem;
+    }
+
+    .cta-grid {
+      gap: 1rem;
+    }
+
+    .header-section {
+      margin-bottom: 2rem;
+    }
+  }
+</style>

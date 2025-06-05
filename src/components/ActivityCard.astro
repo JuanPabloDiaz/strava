@@ -26,86 +26,47 @@ const activityType = activity.type || activity.sport_type || "Unknown";
 ---
 
 <div class="activity-card" data-activity-type={activityType}>
-  <h2>{activity.name}</h2>
-  <p><strong>Date:</strong> {activityDate}</p>
-  <p><strong>Duration:</strong> {durationFormatted}</p>
-  <p><strong>Distance:</strong> {distanceFormatted}</p>
-  <p><strong>Type:</strong> {activity.type} ({activity.sport_type})</p>
+  <h2 class="text-lg font-bold">{activity.name}</h2>
+  <div class="grid grid-cols-2 gap-4 md:grid-cols-2 lg:grid-cols-4">
+    <p><strong>Date:</strong> {activityDate}</p>
+    <p><strong>Duration:</strong> {durationFormatted}</p>
+    <p><strong>Distance:</strong> {distanceFormatted}</p>
+    <p><strong>Type:</strong> {activity.type} ({activity.sport_type})</p>
+  </div>
   {
     hasGpsData ? (
       <ActivityMap activities={[activity]} />
     ) : (
-      <div class="activity-no-map-placeholder">
-        <p>No map data available for this activity.</p>
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          width="24"
-          height="24"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          stroke-width="2"
-          stroke-linecap="round"
-          stroke-linejoin="round"
-        >
-          <path d="M12 22s-8-4.5-8-11.5a8 8 0 0 1 16 0c0 7-8 11.5-8 11.5z" />
-          <line x1="7" y1="7" x2="17" y2="17" />
-          <path d="M10 9a3 3 0 0 1 3-3" />
-        </svg>
-      </div>
+      <p>No GPS data available</p>
     )
   }
-  <!-- TODO: Display heart rate if available -->
 </div>
 
 <style>
   .activity-card {
-    border: 1px solid #0f0; /* Matrix green border */
+    border: 1px solid #0f0;
     padding: 1.5em;
     margin-bottom: 1.5em;
-    background-color: #0a0a0a; /* Darker background */
+    background-color: #0a0a0a;
     color: #ccc;
-    font-family: "Courier New", Courier, monospace; /* Monospaced font */
-    box-shadow: 0 0 10px #0f0; /* Green glow effect */
+    font-family: "Courier New", Courier, monospace;
+    box-shadow: 0 0 10px #0f0;
   }
 
   .activity-card h2 {
     margin-top: 0;
     margin-bottom: 0.75em;
-    color: #0f0; /* Matrix green */
+    color: #0f0;
     text-shadow: 0 0 5px #0f0;
   }
 
   .activity-card p {
     margin-bottom: 0.5em;
     line-height: 1.6;
-    color: #ddd; /* Lighter grey for paragraph text */
+    color: #ddd;
   }
 
   .activity-card p strong {
-    color: #0f0; /* Green for emphasized parts */
-  }
-
-  .activity-no-map-placeholder {
-    border: 1px solid #0f0; /* Matrix green border */
-    padding: 1.5em; /* Consistent with the card's padding */
-    margin-top: 1em; /* Space below activity details */
-    background-color: #0a0a0a; /* Darker background, same as card */
-    color: #ccc; /* Main text color */
-    font-family: "Courier New", Courier, monospace; /* Monospaced font */
-    box-shadow: 0 0 10px #0f0; /* Green glow effect */
-    text-align: center; /* Center the message and icon */
-  }
-
-  .activity-no-map-placeholder p {
-    margin-bottom: 0.5em;
-    color: #0f0; /* Matrix green for emphasis */
-  }
-
-  .activity-no-map-placeholder svg {
-    stroke: #0f0; /* Matrix green for the icon lines */
-    width: 48px; /* Adjusted for visual balance */
-    height: 48px; /* Adjusted for visual balance */
-    margin-top: 0.5em; /* Space between message and icon */
+    color: #0f0;
   }
 </style>

@@ -1,8 +1,8 @@
-# Fit 🏃‍♂️💪
+# The Fitness Matrix 🏃‍♂️💪
 
 > Transform your fitness data into a Matrix-inspired visual experience.
 
-Fit is a cutting-edge web application that revolutionizes how you visualize and analyze your fitness data. By seamlessly integrating Strava and Hevy APIs, it delivers an immersive, Matrix-themed interface that makes tracking your physical performance both engaging and insightful.
+The Fitness Matrix is a cutting-edge web application that revolutionizes how you visualize and analyze your fitness data. By seamlessly integrating Strava and Hevy APIs, it delivers an immersive, Matrix-themed interface that makes tracking your physical performance both engaging and insightful.
 
 <div align="center">
 
@@ -18,7 +18,7 @@ _Transform your fitness journey into a visual masterpiece_
 
 ## 🔍 About
 
-Fit transforms your fitness journey into a visual masterpiece. This innovative platform combines the power of Strava's activity tracking with Hevy's strength training data, presenting everything through a captivating Matrix-inspired interface that makes data analysis both intuitive and visually stunning.
+The Fitness Matrix transforms your fitness journey into a visual masterpiece. This innovative platform combines the power of Strava's activity tracking with Hevy's strength training data, presenting everything through a captivating Matrix-inspired interface that makes data analysis both intuitive and visually stunning.
 
 **Key Features:**
 
