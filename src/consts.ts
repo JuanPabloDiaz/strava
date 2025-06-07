@@ -1,5 +1,5 @@
 export const SITE_TITLE = "Fit";
-export const SITE_DESCRIPTION = "Strava";
+export const SITE_DESCRIPTION = "";
 export const SITE_AUTHOR = "Juan Diaz";
 export const SITE_URL = "https://fit.jpdiaz.dev";
 export const SITE_PORTFOLIO = "https://jpdiaz.dev";
