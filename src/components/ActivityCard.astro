@@ -31,7 +31,15 @@ const activityType = activity.type || activity.sport_type || "Unknown";
     <p><strong>Date:</strong> {activityDate}</p>
     <p><strong>Duration:</strong> {durationFormatted}</p>
     <p><strong>Distance:</strong> {distanceFormatted}</p>
-    <p><strong>Type:</strong> {activity.type} ({activity.sport_type})</p>
+    <p>
+      <strong>Type:</strong>
+      {activity.type}
+      {
+        activity.type !== activity.sport_type && activity.sport_type
+          ? ` (${activity.sport_type})`
+          : ""
+      }
+    </p>
   </div>
   {
     hasGpsData ? (
@@ -51,6 +59,7 @@ const activityType = activity.type || activity.sport_type || "Unknown";
     color: #ccc;
     font-family: "Courier New", Courier, monospace;
     box-shadow: 0 0 10px #0f0;
+    border-radius: 0.5em;
   }
 
   .activity-card h2 {
@@ -68,5 +77,12 @@ const activityType = activity.type || activity.sport_type || "Unknown";
 
   .activity-card p strong {
     color: #0f0;
+  }
+  .activity-card:hover {
+    background-color: #121212;
+    box-shadow: 0 0 15px #0f0;
+    transition:
+      background-color 0.3s,
+      box-shadow 0.3s;
   }
 </style>
