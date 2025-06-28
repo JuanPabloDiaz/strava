@@ -36,17 +36,13 @@ const currentPath = Astro.url.pathname;
     <meta name="keywords" content={keywords.join(", ")} />
     <link rel="icon" type="image/x-icon" href="/favicon.ico" />
     <title>{title}</title>
-    <script async src="https://www.googletagmanager.com/gtag/js?id=G-9ZZXEM92EB"
-    ></script>
-    <script
-      dangerouslySetInnerHTML={{
-        __html: `
-              window.dataLayer = window.dataLayer || [];
-              function gtag(){dataLayer.push(arguments);}
-              gtag('js', new Date());
-              gtag('config', 'G-9ZZXEM92EB');
-            `,
-      }}></script>
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-9ZZXEM92EB" is:inline></script>
+    <script is:inline>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', 'G-9ZZXEM92EB');
+    </script>
   </head>
   <body class="bg-black text-green-400 font-mono overflow-x-hidden">
     <!-- Matrix Rain Background -->
